@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
+
 const UserSchema = new mongoose.Schema({
+  category:{
+    type: [String],
+  },
   userEmail: {
     type: String,
     required: true,
@@ -21,16 +25,11 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
-//UserSchema.virtual("userId").get(function () {
- // return this._id.toHexString();
-//});
+UserSchema.virtual("userId").get(function () {
+ return this._id.toHexString();
+});
 
-
-//UserSchema.set("toJSON", {
- // virtuals: true,
-//});
-
-//UserSchema.index({location: "2dsphere"});
+UserSchema.index({location: "2dsphere"});
 
 UserSchema.set("toJSON", {virtuals: true,});
 

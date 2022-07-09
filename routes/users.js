@@ -3,14 +3,10 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../schemas/user");
 const authMiddleware = require('../middlewares/auth-middleware');
-const user = require("../schemas/user");
 const bcrypt = require('bcrypt');
 const mailer = require("../mail/passwordEmail");
+
 require("dotenv").config();
-
-
-
-
 
 //signup
 router.post('/signup', async (req, res) => {
@@ -41,6 +37,7 @@ router.post('/signup', async (req, res) => {
       });
       await user.save();
       res.status(201).json({ message: "회원가입이 완료!"});
+      //res.status(201).send({ message: "회원가입이 완료!" });
     }
      catch (err) {
       console.log(err);
@@ -53,11 +50,40 @@ router.post('/signup', async (req, res) => {
 
 
 
+
+
+//refreshToken check
+router.post('/refresh', (req, res) => {
+  if (req.cookies?.jwt) {
+      // Destructuring refreshToken from cookie
+      const refreshToken = req.cookies.jwt;
+      // Verifying refresh token
+      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, 
+      (err, decoded) => {
+          if (err) {
+              // Wrong Refesh Token
+              return res.status(406).json({ message: 'Unauthorized' });
+          }else {
+              // Correct token we send a new access token
+              const accessToken = jwt.sign({
+                  userEmail: user.userEmail
+              }, process.env.ACCESS_TOKEN_SECRET, {
+                  expiresIn: '10m'
+              });
+              return res.json({ accessToken });
+          };
+      });} else {
+      return res.status(406).json({ message: 'Unauthorized' });
+  };
+});
+
+
 // login
 router.post("/login", async (req, res) => {
   try {
     const { userEmail, password } = await (req.body);
     const user = await User.findOne({ userEmail: userEmail }).exec();
+
     if (!user) {
       res.status(400).send({
         errorMessage: "이메일 또는 비밀번호를 확인해주세요.",
@@ -98,7 +124,7 @@ router.post('/refresh', (req, res) => {
       (err, decoded) => {
           if (err) {
               // Wrong Refesh Token
-              return res.status(406).json({ message: 'Unauthorized 111' });
+              return res.status(406).json({ message: 'Unauthorized' });
           }else {
               // Correct token we send a new access token
               const accessToken = jwt.sign({
@@ -114,9 +140,6 @@ router.post('/refresh', (req, res) => {
 });
 
 
-
-
-//id_check
 router.get('/id_check', async (req, res) => {
   const { phoneNumber } = req.body;
   try {
@@ -126,7 +149,7 @@ router.get('/id_check', async (req, res) => {
       });
       return;
     }
-    const user = await User.findOne({ where: { phoneNumber: phoneNumber } });
+    const user = await User.findOne({phoneNumber: phoneNumber});
     console.log(user);
     if (!user) {
       res.status(406).send({ errorMessage: "존재하지 않는 번호입니다" });
@@ -141,6 +164,8 @@ router.get('/id_check', async (req, res) => {
     res.status(400).json({ errorMessage: "fail" });
   }
 });
+
+
 
 
 
@@ -165,7 +190,6 @@ router.post('/password_check', async (req, res) => {
       { password: hashPassword },
       { where: { userEmail: userEmail } }
     );
-
     let emailParam = {
       toEmail: userEmail, // 수신할 이메일
       subject: "petsitter 임시 비밀번호 메일발송", // 메일 제목
@@ -179,7 +203,6 @@ router.post('/password_check', async (req, res) => {
   }});
 
 
-  
 
 //usercheck 
 router.get('/auth', authMiddleware, (req, res) => {

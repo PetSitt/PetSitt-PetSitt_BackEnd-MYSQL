@@ -33,7 +33,6 @@ router.get("/:sitterId", async(req, res) => {
     });
   }
 
-
   res.status(200).send({
     user: {
       userName:  user_info.userName,

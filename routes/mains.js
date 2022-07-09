@@ -32,11 +32,11 @@ router.get(
 
 
 router.get("/search/:category",async(req,res) => {
-   const {category} = req.params;
-   const categories = await Sitter.find({category})
-   res.send({
+  const {category} = req.params;
+  const categories = await Sitter.find({category})
+  res.send({
       categories
-   })
+  })
 });
 module.exports = router;
 
