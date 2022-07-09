@@ -19,7 +19,7 @@ const s3 = new AWS.S3({
 const storage = multerS3({
     s3: s3,
     acl: 'public-read-write',
-    bucket: "avostorage",   // s3 버킷명+경로
+    bucket: process.env.MY_S3_BUCKET || "avostorage",   // s3 버킷명+경로
     key: (req, file, callback) => {
     	let dir = req.body.dir;
         let datetime = moment().format('YYYYMMDDHHmmss');
