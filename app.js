@@ -1,6 +1,7 @@
 const express = require("express");
 const connect_MongoDB = require("./schemas/connect_db");
-const detailsRouter = require("./routes/details.js");
+const {sequelize} = require("./models");
+
 const reviewsRouter = require("./routes/reviews.js");
 const mainRouter = require("./routes/mains.js");
 const testRouter = require("./routes/test_tools.js");
@@ -40,7 +41,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api",[userRouter]);
-app.use("/details", [detailsRouter]);
+
 app.use("/reviews", [reviewsRouter]);
 app.use("/mains", [mainRouter]);
 app.use("/tests", [testRouter]);
