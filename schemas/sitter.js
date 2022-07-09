@@ -77,12 +77,16 @@ const SitterSchema = new mongoose.Schema({
   rehireRate: {
     type: Number,
     default: 0,
+  },
+  totalReview:{
+    type: Number,
   }
 });
 
 SitterSchema.virtual("sitterId").get(function () {
   return this._id.toHexString();
 });
+
 SitterSchema.set("toJSON", {
   virtuals: true,
 });

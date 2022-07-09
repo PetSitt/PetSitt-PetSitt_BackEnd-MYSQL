@@ -1,16 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const User = require("../schemas/user");
 const authMiddleware = require('../middlewares/auth-middleware');
-const user = require("../schemas/user");
+const {User} = require("../schemas/user");
 const bcrypt = require('bcrypt');
+const { route } = require("express/lib/application");
+const nodemailer = require("nodemailer");
 const mailer = require("../mail/passwordEmail");
+
 require("dotenv").config();
-
-
-
-
 
 //signup
 router.post('/signup', async (req, res) => {
@@ -41,6 +39,7 @@ router.post('/signup', async (req, res) => {
       });
       await user.save();
       res.status(201).json({ message: "회원가입이 완료!"});
+      //res.status(201).send({ message: "회원가입이 완료!" });
     }
      catch (err) {
       console.log(err);
@@ -51,6 +50,30 @@ router.post('/signup', async (req, res) => {
   });
 
 
+//refreshToken check
+router.post('/refresh', (req, res) => {
+  if (req.cookies?.jwt) {
+      // Destructuring refreshToken from cookie
+      const refreshToken = req.cookies.jwt;
+      // Verifying refresh token
+      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, 
+      (err, decoded) => {
+          if (err) {
+              // Wrong Refesh Token
+              return res.status(406).json({ message: 'Unauthorized' });
+          }else {
+              // Correct token we send a new access token
+              const accessToken = jwt.sign({
+                  userEmail: user.userEmail
+              }, process.env.ACCESS_TOKEN_SECRET, {
+                  expiresIn: '10m'
+              });
+              return res.json({ accessToken });
+          };
+      });} else {
+      return res.status(406).json({ message: 'Unauthorized' });
+  };
+});
 
 
 // login
@@ -58,6 +81,7 @@ router.post("/login", async (req, res) => {
   try {
     const { userEmail, password } = await (req.body);
     const user = await User.findOne({ userEmail: userEmail }).exec();
+
     if (!user) {
       res.status(400).send({
         errorMessage: "이메일 또는 비밀번호를 확인해주세요.",
@@ -179,7 +203,6 @@ router.post('/password_check', async (req, res) => {
   }});
 
 
-  
 
 //usercheck 
 router.get('/auth', authMiddleware, (req, res) => {
@@ -196,6 +219,7 @@ router.get('/auth', authMiddleware, (req, res) => {
     });
   }
 });
+
 
 
 module.exports = router;

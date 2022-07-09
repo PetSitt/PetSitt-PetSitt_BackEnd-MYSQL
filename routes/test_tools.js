@@ -13,6 +13,17 @@ require("dotenv").config();
 * /adduser 사용후
 * /addpet, /addsitter 순서 상관없이 1번씩 api접근하시면 됩니다!
 */
+router.post("/", async (req, res)=>{
+  console.log("들어옵니다!");
+  const { test } = req.body;
+
+  console.log("배열?: ", test);
+  const decode_test = JSON.parse(test);
+
+  console.log(decode_test);
+
+  res.status(200).send({ msg : "성공"});
+});
 
 
 //테스트용 유저 넣는 api입니다.
@@ -63,29 +74,30 @@ router.post("/addpet", async (req, res) => {
                      "는 간식을 좋아해요"];
 
   if (users.length) {
-    users.map((user, index) => {
-      const petName  = r_arr_val(pet_first) + r_arr_val(pet_name);
-      const petType  = r_arr_val(pet_select);
-      const petIntro = petName + r_arr_val(pet_intro);
-
-      const pet =  new Pet ({ 
-        petName,
-        petType,
-        petIntro,
-        petImage:  process.env.AWS_IP + petType+ ".jpg",
-        petAge:    r_num() % 15,
-        petWeight: r_num() % 20,
-        petSpay:   r(),
-        userId:    user._id.toString()
-      });
-    
-      pet.save();
-    });
+    for (let i = 0; i < users.length; i++ ) {
+      for (let j = 0; j < r_num() % 3 + 1; j++) {
+        const petName  = r_arr_val(pet_first) + r_arr_val(pet_name);
+        const petType  = r_arr_val(pet_select);
+        const petIntro = petName + r_arr_val(pet_intro);
+        const pet =  new Pet ({ 
+          petName,
+          petType,
+          petIntro,
+          petImage:  process.env.AWS_IP + petType+ ".jpg",
+          petAge:    r_num() % 13 + 1,
+          petWeight: r_num() % 20 + 1,
+          petSpay:   r(),
+          userId:    users[i]._id.toString()
+        });
+      
+        pet.save();
+      }
+    }
   }
   res.send({msg: "성공"});
 });
 
-//유저 생성이후 정보 넣기
+//유저 생성이후 시터정보 넣기
 router.post("/addsitter", async (req, res) => {
   const users = await User.find({});
 
@@ -100,49 +112,68 @@ router.post("/addsitter", async (req, res) => {
                       "밍꾸와 함께하는 보금자리👭"];
 
   const r_house = ["house1.jpg",
-                 "house2.jpg",
-                 "house3.jpeg",
-                 "house4.jpeg"];
+                    "house2.jpg",
+                    "house3.jpeg",
+                    "house4.jpeg"];
 
 
   if (users.length > 0) {
-    users.map((user, index) => {
+    for(let index = 0; index < users.length; index++) {
+
+      if ( location_info.length === index ) break;
 
       const sitter = new Sitter({
-        userId:       user._id.toString(),
+        userId:       users[i]._id.toString(),
         imageUrl:     process.env.AWS_IP + "default.jpg",
         mainImageUrl: process.env.AWS_IP + r_arr_val(r_house),
         introTitle:   r_arr_val(title_text),
         myIntro:      `인트로확인용_${index}`,
         careSize:     [r()?true:false, r()?true:false, r()?true:false],
         category:     r_category(),
-        servicePrice: (r_num() %10 *10000) + (r_num() % 10 * 1000),
+        servicePrice: ((r_num() % 10 + 1) *10000) + ((r_num() % 10 + 1) * 1000),
         plusService:  r_plusService(),
         noDate:       r_date(),
         averageStar:  r_num() % 5 + 0.5*(r_num() % 2),
-        address:            location_info[index].address,
-        detailAddress:      location_info[index].detailAddress,
-        region_1depth_name: location_info[index].region_1depth_name,
-        region_2depth_name: location_info[index].region_2depth_name,
-        region_3depth_name: location_info[index].region_3depth_name,
+        address:            location_info[index]?.address,
+        detailAddress:      location_info[index]?.detailAddress,
+        region_1depth_name: location_info[index]?.region_1depth_name,
+        region_2depth_name: location_info[index]?.region_2depth_name,
+        region_3depth_name: location_info[index]?.region_3depth_name,
         location: {
           type: "Point",
           coordinates: [
-            location_info[index].x,
-            location_info[index].y
+            location_info[index]?.x,
+            location_info[index]?.y
           ],
         },
-        rehireRate:   r_num() % 100
+        rehireRate: r_num() % 100
       });
 
       sitter.save();
-    });
+    }
   }
-
+  
   res.send({msg:"성공"});
 });
 
+router.post("/addsitter", async (req, res) => {
+  const users = await User.find({});
+  const sitters = await Sitter.find({});
+  const pets = await Pet.find({});
 
+
+
+
+
+
+
+});
+
+
+
+
+
+//거리검색 테스트용
 router.get("/find", async (req, res) => {
 
   const users = await User.find({
@@ -183,7 +214,7 @@ const r_date = () => { // 기본형참고 - 2022/06/29
   for (let i = 0; i < r_num() % 4 + 3; i++) {
     let temp = (r_num() % 3) + `${i}`;
 
-    arr_date.push(`2022/07/${temp}`);
+    arr_date.push(`2022/08/${temp}`);
   }
 
   return arr_date;
@@ -209,12 +240,12 @@ const r_category = () => {
 
 const r_plusService = () => {
   const plusService = ["집앞 픽업 가능", 
-                           "응급 처치",
-                           "장기 예약 가능",
-                           "퍼피 케어",
-                           "노견 케어",
-                           "실내놀이",
-                           "마당있음"];
+                        "응급 처치",
+                        "장기 예약 가능",
+                        "퍼피 케어",
+                        "노견 케어",
+                        "실내놀이",
+                        "마당있음"];
 
   const return_arr = [];
 
