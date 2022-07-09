@@ -13,9 +13,9 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  imageUrl: {  //시터쪽 이미지
+  reservationId: { //예약아이디
     type: String,
-    default: ""
+    // required: true,    
   },
   reviewStar: {
     type: Number,
@@ -29,7 +29,7 @@ const reviewSchema = new mongoose.Schema({
     type: Date,
     default: new Date(),
     required: true,
-  }
+  },
 });
 
 reviewSchema.virtual("reviewId").get(function () {

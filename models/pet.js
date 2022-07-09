@@ -35,4 +35,8 @@ module.exports = class Pet extends Sequelize.Model {
 
     static associate(db) {
     }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f

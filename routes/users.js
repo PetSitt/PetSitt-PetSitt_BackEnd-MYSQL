@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const User = require("../schemas/user");
 const authMiddleware = require('../middlewares/auth-middleware');
+<<<<<<< HEAD
+=======
+const {User} = require("../schemas/user");
+>>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 const bcrypt = require('bcrypt');
+const { route } = require("express/lib/application");
+const nodemailer = require("nodemailer");
 const mailer = require("../mail/passwordEmail");
 
 require("dotenv").config();
@@ -48,6 +53,30 @@ router.post('/signup', async (req, res) => {
   });
 
 
+//refreshToken check
+router.post('/refresh', (req, res) => {
+  if (req.cookies?.jwt) {
+      // Destructuring refreshToken from cookie
+      const refreshToken = req.cookies.jwt;
+      // Verifying refresh token
+      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, 
+      (err, decoded) => {
+          if (err) {
+              // Wrong Refesh Token
+              return res.status(406).json({ message: 'Unauthorized' });
+          }else {
+              // Correct token we send a new access token
+              const accessToken = jwt.sign({
+                  userEmail: user.userEmail
+              }, process.env.ACCESS_TOKEN_SECRET, {
+                  expiresIn: '10m'
+              });
+              return res.json({ accessToken });
+          };
+      });} else {
+      return res.status(406).json({ message: 'Unauthorized' });
+  };
+});
 
 
 
@@ -219,6 +248,7 @@ router.get('/auth', authMiddleware, (req, res) => {
     });
   }
 });
+
 
 
 module.exports = router;

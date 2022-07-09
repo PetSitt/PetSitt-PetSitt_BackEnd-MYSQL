@@ -1,36 +1,68 @@
 const express = require("express");
 const router = express.Router();
-const { Sitter } = require("../schemas/sitter");
+const {Op} = require("sequelize")
+const { Sitter,sequelize} = require("../models");
 
-router.get("/", async (req, res) => {
-  const sitters = await Sitter.find().sort({ averageStar: -1 });
-  res.send({
-    sitters,
+router.post("/", async (req, res) => {
+
+  const {x,y} = req.body;
+  const sitters = await Sitter.findAll({
+    location :{
+       type: 'Point',
+       coordinates: [x, y] 
+      }
+})
+    res.send({sitters})
+
   });
-});
 
-router.get(
-  "/auth",
-  /*authMiddleware,*/ async (req, res) => {
-    const {x,y} = req.body;
-    const sitters = await Sitter.find({
-      location: {
-        $nearSphere: {
-          $geometry: {
-            type: "Point",
-            coordinates: [x,y],
-          },
-          $maxDistance: 100000,
-        },
+
+router.post("/search", async (req, res) => {
+
+  const {region_2depth_name,searchDate, walk, wash, prac, dayCare, boarding } = req.body;
+  const sitters = await Sitter.findAll({
+    attributes:[region_2depth_name,searchDate,walk, wash, prac, dayCare, boarding],
+        region_2depth_name:{
+        eq:region_2depth_name,
+
       },
-    }).sort({ averageStar: -1 });
-    res.send({
-      sitters,
+        noDate:{
+          [Op.notIn]:[searchDate
+          ],
+        },
+        category:{
+          [Op.in]: [walk, wash, prac, dayCare, boarding,
+          ]},
     });
-  }
-);
+    if(!sitters?.length){
+      const sitter2 = await Sitter.findAll({
+        where:{
+          [Op.and]:[
+            {noDate:{
+              [Op.notIn]:
+                [searchDate],
+              }
+            },
+            {category:{
+              [Op.notIn]: [
+                walk, wash, prac, dayCare, boarding,
+              ]}
+            },
+        ],
+        },
+        location :{
+          type: 'Point',
+          coordinates: [x, y] 
+         }
+      })
+      return res.send({sitter2})
+    }
+    res.send({sitters});
+  });
 
 
+
+<<<<<<< HEAD
 router.get("/search/:category",async(req,res) => {
   const {category} = req.params;
   const categories = await Sitter.find({category})
@@ -38,5 +70,7 @@ router.get("/search/:category",async(req,res) => {
       categories
   })
 });
+=======
+>>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 module.exports = router;
 

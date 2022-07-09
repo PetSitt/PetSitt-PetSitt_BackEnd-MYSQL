@@ -12,7 +12,15 @@ const reservationSchema = new mongoose.Schema({
   },
   petId: {
     type: Array,
-    default: [],
+    required: true,
+  },
+  diaryId: {
+    type: String,
+    default: "",    
+  },
+  reservationState: {
+    type: String,
+    required: true,
   },
   category: {
     type: Array,
@@ -21,18 +29,6 @@ const reservationSchema = new mongoose.Schema({
   reservationDate: {
     type: Array,
     required: true,
-  },
-  diaryImage: {
-    type: Array,
-    default:[],
-  },
-  diaryInfo: {
-    type: String,
-    default: ""
-  },
-  checkList: {
-    type: Array,
-    default: []
   },
 });
 
