@@ -35,6 +35,7 @@ module.exports = class Sitter extends Sequelize.Model {
             },
             category: {
               type:Sequelize.JSON,
+              defaultValue:[]
             },
             plusService: {
               type:Sequelize.JSON,
@@ -62,10 +63,11 @@ module.exports = class Sitter extends Sequelize.Model {
               type: Sequelize.STRING,
               defaultValue:""
             },
-            location: {
-              type: Sequelize.GEOMETRY('POINT')
-            },
-            
+           
+              coordinates: {
+                type: Sequelize.GeoJSON
+              
+          },
             rehireRate: {
               type: Sequelize.INTEGER,
               defaultValue:0
