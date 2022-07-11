@@ -33,10 +33,16 @@
     "multer-s3": "^2.10.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
+<<<<<<< HEAD
     "nodemailer": "^6.7.6",
     "nodemailer-smtp-transport": "^2.4.2",
     "sequelize": "^6.21.2",
     "uuid": "^8.3.2"
+=======
+    "nodemailer": "^6.7.7",
+    "nodemailer-smtp-transport": "^2.4.2",
+    "sequelize": "^6.21.2"
+>>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
   },
   "description": "",
   "devDependencies": {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use strict';
 
 const fs = require('fs');
@@ -30,8 +31,31 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
 });
+=======
+const Sequelize = require('sequelize');
+const Pet = require('./pet');
+const Sitter = require('./sitter');
+
+const env = process.env.NODE_ENV || 'development';
+const config = require('../config/config')[env];
+const db = {};
+
+const sequelize = new Sequelize(config.database, config.username, config.password, config);
+>>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+<<<<<<< HEAD
+=======
+db.Pet = Pet;
+db.Sitter = Sitter;
+
+Pet.init(sequelize);
+Sitter.init(sequelize);
+
+Pet.associate(db);
+Sitter.associate(db);
+
+>>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 module.exports = db;

@@ -4,15 +4,19 @@ const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/index");
 const authMiddleware = require('../middlewares/auth-middleware');
-const user = require("../schemas/user");
+const {User} = require("../schemas/user");
 const bcrypt = require('bcrypt');
+const { route } = require("express/lib/application");
+const nodemailer = require("nodemailer");
 const mailer = require("../mail/passwordEmail");
 const cookieParser = require('cookie-parser');
 require("dotenv").config();
 const db = require("../config/db");
 
 
-//signup 회원가입 
+
+//signup
+
 router.post('/signup', async (req, res) => {
   try {
     const { userEmail, 
@@ -43,6 +47,7 @@ router.post('/signup', async (req, res) => {
         refreshToken,
       });
       res.status(201).json({ message: "회원가입이 완료!"});
+      //res.status(201).send({ message: "회원가입이 완료!" });
     }
      catch (err) {
       console.log(err);
@@ -51,6 +56,7 @@ router.post('/signup', async (req, res) => {
       });
     }
   });
+
 
 
 
@@ -102,7 +108,6 @@ router.post("/login", async (req, res) => {
 
 //refreshToken check  리프레시토큰 체크 
 router.get('/refresh', async(req, res) => {
-
   const refreshToken = req.cookies.refreshToken
   if (!refreshToken) {
     return res.status(401).json({ errorMessage: "토큰 검증실패1" });
@@ -137,6 +142,8 @@ router.get('/refresh', async(req, res) => {
   });
 
 
+
+
 //id_check  유저 아이디찾기 
 router.post('/id_check', async (req, res) => {
   try {
@@ -161,6 +168,8 @@ router.post('/id_check', async (req, res) => {
 });
 
 
+
+
 //password check  유저 비밀번호 찾기 
 router.post('/password_check', async (req, res) => {
   const { userEmail } = req.body;
@@ -169,7 +178,7 @@ router.post('/password_check', async (req, res) => {
       res.status(400).send({
         errorMessage: "빈 문자열입니다."  });
       return; }
-    const user = await User.findOne({ userEmail: userEmail });
+    const user = await User.findOne({where: { userEmail } });
     console.log(user);
     if (!user) {
       res.status(406).send({ errorMessage: "존재하지 않는 이메일입니다" });
@@ -195,7 +204,8 @@ router.post('/password_check', async (req, res) => {
   }});
 
 
-//usercheck  유저 정보 조회 
+
+//usercheck 
 router.get('/auth', authMiddleware, (req, res) => {
   try {
     const { user } = res.locals.user;
@@ -210,6 +220,7 @@ router.get('/auth', authMiddleware, (req, res) => {
     });
   }
 });
+
 
 
 module.exports = router;
