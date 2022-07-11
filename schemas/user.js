@@ -12,9 +12,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  hashPassword:{
-    type: String,
-  },
   userName: {
     type: String,
     required: true,
@@ -22,6 +19,10 @@ const UserSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     required: true,
+  },
+  refreshToken:{
+    type: String,
+   
   }
 });
 
