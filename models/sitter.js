@@ -63,40 +63,20 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:""
             },
             location: {
-<<<<<<< HEAD
-<<<<<<< HEAD
               type:Sequelize.GEOMETRY('POINT')
             },
-=======
-              type: Sequelize.GEOMETRY('POINT')
-            },
-            
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
-=======
-              type:Sequelize.GEOMETRY('POINT')
-            },
->>>>>>> b4e9707d8e18c2f92e288b63a07e4d6604718b30
             rehireRate: {
               type: Sequelize.INTEGER,
               defaultValue:0
             },
             zoneCode: {
               type: Sequelize.STRING,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b4e9707d8e18c2f92e288b63a07e4d6604718b30
             },
             userName: {
               type: Sequelize.STRING,
             },
             gender: {
               type: Sequelize.STRING,
-<<<<<<< HEAD
-=======
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
-=======
->>>>>>> b4e9707d8e18c2f92e288b63a07e4d6604718b30
             }
         }, {
             sequelize,
@@ -109,12 +89,4 @@ module.exports = class Sitter extends Sequelize.Model {
 
     static associate(db) {
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
-=======
-};
->>>>>>> b4e9707d8e18c2f92e288b63a07e4d6604718b30

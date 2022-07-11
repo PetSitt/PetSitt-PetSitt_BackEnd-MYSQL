@@ -2,19 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models/index");
+const { User } = require("../models");
 const authMiddleware = require('../middlewares/auth-middleware');
-<<<<<<< HEAD
-=======
-const {User} = require("../schemas/user");
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 const bcrypt = require('bcrypt');
-const { route } = require("express/lib/application");
 const nodemailer = require("nodemailer");
 const mailer = require("../mail/passwordEmail");
 const cookieParser = require('cookie-parser');
 require("dotenv").config();
-const db = require("../config/db");
 
 
 
@@ -63,39 +57,8 @@ router.post('/signup', async (req, res) => {
 
 
 
-<<<<<<< HEAD
 
-
-//refreshToken check
-router.post('/refresh', (req, res) => {
-  if (req.cookies?.jwt) {
-      // Destructuring refreshToken from cookie
-      const refreshToken = req.cookies.jwt;
-      // Verifying refresh token
-      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, 
-      (err, decoded) => {
-          if (err) {
-              // Wrong Refesh Token
-              return res.status(406).json({ message: 'Unauthorized' });
-          }else {
-              // Correct token we send a new access token
-              const accessToken = jwt.sign({
-                  userEmail: user.userEmail
-              }, process.env.ACCESS_TOKEN_SECRET, {
-                  expiresIn: '10m'
-              });
-              return res.json({ accessToken });
-          };
-      });} else {
-      return res.status(406).json({ message: 'Unauthorized' });
-  };
-});
-
-
-// login
-=======
 // login 로그인 
->>>>>>> 66cb0d1b38835e3251fc10012c0eb0b42f62b78e
 router.post("/login", async (req, res) => {
   try {
     const { userEmail, password } = await (req.body);
@@ -119,7 +82,7 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign({
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '5s'
+      expiresIn: '10d'
     });
     const refreshToken = jwt.sign({
       userEmail: user.userEmail
@@ -156,27 +119,6 @@ router.get('/refresh', async(req, res) => {
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
           console.log(refreshToken)
           if (err) {
-<<<<<<< HEAD
-              // Wrong Refesh Token
-              return res.status(406).json({ message: 'Unauthorized' });
-          }else {
-              // Correct token we send a new access token
-              const accessToken = jwt.sign({
-                  userEmail: user.userEmail
-              }, process.env.ACCESS_TOKEN_SECRET, {
-                  expiresIn: '10m'
-              });
-              return res.json({ accessToken });
-          };
-      });} else {
-      return res.status(406).json({ message: 'Unauthorized' });
-  };
-});
-
-
-router.get('/id_check', async (req, res) => {
-  const { phoneNumber } = req.body;
-=======
             return res.status(401).send({ errorMessage: "토큰 검증실패3" });
           } else {
             const accessToken = jwt.sign({
@@ -202,7 +144,6 @@ router.get('/id_check', async (req, res) => {
 
 //id_check  유저 아이디찾기 
 router.post('/id_check', async (req, res) => {
->>>>>>> 66cb0d1b38835e3251fc10012c0eb0b42f62b78e
   try {
     const { phoneNumber } = req.body;
     if (phoneNumber === " ") {
@@ -211,11 +152,7 @@ router.post('/id_check', async (req, res) => {
       });
       return;
     }
-<<<<<<< HEAD
-    const user = await User.findOne({phoneNumber: phoneNumber});
-=======
     const user = await User.findOne({where: { phoneNumber }});
->>>>>>> 66cb0d1b38835e3251fc10012c0eb0b42f62b78e
     console.log(user);
     if (!user) {
       res.status(406).send({ errorMessage: "존재하지 않는 번호입니다" });
@@ -228,15 +165,7 @@ router.post('/id_check', async (req, res) => {
   }
 });
 
-
-
-
-<<<<<<< HEAD
-
-//password check 
-=======
 //password check  유저 비밀번호 찾기 
->>>>>>> 66cb0d1b38835e3251fc10012c0eb0b42f62b78e
 router.post('/password_check', async (req, res) => {
   const { userEmail } = req.body;
   try {
@@ -269,13 +198,10 @@ router.post('/password_check', async (req, res) => {
     res.status(400).json({ errorMessage: "fail" });
   }});
 
-
-
 //usercheck 
 router.get('/auth', authMiddleware, (req, res) => {
   try {
-    const { user } = res.locals.user;
-    console.log(res.locals.user);
+    const { user } = res.locals ;
     res.status(200).send({
       user
     });
@@ -286,7 +212,6 @@ router.get('/auth', authMiddleware, (req, res) => {
     });
   }
 });
-
 
 
 module.exports = router;

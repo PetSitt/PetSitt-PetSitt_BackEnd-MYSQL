@@ -1,12 +1,3 @@
 node_modules
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 *.env
-config
-=======
-*.env
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
-=======
-*.env
-config
->>>>>>> b4e9707d8e18c2f92e288b63a07e4d6604718b30

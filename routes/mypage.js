@@ -1,8 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../schemas/user.js");
-// const {Pet} = require("../schemas/pet.js");
-// const {Sitter} = require("../schemas/sitter.js");
 const AWS = require('aws-sdk');
 const authMiddleware = require('../middlewares/auth-middleware');
 require("dotenv").config();
@@ -12,6 +9,7 @@ const moment = require('moment');
 const { Op } = require("sequelize");
 const { Pet } = require("../models");
 const { Sitter } = require("../models");
+const { User } = require("../models");
 
 const s3 = new AWS.S3({
     accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -58,10 +56,9 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
 })
 
 // 마이페이지 - 반려동물 프로필조회 / 미들웨어 없이 테스트 ok
-router.get("/petprofile/:userId", async (req, res) => {
+router.get("/petprofile", authMiddleware, async (req, res) => {
     try{
-        // const { userId } = res.locals.user;
-        const { userId } = req.params;
+        const { userId } = res.locals;
         const petprofile = await Pet.findAll({ where: {userId: userId }});
 
         res.json({ petprofile });
@@ -71,10 +68,9 @@ router.get("/petprofile/:userId", async (req, res) => {
 })
 
 // 마이페이지 - 돌보미 프로필조회 / 미들웨어 없이 테스트 ok
-router.get("/sitterprofile/:userId", async (req, res) => {
+router.get("/sitterprofile", authMiddleware, async (req, res) => {
     try{
-        // const { userId } = res.locals.user;
-        const { userId } = req.params;
+        const { userId } = res.locals;
         const sitterprofile = await Sitter.findOne({ userId: userId });
 
         res.json({ sitterprofile });
@@ -84,9 +80,9 @@ router.get("/sitterprofile/:userId", async (req, res) => {
 })
 
 // 마이페이지 - 반려동물 프로필 등록 / 미들웨어 없이 테스트 ok
-router.post("/petprofile/:userId", upload.single('petImage'), async (req, res) => {
+router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
-        const { userId } = req.params;
+        const { userId } = res.locals;
         const { petName, petAge, petWeight, petType, petSpay, petIntro } = req.body;
         const petImage = req.file.location;
         const petprofile = await Pet.create({ petName: petName, petAge: petAge, petWeight: petWeight, petType: petType, petSpay: petSpay, petIntro: petIntro, petImage: petImage, userId: userId });
@@ -98,9 +94,8 @@ router.post("/petprofile/:userId", upload.single('petImage'), async (req, res) =
 })
 
 // 마이페이지 - 돌보미 등록  / 미들웨어 없이 테스트 ok
-router.post("/sitterprofile/:userId", upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
-    // const { userId } = res.locals.user;
-    const { userId } = req.params
+router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
+    const { userId } = res.locals;
     const { userName, gender, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, x, y, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
     const imageUrl = req.files.imageUrl[0].location;
     const mainImageUrl = req.files.mainImageUrl[0].location;

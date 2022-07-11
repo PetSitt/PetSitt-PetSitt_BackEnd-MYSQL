@@ -60,17 +60,5 @@ router.post("/search", async (req, res) => {
     res.send({sitters});
   });
 
-
-
-<<<<<<< HEAD
-router.get("/search/:category",async(req,res) => {
-  const {category} = req.params;
-  const categories = await Sitter.find({category})
-  res.send({
-      categories
-  })
-});
-=======
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 module.exports = router;
 
