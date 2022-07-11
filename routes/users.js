@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
+const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
-const User = require("../schemas/user");
+const { User } = require("../models/index");
 const authMiddleware = require('../middlewares/auth-middleware');
 const user = require("../schemas/user");
 const bcrypt = require('bcrypt');
 const mailer = require("../mail/passwordEmail");
+const cookieParser = require('cookie-parser');
 require("dotenv").config();
+const db = require("../config/db");
 
 
-
-
-
-//signup
+//signup 회원가입 
 router.post('/signup', async (req, res) => {
   try {
     const { userEmail, 
@@ -20,26 +20,28 @@ router.post('/signup', async (req, res) => {
             password, 
             phoneNumber, 
           } = (req.body);
+    const refreshToken= "";
    // userEmail 중복확인 
-      const existUsers = await User.find({
-      $or: [{ userEmail }],
+      const existUsers = await User.findAll({
+         where: {
+           [Op.or]: [{userEmail}, {phoneNumber}]
+         }
       });
-    if (existUsers.length) {
+  if (existUsers.length) {
         res.status(400).send({
-        errorMessage: "중복된 아이디입니다",
+        errorMessage: "중복된 아이디 혹은 핸드폰 번호 입니다",
       });
       return;
     };
-   // const hash = await bcrypt.hash(password, 10);
       const salt = await bcrypt.genSalt(Number(process.env.SALT));
-      const hashPassword = await bcrypt.hash(req.body.password, salt);
-      const user = new User({
+      const hashPassword = await bcrypt.hash(password, salt);
+      await User.create({
         userEmail, 
         userName, 
         password : hashPassword, 
         phoneNumber, 
+        refreshToken,
       });
-      await user.save();
       res.status(201).json({ message: "회원가입이 완료!"});
     }
      catch (err) {
@@ -52,99 +54,114 @@ router.post('/signup', async (req, res) => {
 
 
 
-
-// login
+// login 로그인 
 router.post("/login", async (req, res) => {
   try {
     const { userEmail, password } = await (req.body);
-    const user = await User.findOne({ userEmail: userEmail }).exec();
+    const user = await User.findOne({ where: {userEmail: userEmail} });
     if (!user) {
       res.status(400).send({
         errorMessage: "이메일 또는 비밀번호를 확인해주세요.",
       });
       return;
     };
+    if(user){
+    let passwordIsValid = bcrypt.compareSync(
+      password, user.password
+    );
+    if (!passwordIsValid) {
+      return res.status(401).send({
+        accessToken: null,
+        message: "이메일 또는 비밀번호를 확인해주세요",
+      });
+    }}
     const accessToken = jwt.sign({
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '1d'
+      expiresIn: '5s'
     });
     const refreshToken = jwt.sign({
       userEmail: user.userEmail
     }, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: '10d'
     });
-    res.send({
-      accessToken,refreshToken,
-      user: {
-        userEmail: user.userEmail,
-      },
-    });
+    console.log(refreshToken)
+      await User.update({ refreshToken }, { where: { userEmail } });
+    res.cookie('jwt', refreshToken, {
+       httpOnly: true,
+       sameSite: "none",
+       secure: true,
+     });
+     return res.status(200).send({message: "로그인 성공", accessToken: accessToken, refreshToken:refreshToken});
   } catch (error) {
-    res.status(400).send({
-    });
+    res.status(400).send({message: "이메일 또는 비밀번호를 확인해주세요 " });
   }
 });
 
 
 
-//refreshToken check
-router.post('/refresh', (req, res) => {
-  if (req.cookies?.jwt) {
-      // Destructuring refreshToken from cookie
-      const refreshToken = req.cookies.jwt;
-      // Verifying refresh token
-      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, 
-      (err, decoded) => {
+//refreshToken check  리프레시토큰 체크 
+router.get('/refresh', async(req, res) => {
+
+  const refreshToken = req.cookies.refreshToken
+  if (!refreshToken) {
+    return res.status(401).json({ errorMessage: "토큰 검증실패1" });
+  }
+     // Verifying refresh token
+     const user = await User.findAll({ where: { refreshToken } });
+    try {
+      if (!user) {
+        return res.status(401).json({ errorMessage: "토큰 검증실패2" });
+      } else {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
+          console.log(refreshToken)
           if (err) {
-              // Wrong Refesh Token
-              return res.status(406).json({ message: 'Unauthorized 111' });
-          }else {
-              // Correct token we send a new access token
-              const accessToken = jwt.sign({
-                  userEmail: user.userEmail
-              }, process.env.ACCESS_TOKEN_SECRET, {
-                  expiresIn: '10m'
-              });
-              return res.json({ accessToken });
-          };
-      });} else {
-      return res.status(406).json({ message: 'Unauthorized' });
-  };
-});
+            return res.status(401).send({ errorMessage: "토큰 검증실패3" });
+          } else {
+            const accessToken = jwt.sign({
+              userEmail: user.userEmail
+            }, process.env.ACCESS_TOKEN_SECRET, {
+              expiresIn: '10m'
+            });
+            return res.status(200).send({ message: "토큰 재발급 완료.",  
+            accessToken: accessToken, refreshToken:refreshToken });
+          }
+        });
+      }
+    } catch (err) {
+      if (err) {
+        console.log(err);
+        return res.status(401).send({ errorMessage: "토큰 검증실패4" });
+      }
+    }
+  });
 
 
-
-
-//id_check
-router.get('/id_check', async (req, res) => {
-  const { phoneNumber } = req.body;
+//id_check  유저 아이디찾기 
+router.post('/id_check', async (req, res) => {
   try {
+    const { phoneNumber } = req.body;
     if (phoneNumber === " ") {
       res.status(400).send({
         errorMessage: "핸드폰 번호를 확인해주세요.",
       });
       return;
     }
-    const user = await User.findOne({ where: { phoneNumber: phoneNumber } });
+    const user = await User.findOne({where: { phoneNumber }});
     console.log(user);
     if (!user) {
       res.status(406).send({ errorMessage: "존재하지 않는 번호입니다" });
       return;
-    }
-    res.send({
-      user: {
-        userEmail: user.userEmail,
-      },
-    });
-  } catch (err) {
+    } if(user) {
+      return res.status(200).send({message :" 이메일 확인" , userEmail
+     });
+  } }catch (err) {
     res.status(400).json({ errorMessage: "fail" });
   }
 });
 
 
-
-//password check 
+//password check  유저 비밀번호 찾기 
 router.post('/password_check', async (req, res) => {
   const { userEmail } = req.body;
   try {
@@ -161,11 +178,10 @@ router.post('/password_check', async (req, res) => {
     // 새 비밀번호 (암호화)
     const randomPassword = String(Math.floor(Math.random() * 1000000) + 100000);
     const hashPassword = await bcrypt.hash(randomPassword, 10);
-    await User.update(
+    await user.update(
       { password: hashPassword },
       { where: { userEmail: userEmail } }
     );
-
     let emailParam = {
       toEmail: userEmail, // 수신할 이메일
       subject: "petsitter 임시 비밀번호 메일발송", // 메일 제목
@@ -179,12 +195,10 @@ router.post('/password_check', async (req, res) => {
   }});
 
 
-  
-
-//usercheck 
+//usercheck  유저 정보 조회 
 router.get('/auth', authMiddleware, (req, res) => {
   try {
-    const user = res.locals.user;
+    const { user } = res.locals.user;
     console.log(res.locals.user);
     res.status(200).send({
       user
