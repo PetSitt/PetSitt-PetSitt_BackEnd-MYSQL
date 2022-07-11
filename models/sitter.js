@@ -63,14 +63,19 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:""
             },
             location: {
-              type: Sequelize.GEOMETRY('POINT')
+              type:Sequelize.GEOMETRY('POINT')
             },
-            
             rehireRate: {
               type: Sequelize.INTEGER,
               defaultValue:0
             },
             zoneCode: {
+              type: Sequelize.STRING,
+            },
+            userName: {
+              type: Sequelize.STRING,
+            },
+            gender: {
               type: Sequelize.STRING,
             }
         }, {

@@ -2,16 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models/index");
+const { User } = require("../models");
 const authMiddleware = require('../middlewares/auth-middleware');
-const {User} = require("../schemas/user");
 const bcrypt = require('bcrypt');
-const { route } = require("express/lib/application");
 const nodemailer = require("nodemailer");
 const mailer = require("../mail/passwordEmail");
 const cookieParser = require('cookie-parser');
 require("dotenv").config();
-const db = require("../config/db");
 
 
 
@@ -60,6 +57,7 @@ router.post('/signup', async (req, res) => {
 
 
 
+
 // login 로그인 
 router.post("/login", async (req, res) => {
   try {
@@ -84,7 +82,7 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign({
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '5s'
+      expiresIn: '10d'
     });
     const refreshToken = jwt.sign({
       userEmail: user.userEmail
@@ -167,9 +165,6 @@ router.post('/id_check', async (req, res) => {
   }
 });
 
-
-
-
 //password check  유저 비밀번호 찾기 
 router.post('/password_check', async (req, res) => {
   const { userEmail } = req.body;
@@ -203,13 +198,10 @@ router.post('/password_check', async (req, res) => {
     res.status(400).json({ errorMessage: "fail" });
   }});
 
-
-
 //usercheck 
 router.get('/auth', authMiddleware, (req, res) => {
   try {
-    const { user } = res.locals.user;
-    console.log(res.locals.user);
+    const { user } = res.locals ;
     res.status(200).send({
       user
     });
@@ -220,7 +212,6 @@ router.get('/auth', authMiddleware, (req, res) => {
     });
   }
 });
-
 
 
 module.exports = router;

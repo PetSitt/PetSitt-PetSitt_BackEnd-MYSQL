@@ -1,53 +1,41 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+const Sequelize = require('sequelize');
+module.exports = class User extends Sequelize.Model {
+    static init(sequelize) {
+        return super.init({
+          userId: {
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+            type: Sequelize.INTEGER,
+          },
+          userEmail: {
+                type: Sequelize.STRING
+            },
+            password: {
+              type: Sequelize.STRING,
+              defaultValue:""
+            },
+            userName:{
+              type: Sequelize.STRING,
+              defaultValue:""
+            },
+            phoneNumber:{
+              type: Sequelize.STRING,
+              defaultValue:""
+            },
+            refreshToken:{
+              type: Sequelize.STRING,
+              defaultValue:""
+            },
+        }, {
+            sequelize,
+            modelName: 'User',
+            tableName: 'Users',
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_general_ci'
+        });
     }
-  }
-  User.init({
-    id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-  },
-  userEmail: {
-    type: DataTypes.STRING
-  },
-  password: {
-    type: DataTypes.STRING
-  },
-  userName: {
-    type: DataTypes.STRING
-  },
-  phoneNumber: {
-    type: DataTypes.STRING
-  },
-  refreshToken: {
-  allowNull: true,
-   type: DataTypes.STRING
-  },
-  createdAt: {
-    allowNull: false,
-    type: DataTypes.DATE
-  },
-  updatedAt: {
-    allowNull: false,
-    type: DataTypes.DATE
-  }
-  }, {
-    sequelize,
-    modelName: 'User',
-  });
-  return User;
-};
 
+    static associate(db) {
+    }
+};

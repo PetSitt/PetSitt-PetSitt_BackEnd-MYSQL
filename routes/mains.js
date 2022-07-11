@@ -60,7 +60,5 @@ router.post("/search", async (req, res) => {
     res.send({sitters});
   });
 
-
-
 module.exports = router;
 

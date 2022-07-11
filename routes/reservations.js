@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const {User} = require("../schemas/user");
 const {Pet} = require("../schemas/pet");
 const {Reservation} = require("../schemas/reservation.js");
 const authMiddleware = require("../middlewares/auth-middleware.js");

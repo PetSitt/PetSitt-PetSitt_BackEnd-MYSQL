@@ -4,16 +4,13 @@ const {sequelize} = require("./models");
 
 const reviewsRouter = require("./routes/reviews.js");
 const mainRouter = require("./routes/mains.js");
-<<<<<<< HEAD
 const cookieParser = require('cookie-parser');
-=======
-const testRouter = require("./routes/test_tools.js");
 const mypageRouter = require("./routes/mypage");
-const userRouter = require("./routes/users");
+const usersRouter = require("./routes/users");
 const reservationRouter = require("./routes/reservations.js");
 const diaryRouter = require("./routes/diarys.js");
+const detailsRouter = require("./routes/details.js");
 const cors = require('cors');
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 require("dotenv").config();
 
 const app = express();
@@ -40,22 +37,12 @@ app.use(express.json()); // json형태의 데이터를 parsing하여 사용할 �
 app.use(express.urlencoded({extended:false}));
 app.use(cookieParser());
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 app.use((req, res, next) => {
   console.log('Request URL:', req.originalUrl, ' - ', new Date());
   next();
 });
-<<<<<<< HEAD
 app.use("/api",[usersRouter]);
 app.use("/details", [detailsRouter]);
-=======
-
-app.use("/api",[userRouter]);
-
->>>>>>> 320cb04293f71e8e0cdbbc2b78c05b83fb68a56f
 app.use("/reviews", [reviewsRouter]);
 app.use("/mains", [mainRouter]);
 app.use("/mypage", [mypageRouter]);
