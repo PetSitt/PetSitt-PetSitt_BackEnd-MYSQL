@@ -31,17 +31,16 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:""
             },
             careSize: {
-              type:Sequelize.JSON,
+              type:Sequelize.BOOLEAN,
             },
             category: {
-              type:Sequelize.JSON,
-              defaultValue:[]
+              type:Sequelize.BOOLEAN,
             },
             plusService: {
               type:Sequelize.JSON,
             },
-            noDate: {
-              type:Sequelize.JSON,
+            noDate:{
+              type: Sequelize.JSON,
             },
             sevicePrice: {
               type: Sequelize.INTEGER,
@@ -63,6 +62,7 @@ module.exports = class Sitter extends Sequelize.Model {
               type: Sequelize.STRING,
               defaultValue:""
             },
+           
             location: {
               type:Sequelize.GEOMETRY('POINT')
             },
