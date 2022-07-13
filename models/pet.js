@@ -3,6 +3,12 @@ const Sequelize = require('sequelize');
 module.exports = class Pet extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
+            petId: {
+                allowNull: false,
+                autoIncrement: true,
+                primaryKey: true,
+                type: Sequelize.INTEGER,
+            },
             petImage: {
                 type: Sequelize.STRING
             },
@@ -22,6 +28,9 @@ module.exports = class Pet extends Sequelize.Model {
                 type: Sequelize.STRING
             },
             userId: {
+                type: Sequelize.STRING
+            },
+            petName:{
                 type: Sequelize.STRING
             }
         }, {

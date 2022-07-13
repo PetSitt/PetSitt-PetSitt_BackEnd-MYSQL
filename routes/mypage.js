@@ -33,9 +33,8 @@ const upload = multer({ storage: storage });
 // 마이페이지 - 내프로필 조회 
 router.get("/myprofile", authMiddleware, async (req, res) => {
     try{
-        const { userId } = res.locals.user;
-        const myprofile = await User.findOne({ _id: userId });
-
+        const { user } = res.locals;
+        const myprofile = user;
         res.json({ myprofile });
     }catch(error){
         console.error(error);
@@ -45,21 +44,22 @@ router.get("/myprofile", authMiddleware, async (req, res) => {
 // 마이페이지 - 내프로필 수정 
 router.patch("/myprofile", authMiddleware, async (req, res) => {
     try{
-        const { userId } = res.locals.user;
+        const { user } = res.locals;
         const { userName, phoneNumber, userEmail } = req.body;
 
-        const myprofile = await User.updateOne({_id: userId}, { $set: {userName: userName, phoneNumber: phoneNumber, userEmail: userEmail} });
+        const myprofile = await User.update({userName: userName, phoneNumber: phoneNumber, userEmail: userEmail}, 
+            { where: {userId: user.userId}} );
         res.json({ myprofile });
     }catch(error){
         console.error(error);
     }
 })
 
-// 마이페이지 - 반려동물 프로필조회 / 미들웨어 없이 테스트 ok
+// 마이페이지 - 반려동물 프로필조회
 router.get("/petprofile", authMiddleware, async (req, res) => {
     try{
-        const { userId } = res.locals;
-        const petprofile = await Pet.findAll({ where: {userId: userId }});
+        const { user } = res.locals;
+        const petprofile = await Pet.findAll({ where: {userId: user.userId }});
 
         res.json({ petprofile });
     }catch(error){
@@ -70,22 +70,26 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
 // 마이페이지 - 돌보미 프로필조회 / 미들웨어 없이 테스트 ok
 router.get("/sitterprofile", authMiddleware, async (req, res) => {
     try{
-        const { userId } = res.locals;
-        const sitterprofile = await Sitter.findOne({ userId: userId });
+        const { user } = res.locals;
+        const sitterprofile = await Sitter.findOne({ where: {userId: user.userId } });
+        const careSizeArr = sitterprofile.careSize.split(",");
+        const categoryArr = sitterprofile.category.split(",");
+        const plusServiceArr = sitterprofile.plusService.split(",");
 
-        res.json({ sitterprofile });
+        
+        res.json({ sitterprofile, careSizeArr, categoryArr, plusServiceArr });
     }catch(error){
         console.log(error)
     }
 })
 
-// 마이페이지 - 반려동물 프로필 등록 / 미들웨어 없이 테스트 ok
+// 마이페이지 - 반려동물 프로필 등록
 router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
-        const { userId } = res.locals;
+        const { user } = res.locals;
         const { petName, petAge, petWeight, petType, petSpay, petIntro } = req.body;
         const petImage = req.file.location;
-        const petprofile = await Pet.create({ petName: petName, petAge: petAge, petWeight: petWeight, petType: petType, petSpay: petSpay, petIntro: petIntro, petImage: petImage, userId: userId });
+        const petprofile = await Pet.create({ petName: petName, petAge: petAge, petWeight: petWeight, petType: petType, petSpay: petSpay, petIntro: petIntro, petImage: petImage, userId: user.userId });
 
         res.json({ petprofile });
     }catch(error){
@@ -95,14 +99,14 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
 
 // 마이페이지 - 돌보미 등록  / 미들웨어 없이 테스트 ok
 router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
-    const { userId } = res.locals;
+    const { user } = res.locals;
     const { userName, gender, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, x, y, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
     const imageUrl = req.files.imageUrl[0].location;
     const mainImageUrl = req.files.mainImageUrl[0].location;
     const location = { type: 'Point', coordinates: [x, y]};
     try{
-        const createSitter =  new Sitter ({ 
-            userId: userId,
+        const createSitter =  await Sitter.create({
+            userId: user.userId,
             userName: userName,
             gender: gender,
             address: address,
@@ -122,8 +126,6 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
             mainImageUrl: mainImageUrl,
             zoneCode: zoneCode
         });
-        createSitter.save();
-        console.log(createSitter.location);
         res.json({ createSitter })
     }catch(error){
         console.error(error);
@@ -131,11 +133,10 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
 })
 
 // 마이페이지 - 돌보미 프로필 삭제 / 미들웨어 없이 테스트 ok
-router.delete("/sitterprofile/:userId", async (req, res) => {
-    // const { userId } = res.locals.user;
-    const { userId } = req.params;
+router.delete("/sitterprofile", authMiddleware, async (req, res) => {
+    const { user } = res.locals;
     try{
-        await Sitter.destroy({ where: { userId: userId }});
+        await Sitter.destroy({ where: { userId: user.userId }});
         res.json({ result: "success" });
     }catch{
         res.json({ result: "fail" });
@@ -154,7 +155,7 @@ router.delete("/petprofile/:petId", async (req, res) => {
 })
 
 // 반려동물 프로필 수정 
-router.patch("/petprofile/:petId", upload.single('petImage'), async (req, res) => {
+router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
     const { petId } = req.params;
     const { petName, petAge, petWeight, petType, petSpay, petIntro } = req.body;
@@ -169,16 +170,16 @@ router.patch("/petprofile/:petId", upload.single('petImage'), async (req, res) =
 })
 
 // 마이페이지 - 돌보미 프로필 수정 / 미들웨어 없이 테스트 ok 
-router.patch("/sitterprofile/:userId", upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
+router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
     try{
-    const { userId } = req.params;
+    const { user } = req.locals;
     const { userName, gender, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, x, y, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
     const imageUrl = req.files.imageUrl[0].location;
     const mainImageUrl = req.files.mainImageUrl[0].location;
     const location = { type: 'Point', coordinates: [x, y]};
 
-    const sitterprofile = await Sitter.update({ 
-        userId: userId,
+    const sitterprofile = await Sitter.update({
+        userId: user.userId,
         userName: userName,
         gender: gender,
         address: address,
@@ -198,10 +199,27 @@ router.patch("/sitterprofile/:userId", upload.fields([{name:'imageUrl'},{name:'m
         mainImageUrl: mainImageUrl,
         zoneCode: zoneCode
     },
-        {where: {userId: userId}} );
+        {where: {userId: user.userId}} );
     res.json({ sitterprofile });
     }catch(error){
         console.log(error);
+    }
+})
+
+// 마이페이지 돌보미, 펫 사진 보내주기
+router.get("/info", authMiddleware, async (req, res) => {
+    try{
+        const { user } = res.locals;
+        const sitterprofile = await Sitter.findOne({ where: {userId: user.userId } });
+        const petprofile = await Pet.findAll({ where: {userId: user.userId }});
+        console.log(petprofile[1].petImage);
+
+        const sitterimageUrl = sitterprofile.imageUrl;
+        const sitterMainImageUrl = sitterprofile.mainImageUrl;
+
+        res.json({sitterimageUrl,sitterMainImageUrl, petprofile});
+    }catch(error){
+        console.error(error);
     }
 })
 
