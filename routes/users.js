@@ -12,8 +12,7 @@ require("dotenv").config();
 
 
 
-//signup
-
+//signup 회원가입
 router.post('/signup', async (req, res) => {
   try {
     const { userEmail, 
@@ -56,8 +55,6 @@ router.post('/signup', async (req, res) => {
 
 
 
-
-
 // login 로그인 
 router.post("/login", async (req, res) => {
   try {
@@ -82,7 +79,7 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign({
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '10d'
+      expiresIn: '20s'
     });
     const refreshToken = jwt.sign({
       userEmail: user.userEmail
@@ -90,8 +87,8 @@ router.post("/login", async (req, res) => {
       expiresIn: '10d'
     });
     console.log(refreshToken)
-      await User.update({ refreshToken }, { where: { userEmail } });
-    res.cookie('jwt', refreshToken, {
+      await user.update({ refreshToken }, { where: { userEmail: user.userEmail } });
+    res.cookie('refreshToken', refreshToken, {
        httpOnly: true,
        sameSite: "none",
        secure: true,
@@ -104,9 +101,10 @@ router.post("/login", async (req, res) => {
 
 
 
-//refreshToken check  리프레시토큰 체크 
-router.get('/refresh', async(req, res) => {
-  const refreshToken = req.cookies.refreshToken
+//refreshToken check  리프레시토큰 재발급
+/*router.post('/refresh', async(req, res) => {
+  const refreshToken = req.headers.cookie
+  console.log(refreshToken)
   if (!refreshToken) {
     return res.status(401).json({ errorMessage: "토큰 검증실패1" });
   }
@@ -122,7 +120,7 @@ router.get('/refresh', async(req, res) => {
             return res.status(401).send({ errorMessage: "토큰 검증실패3" });
           } else {
             const accessToken = jwt.sign({
-              userEmail: user.userEmail
+              userEmail: refreshToken.userEmail
             }, process.env.ACCESS_TOKEN_SECRET, {
               expiresIn: '10m'
             });
@@ -137,7 +135,32 @@ router.get('/refresh', async(req, res) => {
         return res.status(401).send({ errorMessage: "토큰 검증실패4" });
       }
     }
-  });
+  });*/
+
+  
+  //refreshToken check 로컬에서 테스트완료
+router.post('/refresh', (req, res) => {
+  if (req.cookies?.jwt) {
+    // Destructuring refreshToken from cookie
+    const refreshToken = req.cookies.jwt;
+    // Verifying refresh token
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, 
+    (err, decoded) => {
+          if (err) {
+              // Wrong Refesh Token
+              return res.status(406).json({ message: '리프레시 토큰 오류' });
+          } else {
+              // Correct token we send a new access token
+              const user = { userEmail: refreshToken.userEmail }
+              const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '60s'
+              });
+              return res.json({ accessToken });
+        };
+      }); } else {
+      return res.status(406).json({ message: '토큰 발급 불가' });
+  }});
+
 
 
 
@@ -146,32 +169,34 @@ router.get('/refresh', async(req, res) => {
 router.post('/id_check', async (req, res) => {
   try {
     const { phoneNumber } = req.body;
-    if (phoneNumber === " ") {
+    if (phoneNumber === undefined) {
       res.status(400).send({
         errorMessage: "핸드폰 번호를 확인해주세요.",
       });
       return;
     }
-    const user = await User.findOne({where: { phoneNumber }});
+    const user = await User.findOne({where: { phoneNumber: phoneNumber }});
+    console.log(phoneNumber)
     console.log(user);
     if (!user) {
       res.status(406).send({ errorMessage: "존재하지 않는 번호입니다" });
       return;
-    } if(user) {
-      return res.status(200).send({message :" 이메일 확인" , userEmail
-     });
-  } }catch (err) {
+    } else {
+      return res.status(200).send({message :" 이메일 확인" , userEmail:user.userEmail});
+  }}catch (err) {
     res.status(400).json({ errorMessage: "fail" });
   }
 });
+
+
 
 //password check  유저 비밀번호 찾기 
 router.post('/password_check', async (req, res) => {
   const { userEmail } = req.body;
   try {
-    if (userEmail === "") {
+    if (userEmail === undefined) {
       res.status(400).send({
-        errorMessage: "빈 문자열입니다."  });
+        errorMessage: "이메일을 확인해 주세요."  });
       return; }
     const user = await User.findOne({where: { userEmail } });
     console.log(user);
@@ -198,7 +223,10 @@ router.post('/password_check', async (req, res) => {
     res.status(400).json({ errorMessage: "fail" });
   }});
 
-//usercheck 
+
+
+
+//usercheck 유저정보조회
 router.get('/auth', authMiddleware, (req, res) => {
   try {
     const { user } = res.locals ;
