@@ -1,5 +1,4 @@
 const express = require("express");
-const connect_MongoDB = require("./schemas/connect_db");
 const {sequelize} = require("./models");
 
 const reviewsRouter = require("./routes/reviews.js");
