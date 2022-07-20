@@ -207,5 +207,34 @@ router.get('/auth', authMiddleware, (req, res) => {
   }
 });
 
+//비밀번호 변경 
+router.put('/password_change',authMiddleware, async (req, res) => {
+  try {
+  
+    let { password, newPassword ,userEmail} = req.body;
+    const salt = await bcrypt.genSalt(Number(process.env.SALT));
+    const newHash = bcrypt.hashSync(newPassword, salt);
+
+    const users = await User.findOne({ where: { userEmail } });
+        if (!users) {
+          return res.status(401).send({ errorMessage: "비밀번호를 확인해 주세요" });
+        } else {
+          const hashed = bcrypt.compareSync(password, users.password);
+          if (!hashed) {
+            return res.status(401).send({ errorMessage: "비밀번호가 일치하지 않습니다." });
+          } else {
+            await User.update({ password: newHash }, { where: { userEmail } });
+            return res.status(200).send({ message: "비밀번호 변경 성공!" });
+          }
+        }
+      } catch (err) {
+        if (err) {
+          console.log(err);
+          res.status(400).send({ errorMessage: "비밀번호 변경 실패" });
+        }
+      }
+  });
+
+
 
 module.exports = router;
