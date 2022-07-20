@@ -27,11 +27,24 @@ router.post("/search", async (req, res) => {
   const sitters2 = await Sitter.findAll({
   });
 
-  for(i=0; i<sitters2.length; i++){
-    const intersection = searchDate.split(",").filter(x => sitters2[i].noDate.split(",").includes(x));
-    if(!intersection.length){
-      sitters.push(sitters2[i]);
-    }
+  const date = searchDate.split(",")
+  console.log(date)
+  if(!sitters?.length){
+    const sitter2 = await Sitter.findAll({
+      where:{
+          noDate: {
+        [Op.notIn]: [searchDate],
+      },
+      category: {
+        [Op.in]: [category],
+      },
+         order: distance,
+         where: Sequelize.where(distance, { [Op.lte]: radius }),
+         logging: console.log,
+       }
+    })
+    return res.send({sitter2})
+
   }
   res.send({sitters});
 });
