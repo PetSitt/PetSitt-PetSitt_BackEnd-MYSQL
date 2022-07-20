@@ -3,6 +3,12 @@ const Sequelize = require('sequelize');
 module.exports = class Sitter extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
+            sitterId: {
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+            type: Sequelize.INTEGER,
+            },
             userId: {
                 type: Sequelize.STRING
             },
@@ -11,6 +17,10 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:""
             },
             detailAddress:{
+              type: Sequelize.STRING,
+              defaultValue:""
+            },
+            sitterName: {
               type: Sequelize.STRING,
               defaultValue:""
             },
@@ -31,10 +41,10 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:""
             },
             careSize: {
-              type:Sequelize.BOOLEAN,
+              type:Sequelize.JSON,
             },
             category: {
-              type:Sequelize.BOOLEAN,
+              type:Sequelize.JSON,
             },
             plusService: {
               type:Sequelize.JSON,
@@ -42,7 +52,7 @@ module.exports = class Sitter extends Sequelize.Model {
             noDate:{
               type: Sequelize.JSON,
             },
-            sevicePrice: {
+            servicePrice: {
               type: Sequelize.INTEGER,
               defaultValue:0
             },
@@ -62,7 +72,6 @@ module.exports = class Sitter extends Sequelize.Model {
               type: Sequelize.STRING,
               defaultValue:""
             },
-           
             location: {
               type:Sequelize.GEOMETRY('POINT')
             },
@@ -71,12 +80,6 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:0
             },
             zoneCode: {
-              type: Sequelize.STRING,
-            },
-            userName: {
-              type: Sequelize.STRING,
-            },
-            gender: {
               type: Sequelize.STRING,
             }
         }, {

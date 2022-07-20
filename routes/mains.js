@@ -23,41 +23,17 @@ router.post("/search", async (req, res) => {
   const { region_2depth_name, searchDate, category,radius,x,y } = req.body;
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${ x } ${  y })')`)
   const distance = Sequelize.fn('ST_Distance', Sequelize.col('location'), location)
- 
-  const sitters = await Sitter.findAll({
-    where: {
-      region_2depth_name: {
-        [Op.eq]: region_2depth_name,
-      },
-      noDate: {
-        [Op.notIn]: searchDate,
-      },
-      category: {
-        [Op.in]: [category],
-      },
-    },
-  
+  const sitters = [];
+  const sitters2 = await Sitter.findAll({
   });
-  const date = searchDate.split(",")
-  console.log(date)
-  if(!sitters?.length){
-    const sitter2 = await Sitter.findAll({
-      where:{
-          noDate: {
-        [Op.notIn]: [searchDate],
-      },
-      category: {
-        [Op.in]: [category],
-      },
-         order: distance,
-         where: Sequelize.where(distance, { [Op.lte]: radius }),
-         logging: console.log,
-          }
 
-    })
-    return res.send({sitter2})
+  for(i=0; i<sitters2.length; i++){
+    const intersection = searchDate.split(",").filter(x => sitters2[i].noDate.split(",").includes(x));
+    if(!intersection.length){
+      sitters.push(sitters2[i]);
+    }
   }
-  res.send({ sitters});
+  res.send({sitters});
 });
 
 module.exports = router;
