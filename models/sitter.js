@@ -40,7 +40,10 @@ module.exports = class Sitter extends Sequelize.Model {
               type:Sequelize.JSON,
             },
             noDate:{
-              type: Sequelize.JSON,
+              type: Sequelize.STRING,
+                get() {
+                    return this.getDataValue('noDate').split(',')
+                },
             },
             sevicePrice: {
               type: Sequelize.INTEGER,

@@ -52,8 +52,7 @@ router.post("/search", async (req, res) => {
          order: distance,
          where: Sequelize.where(distance, { [Op.lte]: radius }),
          logging: console.log,
-          }
-
+       }
     })
     return res.send({sitter2})
   }

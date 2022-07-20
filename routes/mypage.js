@@ -46,7 +46,6 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
         const { userName, phoneNumber, userEmail } = req.body;
-
         const myprofile = await User.update({userName: userName, phoneNumber: phoneNumber, userEmail: userEmail}, 
             { where: {userId: user.userId}} );
         res.json({ myprofile });
@@ -67,6 +66,7 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
     }
 })
 
+
 // 마이페이지 - 돌보미 프로필조회 / 미들웨어 없이 테스트 ok
 router.get("/sitterprofile", authMiddleware, async (req, res) => {
     try{
@@ -83,6 +83,7 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
     }
 })
 
+
 // 마이페이지 - 반려동물 프로필 등록
 router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
@@ -96,6 +97,7 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
         console.log(error);
     }
 })
+
 
 // 마이페이지 - 돌보미 등록  / 미들웨어 없이 테스트 ok
 router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
@@ -222,5 +224,6 @@ router.get("/info", authMiddleware, async (req, res) => {
         console.error(error);
     }
 })
+
 
 module.exports = router;

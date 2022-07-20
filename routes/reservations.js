@@ -32,6 +32,8 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
+
+
 //예약하기 페이지 - 예약등록
 router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
   try{
@@ -81,10 +83,10 @@ router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
     });
     reservation.save();
 
+    
     //돌보미 - 예약불가 기간에 추가해줍니다.
     reservationDate.forEach((el) => sitter.noDate.push(el));
     sitter.save();
-
     return res.status(200).send({ msg: "예약 완료" });
 
   } catch {
@@ -110,11 +112,9 @@ router.get("/lists", authMiddleware, async (req, res) => {
 
       case 'sitter': // 돌보미탭 검색
         const sitter = await Sitter.findOne({ userId: user._id });
-
         if (!sitter) {
           return res.status(402).send({ errorMessage: "돌보미 정보가 없습니다." });
         }
-
         searchQuery = { "sitterId": sitter.id };
         dataForm = setSitterFormReservation; // 보내는 데이터세팅 함수
         break;
@@ -159,7 +159,6 @@ router.get("/lists/:reservationId", authMiddleware, async (req, res) => {
     const { user } = res.locals;
     const { reservationId } = req.params;
     const { searchCase } = req.query;
-
     switch (searchCase) {
       case 'user': // 사용자탭 검색
         searchQuery = { "userId": user.id };
@@ -172,7 +171,6 @@ router.get("/lists/:reservationId", authMiddleware, async (req, res) => {
         if (!sitter) {
           return res.status(402).send({ errorMessage: "돌보미 정보가 없습니다." });
         }
-
         searchQuery = { "sitterId": sitter.id };
         dataForm = setSitterFormReservation;
         break;
@@ -298,6 +296,8 @@ router.put("/cancel/:reservationId", authMiddleware, async (req, res) => {
     return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
   }
 });
+
+
 
 //예약 보기용 데이터 세팅 함수 - 유저탭
 const setUserFormReservation = async (array) => {

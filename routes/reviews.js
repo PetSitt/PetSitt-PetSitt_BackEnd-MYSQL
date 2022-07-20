@@ -50,7 +50,6 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
           pure_members.push(review.userId);
         }
       }); 
-
       // (총리뷰수 + 중복이 일어난 멤버 - 순수 멤버 수) / 총리뷰수 * 100 = 재고용률
       sitter.rehireRate = ((totalReview + dup_members.size - pure_members.length) / totalReview * 100)?.toFixed(1);
       sitter.save();
