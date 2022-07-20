@@ -1,27 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const {Pet} = require("../schemas/pet");
-const {Reservation} = require("../schemas/reservation.js");
+const { Pet } = require("../models");
+const { Reservation } = require("../models");
 const authMiddleware = require("../middlewares/auth-middleware.js");
 const multer = require('multer');
-const { Sitter } = require("../schemas/sitter");
+const { Sitter } = require("../models");
+const { User } = require("../models");
 require("dotenv").config();
 
-//예약하기 페이지 - 내 펫정보 요청
+//예약하기 페이지 - 내 펫정보 요청 -- MYSQL 변경완료 / 프론트연결 테스트 x
 router.get("/", authMiddleware, async (req, res) => {
   try{
-    const user = res.locals.user; 
 
-    const pets = await Pet.find(
-      { userId: user._id },
-      {
-        userId:     false,
-        petAge:     false,
-        petSpay:    false,
-        petIntro:   false,
-        petWeight:  false,
-        __v:        false,
-      });
+    const { user } = res.locals;
+    const pets = await Pet.findAll({ where: {userId: user.userId }});
 
     return res.status(200).send({
       pets
@@ -33,25 +25,29 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 
-
-//예약하기 페이지 - 예약등록
+//예약하기 페이지 - 예약등록 -- MYSQL 변경완료 / 프론트연결 테스트 x
 router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
   try{
     const { user } = res.locals;
     const { sitterId } = req.params;
-    const {
+    let {
       petIds,
       category,
       reservationDate,
     } = req.body;
 
+    petIds = JSON.parse(petIds);
+    category = JSON.parse(category);
+    reservationDate = JSON.parse(reservationDate);
+    
     if (!petIds?.length   ||
         !category?.length ||
         !reservationDate?.length) {
       return res.status(401).send({ errorMessage: "필수정보를 기입해주세요." }); 
     }
 
-    const sitter = await Sitter.findById(sitterId);
+    const sitter = await Sitter.findOne({ where: {sitterId: sitterId } });
+    const noDate = JSON.parse(sitter.noDate);
     if (!sitter) {
       return res.status(402).send({
         errorMessage: "돌보미정보가 없습니다.",
@@ -61,7 +57,7 @@ router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
     //예약 안되는 날짜 체크
     let possible_check = false;
     reservationDate.forEach((el)=> {
-      if (sitter.noDate.includes(el)) {
+      if (noDate.includes(el)) {
         possible_check = true;
       }
     });
@@ -73,7 +69,7 @@ router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
     }
 
     //예약등록
-    const reservation = new Reservation({
+    const reservation = await Reservation.create({
       userId: user.id,
       sitterId,
       petId: petIds,
@@ -81,12 +77,12 @@ router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
       category: category,
       reservationDate: reservationDate,
     });
-    reservation.save();
 
     
     //돌보미 - 예약불가 기간에 추가해줍니다.
-    reservationDate.forEach((el) => sitter.noDate.push(el));
-    sitter.save();
+
+    reservationDate.forEach((el) => noDate.push(el));
+    await Sitter.update({ noDate: noDate }, { where: {sitterId: sitterId } })
     return res.status(200).send({ msg: "예약 완료" });
 
   } catch {
@@ -304,29 +300,32 @@ const setUserFormReservation = async (array) => {
   const setArray = [];
 
   if (!array?.length) {
-    return setArray;
+  return setArray;
   } 
 
   for ( let i = 0; i < array.length; i++) {
-    const sitter = await Sitter.findById(array[i].sitterId); //돌보미 정보
-    if (!sitter) continue;
+      const sitter = await Sitter.findOne({ where : { sitterId: array[i].sitterId } })
+      if (!sitter) continue;
 
-    const user   = await User.findById(sitter?.userId); //돌보미의 유저정보
-    if (!user ) continue;
+      const user   = await User.findOne({ where: { userId: sitter.userId }}); //돌보미의 유저정보
+      if (!user ) continue;
 
-    const reservation = {
-      category:         array[i].category,
-      reservationDate:  array[i].reservationDate,
-      reservationId:    array[i].id,
-      reservationState: array[i].reservationState,
-      sitterId:         array[i].sitterId,
-      sitterName:       user.userName,
-      imageUrl:         sitter.imageUrl,
-      address:          sitter.address,
-      phoneNumber:      user.phoneNumber,
-    };
+      const decode_category     = JSON.parse(array[i].category);
+      const decode_reservationDate  = JSON.parse(array[i].reservationDate);
 
-    setArray.push(reservation);
+      const reservation = {
+          category:         decode_category,
+          reservationDate:  decode_reservationDate,
+          reservationId:    array[i].id,
+          reservationState: array[i].reservationState,
+          sitterId:         array[i].sitterId,
+          sitterName:       user.userName,
+          imageUrl:         sitter.imageUrl,
+          address:          sitter.address,
+          phoneNumber:      user.phoneNumber,
+      };
+
+      setArray.push(reservation);
   }
 
   return setArray;
@@ -341,12 +340,15 @@ const setSitterFormReservation = async (array) => {
   } 
 
   for ( let i = 0; i < array.length; i++) {
-    const user   = await User.findById(array[i].userId); //신청자 유저정보
+    const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
     if (!user ) continue;
 
+    const decode_category     = JSON.parse(array[i].category);
+    const decode_reservationDate  = JSON.parse(array[i].reservationDate);
+
     const reservation = {
-      category:         array[i].category,
-      reservationDate:  array[i].reservationDate,
+      category:         decode_category,
+      reservationDate:  decode_reservationDate,
       reservationId:    array[i].id,
       reservationState: array[i].reservationState,
       sitterId:         array[i].sitterId,
