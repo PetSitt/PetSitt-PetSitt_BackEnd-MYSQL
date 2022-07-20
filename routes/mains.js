@@ -19,7 +19,6 @@ router.post("/", async (req, res) => {
   });
 
 
-
   
   router.post("/search", async (req, res) => {
     const { region_2depth_name, searchDate, category, radius, x, y } = req.body;
