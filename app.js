@@ -6,9 +6,9 @@ const mainRouter = require("./routes/mains.js");
 const cookieParser = require('cookie-parser');
 const mypageRouter = require("./routes/mypage");
 const usersRouter = require("./routes/users");
-const reservationRouter = require("./routes/reservations.js");
-const diaryRouter = require("./routes/diarys.js");
-const detailsRouter = require("./routes/details.js");
+// const reservationRouter = require("./routes/reservations.js");
+// const diaryRouter = require("./routes/diarys.js");
+// const detailsRouter = require("./routes/details.js");
 const cors = require('cors');
 require("dotenv").config();
 
@@ -41,12 +41,12 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/api",[usersRouter]);
-app.use("/details", [detailsRouter]);
+// app.use("/details", [detailsRouter]);
 app.use("/reviews", [reviewsRouter]);
 app.use("/mains", [mainRouter]);
 app.use("/mypage", [mypageRouter]);
-app.use("/reservations", [reservationRouter]);
-app.use("/diarys", [diaryRouter]);
+// app.use("/reservations", [reservationRouter]);
+// app.use("/diarys", [diaryRouter]);
 
 
 app.listen(port, () => {

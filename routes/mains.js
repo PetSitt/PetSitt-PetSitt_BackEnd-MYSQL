@@ -4,60 +4,65 @@ const { Op, Sequelize } = require("sequelize");
 const { Sitter } = require("../models");
 
 router.post("/", async (req, res) => {
-  const {x,y,radius} = req.body;
-  const location = Sequelize.literal(`ST_GeomFromText('POINT(${ x } ${  y })')`)
-  const distance = Sequelize.fn('ST_Distance', Sequelize.col('location'), location)
+  const { x, y, category } = req.body;
+  const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
+  const distance = Sequelize.fn(
+    "ST_Distance",
+    Sequelize.col("location"),
+    location
+  );
+  const sitter = []
   const sitters = await Sitter.findAll({
     order: distance,
-    where: Sequelize.where(distance, { [Op.lte]: radius }),
-    logging: console.log,
-    category: {
-      [Op.in]: [category],
-    },
-  })
-    res.send({sitters})
+    where: Sequelize.where(distance, { [Op.lte]: 0.5 }),
   });
-
+  for(i=0; i<sitters.length; i++){
+    const intersection2 = category.filter(x => sitters[i].category.includes(x));
+    if(intersection2.length === category.length ){
+      sitter.push(sitters[i]);
+    }
+  }
+  res.send({ sitter });
+});
 
 router.post("/search", async (req, res) => {
-  const { region_2depth_name, searchDate, category,radius,x,y } = req.body;
-  const location = Sequelize.literal(`ST_GeomFromText('POINT(${ x } ${  y })')`)
-  const distance = Sequelize.fn('ST_Distance', Sequelize.col('location'), location)
- 
-  const sitters = await Sitter.findAll({
-    where: {
-      region_2depth_name: {
-        [Op.eq]: region_2depth_name,
-      },
-      noDate: {
-        [Op.notIn]: searchDate,
-      },
-      category: {
-        [Op.in]: [category],
-      },
-    },
-  
-  });
-  const date = searchDate.split(",")
-  console.log(date)
-  if(!sitters?.length){
-    const sitter2 = await Sitter.findAll({
-      where:{
-          noDate: {
-        [Op.notIn]: [searchDate],
-      },
-      category: {
-        [Op.in]: [category],
-      },
-         order: distance,
-         where: Sequelize.where(distance, { [Op.lte]: radius }),
-         logging: console.log,
-          }
+  const {region_2depth_name, searchDate, category, x, y } = req.body;
+  const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
+  const distance = Sequelize.fn(
+    "ST_Distance",
+    Sequelize.col("location"),
+    location
+  );
 
-    })
-    return res.send({sitter2})
+  const sitters = [];
+  const sitters2 = await Sitter.findAll({ where: {
+    region_2depth_name: { [Op.eq]: region_2depth_name }
   }
-  res.send({ sitters});
+})
+
+  for(i=0; i<sitters2.length; i++){
+    const intersection = searchDate.filter(x => sitters2[i].noDate.includes(x));
+    const intersection2 = category.filter(x => sitters2[i].category.includes(x));
+    if(!intersection.length && intersection2.length === category.length ){
+      sitters.push(sitters2[i]);
+    }
+  }
+
+  if(!sitters?.length){
+    const sitters2 = await Sitter.findAll({
+      order: distance,
+      where: Sequelize.where(distance, { [Op.lte]: 0.5 }),
+  });
+  for(i=0; i<sitters2.length; i++){
+    const intersection = searchDate.filter(x => sitters2[i].noDate.includes(x));
+    const intersection2 = category.filter(x => sitters2[i].category.includes(x));
+    if(!intersection.length && intersection2.length === category.length ){
+      sitters.push(sitters2[i]);
+    }
+  }
+    return res.send({sitters})
+  }
+    res.send({sitters});
 });
 
 module.exports = router;

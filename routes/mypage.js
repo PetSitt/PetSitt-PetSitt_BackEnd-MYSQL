@@ -100,14 +100,14 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
 // 마이페이지 - 돌보미 등록  / 미들웨어 없이 테스트 ok
 router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
     const { user } = res.locals;
-    const { userName, gender, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, x, y, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
-    const imageUrl = req.files.imageUrl[0].location;
-    const mainImageUrl = req.files.mainImageUrl[0].location;
+    const { sitterName, gender, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, x, y, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
+    // const imageUrl = req.files.imageUrl[0].location;
+    // const mainImageUrl = req.files.mainImageUrl[0].location;
     const location = { type: 'Point', coordinates: [x, y]};
     try{
         const createSitter =  await Sitter.create({
             userId: user.userId,
-            userName: userName,
+            sitterName: sitterName,
             gender: gender,
             address: address,
             detailAddress: detailAddress,
@@ -122,8 +122,8 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
             plusService: plusService, // 추가 가능한 서비스 (배열)
             noDate: noDate,
             location: location,
-            imageUrl: imageUrl,
-            mainImageUrl: mainImageUrl,
+            // imageUrl: imageUrl,
+            // mainImageUrl: mainImageUrl,
             zoneCode: zoneCode
         });
         res.json({ createSitter })
