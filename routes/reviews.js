@@ -25,11 +25,13 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
 
     review.save();
 
+
+
     // 예약상태 변경
     await Reservation.updateOne({ reservationId }, { $set: { reservationState: "진행완료" } });
 
     const reviews = await Review.find({sitterId});
-    
+
     if ( reviews?.length > 0 ) {
       const sitter = await Sitter.findById(sitterId);
       const totalReview = reviews.length + 1;
@@ -85,29 +87,5 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
     return res.status(400).send({ errorMessage: "요청 실패" });
   }
 });
-
-// // 리뷰 수정하기
-// router.put("/:reservationId", authMiddleware, async (req, res) => {
-//   try {
-//     const { user } = res.locals;
-//     const { reservationId } = req.params;
-//     const { reviewStar, reviewInfo } = req.body;
-
-//     // 리뷰정보 가져오기 - 내가 신청자일 때 수정가능
-//     const review = await Review.findOne({ reservationId, userId: user._id });
-//     if (!review) {
-//       return res.status(402).send({ errorMessage: "등록된 리뷰가 없습니다." });
-//     }
-
-//     // 수정이 없을 부분은 변수에 null 넣어보내기로 약속
-//     if (reviewStar) review.reviewStar = reviewStar;
-//     if (reviewInfo) review.reviewInfo = reviewInfo;
-
-//     review.save();
-
-//   } catch {
-//     return res.status(400).send({ errorMessage: "요청 실패" });
-//   }
-// });
 
 module.exports = router;

@@ -30,7 +30,7 @@ const storage = multerS3({
 
 const upload = multer({ storage: storage });
 
-// 마이페이지 - 내프로필 조회 
+// 마이페이지 - 내프로필 조회 -> MYSQL 적용 프론트 테스트 OK
 router.get("/myprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
@@ -42,7 +42,7 @@ router.get("/myprofile", authMiddleware, async (req, res) => {
     }
 })
 
-// 마이페이지 - 내프로필 수정 
+// 마이페이지 - 내프로필 수정 -> MYSQL 적용 프론트 테스트 OK
 router.patch("/myprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
@@ -56,7 +56,7 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
     }
 })
 
-// 마이페이지 - 반려동물 프로필조회
+// 마이페이지 - 반려동물 프로필조회 -> MYSQL 적용 프론트 테스트 OK
 router.get("/petprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
@@ -68,7 +68,7 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
     }
 })
 
-// 마이페이지 - 돌보미 프로필조회 / MYSQL프론트 테스트 ok
+// 마이페이지 - 돌보미 프로필조회 -> MYSQL 적용 프론트 테스트 OK
 router.get("/sitterprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
@@ -78,10 +78,10 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
         if (!sitter) { return res.status(200).send({sitterprofile, isError: true}); }
         sitterprofile = sitter;
         if(sitterprofile){
-            sitterprofile.careSize = JSON.parse(sitter.careSize);
-            sitterprofile.category = JSON.parse(sitter.category);
-            sitterprofile.plusService = JSON.parse(sitter.plusService);
-            sitterprofile.noDate = JSON.parse(sitter.noDate);
+            // sitterprofile.careSize = JSON.parse(sitter.careSize);
+            // sitterprofile.category = JSON.parse(sitter.category);
+            // sitterprofile.plusService = JSON.parse(sitter.plusService);
+            // sitterprofile.noDate = JSON.parse(sitter.noDate);
             res.json({ sitterprofile });
         }else{
             res.json({ result: "success" });
@@ -91,10 +91,9 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
     }
 })
 
-// 마이페이지 - 반려동물 프로필 등록
+// 마이페이지 - 반려동물 프로필 등록 -> MYSQL 적용 프론트 테스트 OK
 router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
-        console.log(req.file)
         const { user } = res.locals;
         const { petName, petAge, petWeight, petType, petSpay, petIntro } = req.body;
         if(req.file != undefined){
@@ -110,15 +109,13 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
     }
 })
 
-// 마이페이지 - 돌보미 등록  / 프론트 테스트 ok
+// 마이페이지 - 돌보미 등록  -> MYSQL 적용 프론트 테스트 OK
 router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
     try{
-        
         const { user } = res.locals;
-        const { x, y, sitterName, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
+        const { sitterName, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
         
-        const imageUrl = req.files.imageUrl[0].location;
-        const mainImageUrl = req.files.mainImageUrl[0].location;
+
 
         const decode_careSize     = JSON.parse(careSize);
         let   decode_noDate       = JSON.parse(noDate);
@@ -131,7 +128,11 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
             return (new Date(el)).toISOString().split('T')[0].replaceAll('-', '/');
             });
         }
-
+        let { x, y } = req.body;
+        if (x === 'undefined' || y === 'undefined' || !x || !y ) {
+        x = 0;
+        y = 0;
+        }
         const location = { type: 'Point', coordinates: [x, y]};
         const createSitter =  await Sitter.create({
             userId: user.userId,
@@ -148,18 +149,26 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
             servicePrice: servicePrice, // 일당 서비스 금액
             plusService: decode_plusService, // 추가 가능한 서비스 (배열)
             noDate: decode_noDate,
-            location: location,
-            imageUrl: imageUrl,
-            mainImageUrl: mainImageUrl,
-            zoneCode: zoneCode
+            zoneCode: zoneCode,
+            location: location
         });
+        if(req.files.imageUrl != undefined){
+            const imageUrl = req.files.imageUrl[0].location;
+            await Sitter.update({ imageUrl: imageUrl },
+                {where: {userId: user.userId}} )
+        }
+        if(req.files.mainImageUrl != undefined){
+            const mainImageUrl = req.files.mainImageUrl[0].location;
+            await Sitter.update({ mainImageUrl: mainImageUrl },
+                {where: {userId: user.userId}} )
+        }
         res.json({ createSitter })
     }catch(error){
         console.error(error);
     }
 })
 
-// 마이페이지 - 돌보미 프로필 삭제 / 미들웨어 없이 테스트 ok
+// 마이페이지 - 돌보미 프로필 삭제 -> MYSQL 적용 프론트 테스트 OK
 router.delete("/sitterprofile", authMiddleware, async (req, res) => {
     const { user } = res.locals;
     try{
@@ -195,7 +204,7 @@ router.delete("/sitterprofile", authMiddleware, async (req, res) => {
     }
 })
 
-// 마이페이지 - 반려동물 프로필 삭제 / 미들웨어 없이 테스트 ok
+// 마이페이지 - 반려동물 프로필 삭제 -> MYSQL 적용 프론트 테스트 OK
 router.delete("/petprofile/:petId", async (req, res) => {
     const { petId } = req.params;
     try{
@@ -221,12 +230,25 @@ router.delete("/petprofile/:petId", async (req, res) => {
     }
 })
 
-// 반려동물 프로필 수정 
+// 반려동물 프로필 수정 -> MYSQL 적용 프론트 테스트 OK
 router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
     const { petId } = req.params;
     const { petName, petAge, petWeight, petType, petSpay, petIntro } = req.body;
+    const pet = await Pet.findOne({ where: { petId: petId }}); 
     if(req.file != undefined){
+        const delFile = pet.petImage.substr(51);
+        const delParams = {
+            Bucket: process.env.MY_S3_BUCKET || "avostorage",
+            Key: delFile
+        };
+        s3.deleteObject(delParams, function (error, data) {
+            if (error) {
+                console.log('err: ', error, error.stack);
+            } else {
+                console.log(data, " 정상 삭제 되었습니다.");
+            }
+        })
         const petImage = req.file.location;
         await Pet.update({ petName: petName, petAge: petAge, petWeight: petWeight, petType: petType, petSpay: petSpay, petIntro: petIntro, petImage: petImage },
             {where: {petId: petId}} );
@@ -241,17 +263,28 @@ router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), as
     }
 })
 
-// 마이페이지 - 돌보미 프로필 수정 / 미들웨어 없이 테스트 ok 
+// 마이페이지 - 돌보미 프로필 수정 -> MYSQL 적용 프론트 테스트 OK
 router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
+    const { user } = res.locals;
     try{
-    const { user } = req.locals;
-    const { userName, gender, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, x, y, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
-    const location = { type: 'Point', coordinates: [x, y]};
+    const { x,y,sitterName, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
+    
+    const decode_careSize     = JSON.parse(careSize);
+    let   decode_noDate       = JSON.parse(noDate);
+    const decode_category     = JSON.parse(category);
+    const decode_plusService  = JSON.parse(plusService);
+
+    // 밀리초 형식으로 넘어온 Date형식을 "2022/07/11" 형식으로 변환한다.
+    if (decode_noDate?.length) {
+        decode_noDate = decode_noDate.map((el) => {
+        return (new Date(el)).toISOString().split('T')[0].replaceAll('-', '/');
+        });
+    }
+
     const sitter = await Sitter.findOne({ where: { userId: user.userId }});
     const sitterprofile = await Sitter.update({
         userId: user.userId,
-        userName: userName,
-        gender: gender,
+        sitterName: sitterName,
         address: address,
         detailAddress: detailAddress,
         region_1depth_name: region_1depth_name,
@@ -259,15 +292,27 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
         region_3depth_name: region_3depth_name,
         introTitle: introTitle,
         myIntro: myIntro,
-        careSize: careSize,
-        category: category,  // 제공 가능한 서비스
+        careSize: decode_careSize,
+        category: decode_category, // 제공 가능한 서비스
         servicePrice: servicePrice, // 일당 서비스 금액
-        plusService: plusService, // 추가 가능한 서비스 (배열)
-        noDate: noDate,
-        location: location,
+        plusService: decode_plusService, // 추가 가능한 서비스 (배열)
+        noDate: decode_noDate,
         zoneCode: zoneCode
-    },
-        {where: {userId: user.userId}} );
+    }, {
+        where: {
+            userId: user.userId
+        }
+    });
+
+    if(x !== 'undefined') {
+        console.log(x)
+        console.log('1')
+        const location = { type: 'Point', coordinates: [x, y]};
+        await Sitter.update({
+            location: location
+        },
+            {where: {userId: user.userId}} );
+    }
 
     if(req.files.imageUrl != undefined){
         const delFile = sitter.imageUrl.substr(51);
