@@ -34,6 +34,7 @@ router.post("/", async (req, res) => {
   });
 });
 
+
 router.post("/search", async (req, res) => {
   const {region_2depth_name, searchDate, category, x, y, radius } = req.body;
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);

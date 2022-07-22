@@ -12,6 +12,7 @@ router.get("/:sitterId", async(req, res) => {
     var sitter_info = await Sitter.findOne({where: {sitterId: req.params.sitterId}});
     var user_info = await User.findOne({where: {userId: sitter_info.userId}});
     var pet_info = await Pet.findAll({ where: { userId: user_info.userId } });
+
     if (!sitter_info || !user_info) {
       throw new Error();
     }
@@ -92,5 +93,6 @@ router.get("/:sitterId", async(req, res) => {
 //     return res.status(400).send("DB정보를 받아오지 못했습니다.");
 //   }
 // });
+
 
 module.exports = router;

@@ -5,9 +5,7 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const authMiddleware = require('../middlewares/auth-middleware');
 const bcrypt = require('bcrypt');
-const nodemailer = require("nodemailer");
 const mailer = require("../mail/passwordEmail");
-const cookieParser = require('cookie-parser');
 require("dotenv").config();
 
 
@@ -21,7 +19,7 @@ router.post('/signup', async (req, res) => {
             phoneNumber, 
           } = (req.body);
     const refreshToken= "";
-   // userEmail 중복확인 
+//userEmail 중복확인 
       const existUsers = await User.findAll({
          where: {
            [Op.or]: [{userEmail}, {phoneNumber}]
@@ -79,7 +77,8 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign({
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '10d'
+      expiresIn: '5s'
+
     });
     const refreshToken = jwt.sign({
       userEmail: user.userEmail
@@ -100,68 +99,35 @@ router.post("/login", async (req, res) => {
 });
 
 
-
-//refreshToken check  리프레시토큰 재발급
-/*router.post('/refresh', async(req, res) => {
-  const refreshToken = req.headers.cookie
-  console.log(refreshToken)
-  if (!refreshToken) {
-    return res.status(401).json({ errorMessage: "토큰 검증실패1" });
-  }
-     // Verifying refresh token
-     const user = await User.findAll({ where: { refreshToken } });
-    try {
-      if (!user) {
-        return res.status(401).json({ errorMessage: "토큰 검증실패2" });
-      } else {
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
-          console.log(refreshToken)
-          if (err) {
-            return res.status(401).send({ errorMessage: "토큰 검증실패3" });
-          } else {
-            const accessToken = jwt.sign({
-              userEmail: refreshToken.userEmail
-            }, process.env.ACCESS_TOKEN_SECRET, {
-              expiresIn: '10m'
-            });
-            return res.status(200).send({ message: "토큰 재발급 완료.",  
-            accessToken: accessToken, refreshToken:refreshToken });
-          }
-        });
-      }
-    } catch (err) {
-      if (err) {
-        console.log(err);
-        return res.status(401).send({ errorMessage: "토큰 검증실패4" });
-      }
-    }
-  });*/
-
-  
-  //refreshToken check 로컬에서 테스트완료
-router.post('/refresh', (req, res) => {
-  if (req.cookies?.jwt) {
+ //refreshToken check 리프레시 토큰 확인 / accessToken 재발급 
+  router.post('/refresh', (req, res) => {
     // Destructuring refreshToken from cookie
-    const refreshToken = req.cookies.jwt;
+    const refreshToken  = req.body.refreshToken;
+    if (refreshToken === undefined){
+      return res.status(401).json({ errorMessage: '리프레쉬 토큰이 없습니다.' })
+  };
+    console.log(refreshToken)
     // Verifying refresh token
+    if (req.body) {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, 
-    (err, decoded) => {
-          if (err) {
-              // Wrong Refesh Token
-              return res.status(406).json({ message: '리프레시 토큰 오류' });
-          } else {
-              // Correct token we send a new access token
-              const user = { userEmail: refreshToken.userEmail }
-              const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: '60s'
-              });
-              return res.json({ accessToken });
-        };
-      }); } else {
-      return res.status(406).json({ message: '토큰 발급 불가' });
-  }});
-
-
+    (err, user) => {
+        if (err) {
+            // Wrong Refesh Token
+            return res.status(406).json({ message: '리프레시 토큰 오류' });
+        } else {
+            // Correct token we send a new access token
+           // const user = {userEmail: refreshToken.userEmail}
+            const accessToken = jwt.sign({userEmail:user.userEmail}, process.env.ACCESS_TOKEN_SECRET, {
+              expiresIn: "20s"
+            });
+            return res.json({ 
+              ok: true,
+              message: "accessToken 재발급 성공!",
+              accessToken: accessToken });
+      };
+    }); } else {
+    return res.status(406).json({ message: '토큰 발급 불가' });
+}});
 
 
 
@@ -178,14 +144,14 @@ router.post('/id_check', async (req, res) => {
     const user = await User.findOne({where: { phoneNumber: phoneNumber }});
     console.log(phoneNumber)
     console.log(user);
-    if (!user) {
-      res.status(406).send({ errorMessage: "존재하지 않는 번호입니다" });
-      return;
-    } else {
-      return res.status(200).send({message :" 이메일 확인" , userEmail:user.userEmail});
-  }}catch (err) {
-    res.status(400).json({ errorMessage: "fail" });
-  }
+      if (!user) {
+        res.status(406).send({ errorMessage: "존재하지 않는 번호입니다" });
+        return;
+      } else {
+        return res.status(200).send({message :" 이메일 확인" , userEmail:user.userEmail});
+    }}catch (err) {
+      res.status(400).json({ errorMessage: "fail" });
+    }
 });
 
 
@@ -207,10 +173,10 @@ router.post('/password_check', async (req, res) => {
     // 새 비밀번호 (암호화)
     const randomPassword = String(Math.floor(Math.random() * 1000000) + 100000);
     const hashPassword = await bcrypt.hash(randomPassword, 10);
-    await user.update(
-      { password: hashPassword },
-      { where: { userEmail: userEmail } }
-    );
+        await user.update(
+          { password: hashPassword },
+          { where: { userEmail: userEmail } }
+        );
     let emailParam = {
       toEmail: userEmail, // 수신할 이메일
       subject: "petsitter 임시 비밀번호 메일발송", // 메일 제목
@@ -225,8 +191,7 @@ router.post('/password_check', async (req, res) => {
 
 
 
-
-//usercheck 유저정보조회
+//user_info_check 유저정보조회
 router.get('/auth', authMiddleware, (req, res) => {
   try {
     const { user } = res.locals ;
@@ -241,5 +206,68 @@ router.get('/auth', authMiddleware, (req, res) => {
   }
 });
 
+
+
+//비밀번호 변경 
+router.put('/password_change',authMiddleware, async (req, res) => {
+  try {
+  
+    let { password, newPassword ,userEmail} = req.body;
+    const salt = await bcrypt.genSalt(Number(process.env.SALT));
+    const newHash = bcrypt.hashSync(newPassword, salt);
+
+    const users = await User.findOne({ where: { userEmail } });
+        if (!users) {
+          return res.status(401).send({ errorMessage: "비밀번호를 확인해 주세요" });
+        } else {
+          const hashed = bcrypt.compareSync(password, users.password);
+          if (!hashed) {
+            return res.status(401).send({ errorMessage: "비밀번호가 일치하지 않습니다." });
+          } else {
+            await User.update({ password: newHash }, { where: { userEmail } });
+            return res.status(200).send({ message: "비밀번호 변경 성공!" });
+          }
+        }
+      } catch (err) {
+        if (err) {
+          console.log(err);
+          res.status(400).send({ errorMessage: "비밀번호 변경 실패" });
+        }
+      }
+  });
+
+//kakao login  소셜로그인
+  router.post('/auth/kakao', async (req, res) => {
+    console.log(req.body);
+    const { userEmail, userName} = req.body;
+  
+    const existsUsers = await User.findOne({ where: {userEmail: userEmail }});
+    console.log(existsUsers);
+    if (existsUsers) {
+      // 이미 해당 이메일이 DB에 있는 경우 DB에 new User로 새로 테이블을 만들어주지 않고 토큰만 보내준다.
+      return res.send({
+        result: true,
+        token: jwt.sign(
+          { userEmail: existsUsers.userEmail },
+          process.env.ACCESS_TOKEN_SECRET,
+          {expiresIn: '6h',}
+        ),
+      });
+    } else {
+      const user = await User.create({
+        userEmail,
+        userName,
+      });
+      return res.send({
+        result: true,
+        token: jwt.sign({ userEmail: user.userEmail }, 
+          process.env.ACCESS_TOKEN_SECRET,
+           {expiresIn: '6h', }
+           ),
+      });
+    }
+    // await user.save();
+  });
+  
 
 module.exports = router;
