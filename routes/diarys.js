@@ -178,7 +178,6 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
       errorMessage: "DB정보를 받아오지 못했습니다." 
     });    
   };
-
 });
 
 module.exports = router;

@@ -50,7 +50,7 @@ router.post("/", async (req, res) => {
     });
     if (!sitters.length) {
       const sitter2 = await Sitter.findAll({
-              order: distance,
+          order: distance,
           where: Sequelize.where(distance, { [Op.lte]: radius }),
           logging: console.log,
         where: {
@@ -61,7 +61,6 @@ router.post("/", async (req, res) => {
             [Op.in]: category,
           },
         },
-  
       });
       return res.send({ sitter2 });
     }

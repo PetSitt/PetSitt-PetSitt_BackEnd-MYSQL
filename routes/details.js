@@ -11,6 +11,7 @@ router.get("/:sitterId", async(req, res) => {
     var user_info   = await User.findById(sitter_info.userId);
     var pet_info    = await Pet.find({ userId: user_info._id });
 
+    console.log(sitter_info)
     if (!sitter_info || !user_info) {
       throw new Error();
     }
