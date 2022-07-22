@@ -47,7 +47,6 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
         const { userName, phoneNumber, userEmail } = req.body;
-
         const myprofile = await User.update({userName: userName, phoneNumber: phoneNumber, userEmail: userEmail}, 
             { where: {userId: user.userId}} );
         res.json({ myprofile });
@@ -68,7 +67,9 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
     }
 })
 
+
 // 마이페이지 - 돌보미 프로필조회 -> MYSQL 적용 프론트 테스트 OK
+
 router.get("/sitterprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
@@ -91,7 +92,9 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
     }
 })
 
+
 // 마이페이지 - 반려동물 프로필 등록 -> MYSQL 적용 프론트 테스트 OK
+
 router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
         const { user } = res.locals;
@@ -110,6 +113,7 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
 })
 
 // 마이페이지 - 돌보미 등록  -> MYSQL 적용 프론트 테스트 OK
+
 router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
     try{
         const { user } = res.locals;
@@ -215,7 +219,6 @@ router.delete("/petprofile/:petId", async (req, res) => {
             Bucket: process.env.MY_S3_BUCKET || "avostorage",
             Key: delFile
         };
-        
         s3.deleteObject(delParams, function (error, data) {
             if (error) {
                 console.log('err: ', error, error.stack);
@@ -350,7 +353,6 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
                 console.log(data, " 정상 삭제 되었습니다.");
             }
         })
-
         const mainImageUrl = req.files.mainImageUrl[0].location;
         await Sitter.update({
             mainImageUrl: mainImageUrl
