@@ -19,7 +19,7 @@ router.post('/signup', async (req, res) => {
             phoneNumber, 
           } = (req.body);
     const refreshToken= "";
-   // userEmail 중복확인 
+//userEmail 중복확인 
       const existUsers = await User.findAll({
          where: {
            [Op.or]: [{userEmail}, {phoneNumber}]
@@ -131,7 +131,6 @@ router.post("/login", async (req, res) => {
 
 
 
-
 //id_check  유저 아이디찾기 
 router.post('/id_check', async (req, res) => {
   try {
@@ -192,7 +191,7 @@ router.post('/password_check', async (req, res) => {
 
 
 
-//usercheck 유저정보조회
+//user_info_check 유저정보조회
 router.get('/auth', authMiddleware, (req, res) => {
   try {
     const { user } = res.locals ;
@@ -206,6 +205,8 @@ router.get('/auth', authMiddleware, (req, res) => {
     });
   }
 });
+
+
 
 //비밀번호 변경 
 router.put('/password_change',authMiddleware, async (req, res) => {
@@ -235,6 +236,38 @@ router.put('/password_change',authMiddleware, async (req, res) => {
       }
   });
 
-
+//kakao login  소셜로그인
+  router.post('/auth/kakao', async (req, res) => {
+    console.log(req.body);
+    const { userEmail, userName} = req.body;
+  
+    const existsUsers = await User.findOne({ where: {userEmail: userEmail }});
+    console.log(existsUsers);
+    if (existsUsers) {
+      // 이미 해당 이메일이 DB에 있는 경우 DB에 new User로 새로 테이블을 만들어주지 않고 토큰만 보내준다.
+      return res.send({
+        result: true,
+        token: jwt.sign(
+          { userEmail: existsUsers.userEmail },
+          process.env.ACCESS_TOKEN_SECRET,
+          {expiresIn: '6h',}
+        ),
+      });
+    } else {
+      const user = await User.create({
+        userEmail,
+        userName,
+      });
+      return res.send({
+        result: true,
+        token: jwt.sign({ userEmail: user.userEmail }, 
+          process.env.ACCESS_TOKEN_SECRET,
+           {expiresIn: '6h', }
+           ),
+      });
+    }
+    // await user.save();
+  });
+  
 
 module.exports = router;
