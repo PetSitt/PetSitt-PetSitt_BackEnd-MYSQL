@@ -28,4 +28,6 @@ Sitter.associate(db);
 User.associate(db);
 Reservation.associate(db);
 
+
+
 module.exports = db;
