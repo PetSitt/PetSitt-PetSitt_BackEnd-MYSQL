@@ -305,8 +305,6 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     });
 
     if(x !== 'undefined') {
-        console.log(x)
-        console.log('1')
         const location = { type: 'Point', coordinates: [x, y]};
         await Sitter.update({
             location: location
