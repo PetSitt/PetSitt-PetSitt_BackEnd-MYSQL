@@ -312,7 +312,6 @@ const setUserFormReservation = async (array) => {
 
       const decode_category     = JSON.parse(array[i].category);
       const decode_reservationDate  = JSON.parse(array[i].reservationDate);
-
       const reservation = {
           category:         decode_category,
           reservationDate:  decode_reservationDate,
@@ -338,7 +337,6 @@ const setSitterFormReservation = async (array) => {
   if (!array?.length) {
     return setArray;
   } 
-
   for ( let i = 0; i < array.length; i++) {
     const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
     if (!user ) continue;

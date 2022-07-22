@@ -77,7 +77,7 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign({
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '5s'
+      expiresIn: '100m'
 
     });
     const refreshToken = jwt.sign({
@@ -208,6 +208,7 @@ router.get('/auth', authMiddleware, (req, res) => {
 
 
 
+
 //비밀번호 변경 
 router.put('/password_change',authMiddleware, async (req, res) => {
   try {
@@ -236,6 +237,8 @@ router.put('/password_change',authMiddleware, async (req, res) => {
       }
   });
 
+
+  
 //kakao login  소셜로그인
   router.post('/auth/kakao', async (req, res) => {
     console.log(req.body);

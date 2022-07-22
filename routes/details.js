@@ -1,15 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const {Pet} = require("../schemas/pet.js");
-const {Sitter} = require("../schemas/sitter.js");
+const { Sitter } = require("../models");
+const { Pet } = require("../models");
+const { User } = require("../models");
+const AWS = require('aws-sdk');
 require("dotenv").config();
 
 //상세페이지 불러오기
 router.get("/:sitterId", async(req, res) => {
   try {
-    var sitter_info = await Sitter.findById(req.params.sitterId);
-    var user_info   = await User.findById(sitter_info.userId);
-    var pet_info    = await Pet.find({ userId: user_info._id });
+    var sitter_info = await Sitter.findByPk(req.params.sitterId);
+    console.log(sitter_info)
+    var user_info   = await User.findByPk(sitter_info.userId);
+    var pet_info    = await Pet.findOne({where:
+                                        {userId: user_info._id }});
 
     console.log(sitter_info)
     if (!sitter_info || !user_info) {
