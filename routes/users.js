@@ -19,7 +19,7 @@ router.post('/signup', async (req, res) => {
             phoneNumber, 
           } = (req.body);
     const refreshToken= "";
-//userEmail 중복확인 
+//userEmail ot phoneNum 중복확인 
       const existUsers = await User.findAll({
          where: {
            [Op.or]: [{userEmail}, {phoneNumber}]
@@ -50,6 +50,7 @@ router.post('/signup', async (req, res) => {
       });
     }
   });
+
 
 
 
@@ -106,6 +107,7 @@ router.post("/login", async (req, res) => {
     if (refreshToken === undefined){
       return res.status(401).json({ errorMessage: '리프레쉬 토큰이 없습니다.' })
   };
+
     console.log(refreshToken)
     // Verifying refresh token
     if (req.body) {
@@ -128,6 +130,7 @@ router.post("/login", async (req, res) => {
     }); } else {
     return res.status(406).json({ message: '토큰 발급 불가' });
 }});
+
 
 
 
@@ -188,6 +191,7 @@ router.post('/password_check', async (req, res) => {
   } catch (err) {
     res.status(400).json({ errorMessage: "fail" });
   }});
+
 
 
 

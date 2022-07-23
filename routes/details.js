@@ -13,6 +13,10 @@ router.get("/:sitterId", async(req, res) => {
     var sitter_info = await Sitter.findOne({where: {sitterId: req.params.sitterId}});
     var user_info = await User.findOne({where: {userId: sitter_info.userId}});
     var pet_info = await Pet.findAll({ where: { userId: user_info.userId } });
+    console.log(sitter_info)
+    console.log(user_info)
+    console.log()
+
 
     if (!sitter_info || !user_info) {
       throw new Error();
