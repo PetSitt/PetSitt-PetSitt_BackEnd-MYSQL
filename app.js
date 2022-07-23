@@ -2,13 +2,13 @@ const express = require("express");
 const {sequelize} = require("./models");
 
 const reviewsRouter = require("./routes/reviews.js");
-const mainRouter = require("./routes/mains.js");
+const mainsRouter = require("./routes/mains.js");
 const cookieParser = require('cookie-parser');
-const mypageRouter = require("./routes/mypage");
+const mypagesRouter = require("./routes/mypages");
 const usersRouter = require("./routes/users");
-const reservationRouter = require("./routes/reservations.js");
-const diaryRouter = require("./routes/diarys.js");
-const detailsRouter = require("./routes/details.js");
+const reservationsRouter = require("./routes/reservations");
+const diariesRouter = require("./routes/diaries");
+const detailsRouter = require("./routes/details");
 const cors = require('cors');
 require("dotenv").config();
 
@@ -42,10 +42,10 @@ app.use((req, res, next) => {
 app.use("/api",[usersRouter]);
 app.use("/details", [detailsRouter]);
 app.use("/reviews", [reviewsRouter]);
-app.use("/mains", [mainRouter]);
-app.use("/mypage", [mypageRouter]);
-app.use("/reservations", [reservationRouter]);
-app.use("/diarys", [diaryRouter]);
+app.use("/mains", [mainsRouter]);
+app.use("/mypages", [mypagesRouter]);
+app.use("/reservations", [reservationsRouter]);
+app.use("/diaries", [diariesRouter]);
 
 
 app.listen(port, () => {

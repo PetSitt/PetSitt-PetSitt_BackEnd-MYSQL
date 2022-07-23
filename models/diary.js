@@ -3,11 +3,15 @@ const Sequelize = require('sequelize');
 module.exports = class Diary extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
-          reservationId: {
+          diaryId: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: Sequelize.INTEGER,
+          },
+          reservationId: {
+            type: Sequelize.STRING,
+            defaultValue:""
           },
           diaryImage: {
             type:Sequelize.JSON,
@@ -22,7 +26,6 @@ module.exports = class Diary extends Sequelize.Model {
             state:{
               type:Sequelize.JSON,
             },
-          
         }, {
             sequelize,
             modelName: 'Diary',
