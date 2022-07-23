@@ -10,7 +10,7 @@ module.exports = class Reservation extends Sequelize.Model {
                 type: Sequelize.INTEGER,
             },
             userId: {
-                type: Sequelize.INTEGER
+                type: Sequelize.STRING
             },
             sitterId: {
                 type: Sequelize.INTEGER
@@ -40,5 +40,7 @@ module.exports = class Reservation extends Sequelize.Model {
     }
 
     static associate(db) {
+        Reservation.belongsTo(db.User, { foreignKey: 'userId', sourceKey: 'userId', onDelete: 'CASCADE' });
+        Reservation.belongsTo(db.Sitter, { foreignKey: 'sitterId', sourceKey: 'sitterId', onDelete: 'CASCADE' });
     }
 };

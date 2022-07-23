@@ -9,9 +9,6 @@ module.exports = class Sitter extends Sequelize.Model {
             primaryKey: true,
             type: Sequelize.INTEGER,
             },
-            userId: {
-                type: Sequelize.STRING
-            },
             address: {
               type: Sequelize.STRING,
               defaultValue:""
@@ -92,5 +89,7 @@ module.exports = class Sitter extends Sequelize.Model {
     }
 
     static associate(db) {
+      Sitter.belongsTo(db.User, { foreignKey: 'userId', sourceKey: 'userId', onDelete: 'CASCADE' });
+      Sitter.hasMany(db.Reservation, { foreignKey: 'sitterId', sourceKey: 'sitterId', onDelete:'CASCADE' });
     }
 };
