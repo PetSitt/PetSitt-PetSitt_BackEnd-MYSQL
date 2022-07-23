@@ -10,23 +10,23 @@ module.exports = class User extends Sequelize.Model {
           },
           userEmail: {
                 type: Sequelize.STRING
-            },
-            password: {
-              type: Sequelize.STRING,
-              defaultValue:""
-            },
-            userName:{
-              type: Sequelize.STRING,
-              defaultValue:""
-            },
-            phoneNumber:{
-              type: Sequelize.STRING,
-              defaultValue:""
-            },
-            refreshToken:{
-              type: Sequelize.STRING,
-              defaultValue:""
-            },
+          },
+          password: {
+            type: Sequelize.STRING,
+            defaultValue:""
+          },
+          userName:{
+            type: Sequelize.STRING,
+            defaultValue:""
+          },
+          phoneNumber:{
+            type: Sequelize.STRING,
+            defaultValue:""
+          },
+          refreshToken:{
+            type: Sequelize.STRING,
+            defaultValue:""
+          },
         }, {
             sequelize,
             modelName: 'User',
