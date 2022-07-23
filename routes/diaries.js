@@ -6,7 +6,7 @@ const multer = require('multer');
 const multerS3    = require('multer-s3');
 const { Diary }   = require("../models");
 const { Reservation } = require("../models")
-const authMiddleware = require("../middlewares/auth-middleware");
+const authMiddleware = require("../middlewares/auth-middleware.js");
 require("dotenv").config();
 
 const s3 = new AWS.S3({
