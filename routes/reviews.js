@@ -29,7 +29,6 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
 
     // 예약상태 변경
     await Reservation.updateOne({ reservationId }, { $set: { reservationState: "진행완료" } });
-
     const reviews = await Review.find({sitterId});
 
     if ( reviews?.length > 0 ) {

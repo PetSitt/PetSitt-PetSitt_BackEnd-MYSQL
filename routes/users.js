@@ -41,7 +41,7 @@ router.post('/signup', async (req, res) => {
         refreshToken,
       });
       res.status(201).json({ message: "회원가입이 완료!"});
-      //res.status(201).send({ message: "회원가입이 완료!" });
+    
     }
      catch (err) {
       console.log(err);
