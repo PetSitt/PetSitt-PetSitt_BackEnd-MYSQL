@@ -4,9 +4,9 @@ const moment = require('moment');
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3    = require('multer-s3');
-const { Diary }   = require("../schemas/diary.js");
-const { Reservation } = require("../schemas/reservation.js");
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const { Diary }   = require("../models");
+const { Reservation } = require("../models")
+const authMiddleware = require("../middlewares/auth-middleware");
 require("dotenv").config();
 
 const s3 = new AWS.S3({
@@ -63,9 +63,10 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
       diary.diaryImage = diaryImage;
     }
 
-    diary.save();
+    await diary.save();
     // 예약에 돌봄일지 추가
-    await Reservation.updateOne({ reservationId }, { $set: { diaryId: diary.id } });
+    await Reservation.update({ reservationId: reservationId }, 
+      { where: { diaryId: diary.id } });
 
     return res.status(200).send({
       msg: "돌봄일지 등록 성공" 
@@ -89,7 +90,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
       diaryInfo,
     } = req.body;
 
-    const diary = await Diary.findOne({ reservationId });
+    const diary = await Diary.findOne({where:{ reservationId }});
     if (!diary) { throw new Error(); }
 
     const fileArray = req.files;    
@@ -144,7 +145,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
       });
     }
 
-    diary.save();
+    await diary.save();
 
     return res.status(200).send({ 
       msg: "돌봄일지 수정 성공" 
