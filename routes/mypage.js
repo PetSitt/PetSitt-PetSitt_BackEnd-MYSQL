@@ -141,7 +141,7 @@ router.delete("/sitterprofile", authMiddleware, async (req, res) => {
     }catch{
         res.json({ result: "fail" });
     }
-})
+});
 
 // 마이페이지 - 반려동물 프로필 삭제 / 미들웨어 없이 테스트 ok
 router.delete("/petprofile/:petId", async (req, res) => {
@@ -167,7 +167,7 @@ router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), as
     }catch(error){
         console.log(error);
     }
-})
+});
 
 // 마이페이지 - 돌보미 프로필 수정 / 미들웨어 없이 테스트 ok 
 router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {

@@ -76,12 +76,16 @@ module.exports = class Sitter extends Sequelize.Model {
           type: Sequelize.GEOMETRY("POINT"),
         },
         rehireRate: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.FLOAT,
           defaultValue: 0,
         },
         zoneCode: {
           type: Sequelize.STRING,
         },
+        reviewCount:{
+          type:Sequelize.INTEGER,
+          defaultValue: 0,
+        }
       },
       {
         sequelize,
