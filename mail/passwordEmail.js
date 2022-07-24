@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+//const { getMaxListeners } = require("../schemas/user");
 const smtpTransport = require('nodemailer-smtp-transport');
 require("dotenv").config();
 
@@ -39,3 +40,4 @@ const mailSender = {
 
 
 module.exports = mailSender;
+

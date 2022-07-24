@@ -32,9 +32,6 @@ const petSchema = new mongoose.Schema({
   userId: {
     type: String
   },
-  petSpay: {
-    type: Boolean
-  }
 });
 
 petSchema.virtual("petId").get(function () {
