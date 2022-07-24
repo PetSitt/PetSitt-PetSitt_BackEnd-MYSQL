@@ -9,13 +9,22 @@ const usersRouter = require("./routes/users");
 const reservationRouter = require("./routes/reservations.js");
 const diaryRouter = require("./routes/diarys.js");
 const detailsRouter = require("./routes/details.js");
+const informationRouter = require("./routes/information.js");
+const http = require("http");
 const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
 const port = 3000;
+const server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
-//connect_MongoDB(); //DB 연결
+// 채팅 관련
+const chatRouter = require("./routes/chats.js")(io);
 
 sequelize
   .sync()
@@ -39,7 +48,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-  console.log("Request URL:", req.originalUrl, " - ", new Date());
+  console.log(`Req: [${req.method}] -`, req.originalUrl, " - ", new Date());
   next();
 });
 app.use("/api", [usersRouter]);
@@ -49,7 +58,9 @@ app.use("/mains", [mainRouter]);
 app.use("/mypage", [mypageRouter]);
 app.use("/reservations", [reservationRouter]);
 app.use("/diarys", [diaryRouter]);
+app.use("/chats", [chatRouter]);
+app.use("/informations", [informationRouter]);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(port, "포트로 서버가 켜졌습니다.");
 });
