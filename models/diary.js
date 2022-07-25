@@ -1,5 +1,4 @@
-
-const Sequelize = require('sequelize');
+const Sequelize = require("sequelize");
 module.exports = class Diary extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
@@ -35,6 +34,5 @@ module.exports = class Diary extends Sequelize.Model {
         });
     }
 
-    static associate(db) {
-    }
+  static associate(db) {}
 };

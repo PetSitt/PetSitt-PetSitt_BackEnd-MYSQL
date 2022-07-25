@@ -1,38 +1,41 @@
 const Sequelize = require("sequelize");
-module.exports = class User extends Sequelize.Model {
+
+module.exports = class Room extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        userId: {
+        roomId: {
           allowNull: false,
           autoIncrement: true,
           primaryKey: true,
           type: Sequelize.INTEGER,
         },
-        userEmail: {
+        userId: {
+          allowNull: false,
           type: Sequelize.STRING,
         },
-        password: {
+        sitter_userId: {
+          allowNull: false,
+          type: Sequelize.STRING,
+        },
+        lastChat: {
           type: Sequelize.STRING,
           defaultValue: "",
         },
-        userName: {
-          type: Sequelize.STRING,
-          defaultValue: "",
+        lastChatAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.NOW,
         },
-        phoneNumber: {
-          type: Sequelize.STRING,
-          defaultValue: "",
-        },
-        refreshToken: {
-          type: Sequelize.STRING,
-          defaultValue: "",
+        newMessage: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false,
         },
       },
       {
         sequelize,
-        modelName: "User",
-        tableName: "Users",
+        modelName: "Room",
+        tableName: "rooms",
         charset: "utf8mb4",
         collate: "utf8mb4_general_ci",
       }
