@@ -16,9 +16,7 @@ router.get("/petcheck", authMiddleware, async (req, res) => {
 
     return res.status(200).send({ check: existCheck });
   } catch {
-    return res
-      .status(400)
-      .send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+    return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
   }
 });
 
@@ -34,9 +32,7 @@ router.get("/sittercheck", authMiddleware, async (req, res) => {
 
     return res.status(200).send({ check: existCheck });
   } catch {
-    return res
-      .status(400)
-      .send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+    return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
   }
 });
 

@@ -158,9 +158,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
 
 
   } catch {
-    return res.status(400).send({ 
-      errorMessage: "DB정보를 받아오지 못했습니다." 
-    });    
+    return res.status(400).send({msg: "DB정보를 받아오지 못했습니다."});
   };
 });
 
@@ -180,9 +178,7 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
       checkStatus: diary.checkStatus,
     });
   } catch {
-    return res.status(400).send({ 
-      errorMessage: "DB정보를 받아오지 못했습니다." 
-    });    
+    return res.status(400).send({msg: "DB정보를 받아오지 못했습니다."});
   };
 });
 
