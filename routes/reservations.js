@@ -159,7 +159,7 @@ router.get("/lists", authMiddleware, async (req, res) => {
 });
 
 //예약보기 페이지 - 더보기 리스트 요청 - 무한스크롤 -- MYSQL 변경완료 / 프론트연결 테스트 x (로컬테스트 X) -> 지난내역 아직없어서 테스트 아직불가
-router.get("/lists/:reservationId", authMiddleware, async (req, res) => {
+router.get("/lists/:", authMiddleware, async (req, res) => {
   try{
     const { user } = res.locals;
     const { reservationId } = req.params;
@@ -176,7 +176,6 @@ router.get("/lists/:reservationId", authMiddleware, async (req, res) => {
         if (!sitter) {
           return res.status(402).send({ errorMessage: "돌보미 정보가 없습니다." });
         }
-
         searchQuery = { sitterId: sitter.sitterId };
         dataForm = setSitterFormReservation;
         break;
@@ -240,7 +239,6 @@ router.get("/details/:reservationId", authMiddleware, async (req, res) => {
         });
   
       case 'sitter': // 돌보미탭 검색
-
         user = await User.findOne({where: {userId: reservation.userId}}); //신청자 정보 - 전화번호 필요
         if (!user) { throw new Error(); }
 
@@ -343,10 +341,11 @@ const setSitterFormReservation = async (array) => {
   if (!array?.length) {
     return setArray;
   } 
-  for (let i = 0; i < array.length; i++) {
 
+  for (let i = 0; i < array.length; i++) {
     const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
-    if (!user ) continue;
+    if (!user) continue;
+
 
     const reservation = {
       category:         array[i].category,

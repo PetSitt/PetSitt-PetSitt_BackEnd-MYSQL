@@ -8,26 +8,21 @@ module.exports = class Review extends Sequelize.Model {
             autoIncrement: true,
             primaryKey: true,
             type: Sequelize.INTEGER,
-         },
-          userId: {
-          type: Sequelize.INTEGER,
+        },
+        userId: {
+          type: Sequelize.STRING,
          },
           sitterId: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.STRING,
          },
           userName: {
             type: Sequelize.STRING,
           },
-          reservationId: { //예약아이디
-            type: Sequelize.STRING,
-          },
           reviewStar: {
             type: Sequelize.FLOAT, //소수점까지 나타냄
-            defaultValue: 0,
           },
           reviewInfo: { //1000글자 제한
             type: Sequelize.STRING,
-            defaultValue: "",
           },
           reviewDate: {
             type: Sequelize.DATE,
@@ -43,5 +38,8 @@ module.exports = class Review extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    Review.belongsTo(db.Reservation, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete: 'CASCADE' });
+  }
 };
+

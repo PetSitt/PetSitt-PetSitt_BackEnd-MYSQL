@@ -22,17 +22,13 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
     });
     review.save();
 
-    // 예약상태변경
-    await Reservation.update(
-      { reservationState: "진행완료" },
-      { where: { reservationId:reservationId } }
-    );
+    
+    // 예약상태 변경
+    await Reservation.updateOne({ reservationId }, { $set: { reservationState: "진행완료" } });
+    const reviews = await Review.find({sitterId});
 
-
-    const reviews = await Review.findAll({ where: { sitterId: sitterId } });
-
-    if (reviews?.length > 0) {
-      await Sitter.findByPk(sitterId);
+    if ( reviews?.length > 0 ) {
+      const sitter = await Sitter.findById(sitterId);
       const totalReview = reviews.length + 1;
 
       //  평균별점 계산 = 시터 리뷰별점 총합 / 총 리뷰수
@@ -57,8 +53,7 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
         } else {
           pure_members.push(review.userId);
         }
-      });
-
+      }); 
 
       // (총리뷰수 + 중복이 일어난 멤버 - 순수 멤버 수) / 총리뷰수 * 100 = 재고용률
       await Sitter.update(
@@ -101,7 +96,6 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
     if (!review) {
       return res.status(402).send({ errorMessage: "등록된 리뷰가 없습니다." });
     }
-
     return res.status(200).send({
       star: review.reviewStar,
       reviewinfo: review.reviewInfo,
@@ -112,3 +106,4 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+
