@@ -25,8 +25,7 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
 
     review.save();
 
-
-
+    
     // 예약상태 변경
     await Reservation.updateOne({ reservationId }, { $set: { reservationState: "진행완료" } });
     const reviews = await Review.find({sitterId});
@@ -75,12 +74,10 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
     if (!review) {
       return res.status(402).send({ errorMessage: "등록된 리뷰가 없습니다." });
     }
-
     return res.status(200).send({
       star:       review.reviewStar,
       reviewinfo: review.reviewInfo,
     });
-
   } catch {
     return res.status(400).send({ errorMessage: "요청 실패" });
   }
