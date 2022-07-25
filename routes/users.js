@@ -53,7 +53,6 @@ router.post('/signup', async (req, res) => {
 
 
 
-
 // login 로그인 
 router.post("/login", async (req, res) => {
   try {
@@ -79,7 +78,6 @@ router.post("/login", async (req, res) => {
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '100m'
-
     });
     const refreshToken = jwt.sign({
       userEmail: user.userEmail
@@ -107,7 +105,6 @@ router.post("/login", async (req, res) => {
     if (refreshToken === undefined){
       return res.status(401).json({ errorMessage: '리프레쉬 토큰이 없습니다.' })
   };
-
     console.log(refreshToken)
     // Verifying refresh token
     if (req.body) {
@@ -115,7 +112,7 @@ router.post("/login", async (req, res) => {
     (err, user) => {
         if (err) {
             // Wrong Refesh Token
-            return res.status(406).json({ message: '리프레시 토큰 오류' });
+         return res.status(406).json({ message: '리프레시 토큰 오류' });
         } else {
             // Correct token we send a new access token
            // const user = {userEmail: refreshToken.userEmail}
@@ -130,8 +127,6 @@ router.post("/login", async (req, res) => {
     }); } else {
     return res.status(406).json({ message: '토큰 발급 불가' });
 }});
-
-
 
 
 //id_check  유저 아이디찾기 
@@ -268,9 +263,9 @@ router.put('/password_change',authMiddleware, async (req, res) => {
       return res.send({
         result: true,
         token: jwt.sign({ userEmail: user.userEmail }, 
-          process.env.ACCESS_TOKEN_SECRET,
-           {expiresIn: '6h', }
-           ),
+        process.env.ACCESS_TOKEN_SECRET,
+        {expiresIn: '6h', }
+        ),
       });
     }
     // await user.save();

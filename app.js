@@ -1,8 +1,8 @@
 const express = require("express");
 const {sequelize} = require("./models");
 
-const reviewsRouter = require("./routes/reviews.js");
-const mainsRouter = require("./routes/mains.js");
+const reviewsRouter = require("./routes/reviews");
+const mainsRouter = require("./routes/mains");
 const cookieParser = require('cookie-parser');
 const mypagesRouter = require("./routes/mypages");
 const usersRouter = require("./routes/users");

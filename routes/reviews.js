@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {Review} = require("../schemas/review.js");
+const {Review} = require("../schemas/review");
 const {Sitter} = require("../schemas/sitter.js");
 const {Reservation} = require("../schemas/reservation");
 const authMiddleware = require("../middlewares/auth-middleware.js");
