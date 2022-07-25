@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize');
-
+const Sequelize = require("sequelize");
 module.exports = class Sitter extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
@@ -54,7 +53,7 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:0
             },
             averageStar: {
-              type: Sequelize.INTEGER,
+              type: Sequelize.FLOAT,
               defaultValue:0
             },
             region_1depth_name:{
@@ -93,3 +92,4 @@ module.exports = class Sitter extends Sequelize.Model {
       Sitter.hasMany(db.Reservation, { foreignKey: 'sitterId', sourceKey: 'sitterId', onDelete:'CASCADE' });
     }
 };
+

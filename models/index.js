@@ -7,7 +7,6 @@ const Room = require('./room');
 const Chat = require('./chat');
 const Review = require('./review');
 const Diary = require('./diary');
-
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config")[env];
 const db = {};
@@ -20,7 +19,6 @@ const sequelize = new Sequelize(
 );
 
 db.sequelize = sequelize;
-db.Sequelize = Sequelize;
 
 db.Pet = Pet;
 db.Sitter = Sitter;
@@ -31,6 +29,7 @@ db.Chat = Chat;
 db.Review = Review;
 db.Diary = Diary;
 
+
 Pet.init(sequelize);
 Sitter.init(sequelize);
 User.init(sequelize);
@@ -40,6 +39,7 @@ Chat.init(sequelize);
 Review.init(sequelize);
 Diary.init(sequelize);
 
+
 Pet.associate(db);
 Sitter.associate(db);
 User.associate(db);
@@ -48,5 +48,6 @@ Room.associate(db);
 Chat.associate(db);
 Review.associate(db);
 Diary.associate(db);
+
 
 module.exports = db;

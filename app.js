@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const mypageRouter = require("./routes/mypages");
 const usersRouter = require("./routes/users");
 const reservationRouter = require("./routes/reservations.js");
+
 const diariesRouter = require("./routes/diaries");
 const detailsRouter = require("./routes/details.js");
 const informationRouter = require("./routes/information.js");
@@ -52,6 +53,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use("/api", [usersRouter]);
 app.use("/details", [detailsRouter]);
 app.use("/reviews", [reviewsRouter]);
@@ -61,6 +63,7 @@ app.use("/reservations", [reservationRouter]);
 app.use("/diaries", [diariesRouter]);
 app.use("/chats", [chatRouter]);
 app.use("/informations", [informationRouter]);
+
 
 server.listen(port, () => {
   console.log(port, "포트로 서버가 켜졌습니다.");

@@ -38,5 +38,6 @@ module.exports = class Reservation extends Sequelize.Model {
         Reservation.belongsTo(db.Sitter, { foreignKey: 'sitterId', sourceKey: 'sitterId', onDelete: 'CASCADE' });
         Reservation.hasOne(db.Diary, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete:'CASCADE' });
         Reservation.hasOne(db.Review, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete:'CASCADE' });
+
     }
 };

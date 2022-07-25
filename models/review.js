@@ -42,3 +42,4 @@ module.exports = class Review extends Sequelize.Model {
     Review.belongsTo(db.Reservation, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete: 'CASCADE' });
   }
 };
+

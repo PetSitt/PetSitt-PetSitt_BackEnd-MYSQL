@@ -39,13 +39,11 @@ module.exports = class User extends Sequelize.Model {
     );
   }
 
-<<<<<<< HEAD
+
     static associate(db) {
       User.hasMany(db.Pet, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
       User.hasMany(db.Reservation, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
       User.hasOne(db.Sitter, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
     }
-=======
-  static associate(db) {}
->>>>>>> a47baec7f5c0c19eacce6fe4d380767a80c31d04
+
 };

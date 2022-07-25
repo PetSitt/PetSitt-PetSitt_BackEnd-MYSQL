@@ -12,7 +12,6 @@ const { Op } = require("sequelize");
 //예약하기 페이지 - 내 펫정보 요청 -> MYSQL 적용 프론트 테스트 OK
 router.get("/", authMiddleware, async (req, res) => {
   try{
-
     const { user } = res.locals;
     const pets = await Pet.findAll({ where: {userId: user.userId }});
 
@@ -284,6 +283,7 @@ router.put("/cancel/:reservationId", authMiddleware, async (req, res) => {
     if (!reservation) { throw new Error(); }
 
     //예약 상태 변경
+
     await Reservation.update({ reservationState: "취소완료" }, { where: {reservationId: reservationId } })
 
     //취소시 돌보미 예약불가 날짜 빼기
@@ -328,6 +328,7 @@ const setUserFormReservation = async (array) => {
     };
 
     setArray.push(reservation);
+
   }
 
   return setArray;
@@ -344,6 +345,7 @@ const setSitterFormReservation = async (array) => {
   for (let i = 0; i < array.length; i++) {
     const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
     if (!user) continue;
+
 
     const reservation = {
       category:         array[i].category,
