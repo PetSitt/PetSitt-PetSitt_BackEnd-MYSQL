@@ -74,12 +74,10 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
       
 
       //리뷰 카운트 추가
-      await Sitter.update(
-        { reviewCount: reviewCount + 1 },
+      await Sitter.increment(
+        { reviewCount: 1 },
         { where: { sitterId:sitterId } }
       );
-      //  sitter.reviewCount = sitter.reviewCount + 1;
-      //  sitter.save();
     }
 
     return res.status(200).send({
