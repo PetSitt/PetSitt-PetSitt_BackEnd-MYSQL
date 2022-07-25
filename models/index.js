@@ -44,4 +44,6 @@ Chat.associate(db);
 Review.associate(db);
 Diary.associate(db);
 
+
+
 module.exports = db;

@@ -26,7 +26,6 @@ const storage = multerS3({
     }
   }
 });
-
 const uploadS3 = multer({ storage: storage });
 
 //돌봄일지 등록
@@ -117,7 +116,6 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
       //삭제할 오브젝트 세팅
       const deleteObject = decode_deleteImage.map((el) => {
         const fileName = 'petSitt/' + el.split('/')[4];
-
         return { Key: fileName };
       });
 
@@ -162,7 +160,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
 router.get("/:reservationId", authMiddleware, async (req, res) => {
   try {
     const { reservationId } = req.params;
-    const diary = await Diary.findOne({ reservationId });
+    const diary = await Diary.findOne({where:{ reservationId }});
     if (!diary) { throw new Error(); }
 
     return res.status(200).send({ 
@@ -177,5 +175,6 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
     });    
   };
 });
+
 
 module.exports = router;

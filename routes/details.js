@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const { Sitter } = require("../models");
-const { User } = require("../models");
+
 const { Pet } = require("../models");
+const { User } = require("../models");
+const AWS = require('aws-sdk');
 require("dotenv").config();
 
 //상세페이지 불러오기 -> MYSQL 적용 프론트 테스트 OK -> <댓글 갯수 안나옴 !!>
 router.get("/:sitterId", async(req, res) => {
   try {
-
     var sitter_info = await Sitter.findOne({where: {sitterId: req.params.sitterId}});
     var user_info = await User.findOne({where: {userId: sitter_info.userId}});
     var pet_info = await Pet.findAll({ where: { userId: user_info.userId } });

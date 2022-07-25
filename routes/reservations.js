@@ -331,6 +331,7 @@ const setUserFormReservation = async (array) => {
     };
 
     setArray.push(reservation);
+
   }
 
   return setArray;
@@ -343,8 +344,8 @@ const setSitterFormReservation = async (array) => {
   if (!array?.length) {
     return setArray;
   } 
-
   for (let i = 0; i < array.length; i++) {
+
     const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
     if (!user ) continue;
 
