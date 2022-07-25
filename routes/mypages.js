@@ -39,6 +39,7 @@ router.get("/myprofile", authMiddleware, async (req, res) => {
         res.json({ myprofile });
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -52,6 +53,7 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
         res.json({ myprofile });
     }catch(error){
         console.error(error);
+        return res.send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -64,6 +66,7 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
         res.json({ petprofile });
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -89,6 +92,7 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
         }
     }catch(error){
         console.log(error)
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -109,6 +113,7 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
         }
     }catch(error){
         console.log(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -160,6 +165,7 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
         res.json({ createSitter })
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -195,7 +201,7 @@ router.delete("/sitterprofile", authMiddleware, async (req, res) => {
         await Sitter.destroy({ where: { userId: user.userId }});
         res.json({ result: "success" });
     }catch{
-        res.json({ result: "fail" });
+      return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -220,7 +226,7 @@ router.delete("/petprofile/:petId", async (req, res) => {
         await Pet.destroy({ where: { petId: petId }});
         res.json({ result: "success" });
     }catch{
-        res.json({ result: "fail" });
+      return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -254,6 +260,7 @@ router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), as
     res.json({ result: "success" });
     }catch(error){
         console.log(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -345,6 +352,7 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     res.json({ sitterprofile });
     }catch(error){
         console.log(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });         
     }
 })
 
@@ -362,6 +370,7 @@ router.get("/info", authMiddleware, async (req, res) => {
         res.json({sitterimageUrl,sitterMainImageUrl, petImage});
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });         
     }
 })
 
