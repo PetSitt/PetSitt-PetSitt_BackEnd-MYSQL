@@ -20,10 +20,10 @@ module.exports = class Diary extends Sequelize.Model {
               type: Sequelize.STRING,
               defaultValue:""
             },
-            checkList:{
+          checkList:{
               type:Sequelize.JSON,
             },
-            state:{
+          checkStatus:{
               type:Sequelize.JSON,
             },
         }, {
