@@ -28,10 +28,6 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
       { where: { reservationId:reservationId } }
     );
 
-    // 예약상태 변경
-    // const reservation = await Reservation.findById(reservationId);
-    // reservation.reservationState = "진행완료";
-    // reservation.save();
 
     const reviews = await Review.findAll({ where: { sitterId: sitterId } });
 
@@ -48,7 +44,7 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
         { averageStar: ((sumStar + reviewStar) / totalReview).toFixed(1) },
         { where: { sitterId: sitterId } }
       );
-      //  sitter.averageStar = ( (sumStar + reviewStar) / totalReview).toFixed(1); //소수점 첫째 자리까지
+
 
       //재고용률 계산 - 중복된 사람의 수를 세어 백분율(% 단위)로 기록합니다.
       // dup_members = 중복이 일어난 멤버(2번이상 고용한 사람만 들어감)
@@ -75,7 +71,7 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
         },
         { where: { sitterId:sitterId } }
       );
-      //  sitter.rehireRate = ((totalReview + dup_members.size - pure_members.length) / totalReview * 100)?.toFixed(1);
+      
 
       //리뷰 카운트 추가
       await Sitter.update(
@@ -96,6 +92,7 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
     });
   }
 });
+
 
 //리뷰 상세보기
 router.get("/:reservationId", authMiddleware, async (req, res) => {

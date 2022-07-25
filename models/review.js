@@ -8,12 +8,12 @@ module.exports = class Review extends Sequelize.Model {
             autoIncrement: true,
             primaryKey: true,
             type: Sequelize.INTEGER,
-        },
-        userId: {
-          type: Sequelize.STRING,
+         },
+          userId: {
+          type: Sequelize.INTEGER,
          },
           sitterId: {
-            type: Sequelize.STRING,
+            type: Sequelize.INTEGER,
          },
           userName: {
             type: Sequelize.STRING,
@@ -23,9 +23,11 @@ module.exports = class Review extends Sequelize.Model {
           },
           reviewStar: {
             type: Sequelize.FLOAT, //소수점까지 나타냄
+            defaultValue: 0,
           },
           reviewInfo: { //1000글자 제한
             type: Sequelize.STRING,
+            defaultValue: "",
           },
           reviewDate: {
             type: Sequelize.DATE,

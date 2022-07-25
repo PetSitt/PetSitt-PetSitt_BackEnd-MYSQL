@@ -39,7 +39,7 @@ router.get("/myprofile", authMiddleware, async (req, res) => {
     }catch(error){
         console.error(error);
     }
-})
+});
 
 // 마이페이지 - 내프로필 수정 
 router.patch("/myprofile", authMiddleware, async (req, res) => {
@@ -53,7 +53,7 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
     }catch(error){
         console.error(error);
     }
-})
+});
 
 // 마이페이지 - 반려동물 프로필조회
 router.get("/petprofile", authMiddleware, async (req, res) => {
@@ -65,7 +65,7 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
     }catch(error){
         console.error(error);
     }
-})
+});
 
 // 마이페이지 - 돌보미 프로필조회 / 미들웨어 없이 테스트 ok
 router.get("/sitterprofile", authMiddleware, async (req, res) => {
@@ -81,7 +81,7 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
     }catch(error){
         console.log(error)
     }
-})
+});
 
 // 마이페이지 - 반려동물 프로필 등록
 router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req, res) => {
@@ -95,7 +95,7 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
     }catch(error){
         console.log(error);
     }
-})
+});
 
 // 마이페이지 - 돌보미 등록  / 미들웨어 없이 테스트 ok
 router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
@@ -130,7 +130,7 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
     }catch(error){
         console.error(error);
     }
-})
+});
 
 // 마이페이지 - 돌보미 프로필 삭제 / 미들웨어 없이 테스트 ok
 router.delete("/sitterprofile", authMiddleware, async (req, res) => {
@@ -152,7 +152,7 @@ router.delete("/petprofile/:petId", async (req, res) => {
     }catch{
         res.json({ result: "fail" });
     }
-})
+});
 
 // 반려동물 프로필 수정 
 router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), async (req, res) => {
@@ -204,7 +204,7 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     }catch(error){
         console.log(error);
     }
-})
+});
 
 // 마이페이지 돌보미, 펫 사진 보내주기
 router.get("/info", authMiddleware, async (req, res) => {
@@ -221,6 +221,6 @@ router.get("/info", authMiddleware, async (req, res) => {
     }catch(error){
         console.error(error);
     }
-})
+});
 
 module.exports = router;
