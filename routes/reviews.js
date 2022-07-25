@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
+
 const { Sitter, Review, Reservation } = require("../models");
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const authMiddleware = require("../middlewares/auth-middleware");
 require("dotenv").config();
 
 // 리뷰 작성 - 평균별점, 재고용률, 예약상태 변경
