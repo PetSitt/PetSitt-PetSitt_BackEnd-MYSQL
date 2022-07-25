@@ -4,10 +4,10 @@ const { sequelize } = require("./models");
 const reviewsRouter = require("./routes/reviews.js");
 const mainRouter = require("./routes/mains.js");
 const cookieParser = require("cookie-parser");
-const mypageRouter = require("./routes/mypage");
+const mypageRouter = require("./routes/mypages");
 const usersRouter = require("./routes/users");
 const reservationRouter = require("./routes/reservations.js");
-const diaryRouter = require("./routes/diarys.js");
+const diariesRouter = require("./routes/diaries");
 const detailsRouter = require("./routes/details.js");
 const informationRouter = require("./routes/information.js");
 const http = require("http");
@@ -51,13 +51,14 @@ app.use((req, res, next) => {
   console.log(`Req: [${req.method}] -`, req.originalUrl, " - ", new Date());
   next();
 });
+
 app.use("/api", [usersRouter]);
 app.use("/details", [detailsRouter]);
 app.use("/reviews", [reviewsRouter]);
 app.use("/mains", [mainRouter]);
-app.use("/mypage", [mypageRouter]);
+app.use("/mypages", [mypageRouter]);
 app.use("/reservations", [reservationRouter]);
-app.use("/diarys", [diaryRouter]);
+app.use("/diaries", [diariesRouter]);
 app.use("/chats", [chatRouter]);
 app.use("/informations", [informationRouter]);
 

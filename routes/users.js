@@ -13,7 +13,7 @@ router.post("/signup", async (req, res) => {
   try {
     const { userEmail, userName, password, phoneNumber } = req.body;
     const refreshToken = "";
-    //userEmail 중복확인
+    //userEmail ot phoneNum 중복확인
     const existUsers = await User.findAll({
       where: {
         [Op.or]: [{ userEmail }, { phoneNumber }],
@@ -35,7 +35,6 @@ router.post("/signup", async (req, res) => {
       refreshToken,
     });
     res.status(201).json({ message: "회원가입이 완료!" });
-    //res.status(201).send({ message: "회원가입이 완료!" });
   } catch (err) {
     console.log(err);
     res.status(400).send({
@@ -92,13 +91,11 @@ router.post("/login", async (req, res) => {
       sameSite: "none",
       secure: true,
     });
-    return res
-      .status(200)
-      .send({
-        message: "로그인 성공",
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
+    return res.status(200).send({
+      message: "로그인 성공",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
     res.status(400).send({ message: "이메일 또는 비밀번호를 확인해주세요 " });
   }
@@ -111,6 +108,43 @@ router.post("/refresh", (req, res) => {
   if (refreshToken === undefined) {
     return res.status(401).json({ errorMessage: "리프레쉬 토큰이 없습니다." });
   }
+  console.log(refreshToken);
+  // Verifying refresh token
+  if (req.body) {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+      if (err) {
+        // Wrong Refesh Token
+        return res.status(406).json({ message: "리프레시 토큰 오류" });
+      } else {
+        // Correct token we send a new access token
+        // const user = {userEmail: refreshToken.userEmail}
+        const accessToken = jwt.sign(
+          { userEmail: user.userEmail },
+          process.env.ACCESS_TOKEN_SECRET,
+          {
+            expiresIn: "20s",
+          }
+        );
+        return res.json({
+          ok: true,
+          message: "accessToken 재발급 성공!",
+          accessToken: accessToken,
+        });
+      }
+    });
+  } else {
+    return res.status(406).json({ message: "토큰 발급 불가" });
+  }
+});
+
+//refreshToken check 리프레시 토큰 확인 / accessToken 재발급
+router.post("/refresh", (req, res) => {
+  // Destructuring refreshToken from cookie
+  const refreshToken = req.body.refreshToken;
+  if (refreshToken === undefined) {
+    return res.status(401).json({ errorMessage: "리프레쉬 토큰이 없습니다." });
+  }
+
   console.log(refreshToken);
   // Verifying refresh token
   if (req.body) {
