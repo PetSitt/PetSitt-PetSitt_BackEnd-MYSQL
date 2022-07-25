@@ -28,7 +28,7 @@ function chatSocketRouter(io) {
         //메시지 DB저장
         const chat = await Chat.create({
           roomId: data?.roomId,
-          userId: me.id,
+          userId: me.userId,
           userName: me.userName,
           chatText: data?.message,
         });
@@ -47,7 +47,7 @@ function chatSocketRouter(io) {
         //상대방의 대화목록 업데이트
         //if ( 1명 일 때) //나만있을 때 console.log(io._nsps.get('/').adapter.rooms.get('62d8f4872dcb0968c04b64c2').size);
         // const otherId =
-        //   room.userId !== me.id ? room.userId : room.sitter_userId;
+        //   room.userId !== me.userId ? room.userId : room.sitter_userId;
         // const other = await User.findbyId(otherId);
         // socket
         //   .to(other.userEmail)
@@ -114,7 +114,7 @@ function chatSocketRouter(io) {
       }
 
       const otherId =
-        room.userId !== user.id ? room.userId : room.sitter_userId;
+        room.userId !== user.userId ? room.userId : room.sitter_userId;
 
       // 해당 room의 모든 chat 가져오기
       const set_chats = [];
@@ -136,7 +136,7 @@ function chatSocketRouter(io) {
         );
 
         for (let i = 0; i < chats.length; i++) {
-          const me = chats[i].userId === user.id ? true : false;
+          const me = chats[i].userId === user.userId ? true : false;
           const chat = {
             newMessage: me ? chats[i].newMessage : false,
             roomId: chats[i].roomId,
@@ -189,12 +189,12 @@ function chatSocketRouter(io) {
       // 나와 시터간의 방이 있는지 검사
       let room = await Room.findOne({
         where: {
-          userId: user.id,
+          userId: user.userId,
           sitter_userId: sitterId,
         },
       });
 
-      console.log("방 검색 진행되었습니다: ", room?.id);
+      console.log("방 검색 진행되었습니다: ", room?.roomId);
 
       // 새로운 방 생성하기
       if (!room) {
@@ -207,12 +207,12 @@ function chatSocketRouter(io) {
         }
 
         room = await Room.create({
-          userId: user.id,
+          userId: user.userId,
           sitter_userId: sitter.userId,
         });
       }
 
-      return res.send({ roomId: room.id });
+      return res.send({ roomId: room.roomId });
     } catch {
       return res
         .status(400)
@@ -235,7 +235,7 @@ const setRoomForm = async (user) => {
   // 유저 속해있는 모든 room 검색
   const rooms = await Room.findAll({
     where: {
-      [Op.or]: [{ userId: user.id }, { sitter_userId: user.id }],
+      [Op.or]: [{ userId: user.userId }, { sitter_userId: user.userId }],
     },
   });
 
@@ -252,17 +252,19 @@ const setRoomForm = async (user) => {
 
     //상대방 정보 가져오기
     otherId =
-      rooms[i].userId !== user.id ? rooms[i].userId : rooms[i].sitter_userId;
+      rooms[i].userId !== user.userId
+        ? rooms[i].userId
+        : rooms[i].sitter_userId;
     other = await User.findOne({ where: { userId: otherId } });
     if (!other) continue;
 
-    other_sitter = await Sitter.findOne({ where: { userId: other.id } });
+    other_sitter = await Sitter.findOne({ where: { userId: other.userId } });
     if (other_sitter) imageUrl = other_sitter.imageUrl;
 
     //room 정보 세팅
     room = {
       newMessage: rooms[i].newMessage,
-      roomId: rooms[i].id,
+      roomId: rooms[i].roomId,
       userName: other.userName,
       lastChat: rooms[i].lastChat,
       lastChatAt: new Date(rooms[i].lastChatAt).getTime(),
