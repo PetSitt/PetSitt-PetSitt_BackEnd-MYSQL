@@ -9,12 +9,6 @@ module.exports = class Reservation extends Sequelize.Model {
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            userId: {
-                type: Sequelize.STRING
-            },
-            sitterId: {
-                type: Sequelize.INTEGER
-            },
             petId: {
                 type:Sequelize.JSON
             },
@@ -42,5 +36,7 @@ module.exports = class Reservation extends Sequelize.Model {
     static associate(db) {
         Reservation.belongsTo(db.User, { foreignKey: 'userId', sourceKey: 'userId', onDelete: 'CASCADE' });
         Reservation.belongsTo(db.Sitter, { foreignKey: 'sitterId', sourceKey: 'sitterId', onDelete: 'CASCADE' });
+        Reservation.hasOne(db.Diary, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete:'CASCADE' });
+        Reservation.hasOne(db.Review, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete:'CASCADE' });
     }
 };

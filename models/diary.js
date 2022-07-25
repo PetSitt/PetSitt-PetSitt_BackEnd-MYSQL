@@ -8,10 +8,6 @@ module.exports = class Diary extends Sequelize.Model {
             primaryKey: true,
             type: Sequelize.INTEGER,
         },
-        reservationId: {
-            type: Sequelize.STRING,
-            defaultValue:""
-        },
         diaryImage: {
             type:Sequelize.JSON,
         },
@@ -22,7 +18,7 @@ module.exports = class Diary extends Sequelize.Model {
         checkList:{
             type:Sequelize.JSON,
         },
-        state:{
+        checkStatus:{
             type:Sequelize.JSON,
         },
         }, {
@@ -35,5 +31,7 @@ module.exports = class Diary extends Sequelize.Model {
     }
 
     static associate(db) {
+        Diary.belongsTo(db.Reservation, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete: 'CASCADE' });
+        
     }
 };
