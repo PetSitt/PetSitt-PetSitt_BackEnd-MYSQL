@@ -62,7 +62,7 @@ router.get("/:sitterId", async(req, res) => {
 
 // 상세보기 페이지 댓글요청 입니다. 무한스크롤 기능 ( 테스트 완료 )
 router.post("/reviews/:sitterId", async (req, res) => {
-  // try {
+  try {
     const { reviewId } = req.body;
     const { sitterId } = req.params;
 
@@ -70,7 +70,7 @@ router.post("/reviews/:sitterId", async (req, res) => {
 
     if ( reviewId === 0 ) {
       searchQuery = { 
-        where: { "sitterId": sitterId }, 
+        where: { "sitterId": sitterId },
         order: [["reviewDate", "DESC"]],
       };
     } else {
@@ -87,9 +87,9 @@ router.post("/reviews/:sitterId", async (req, res) => {
     const reviews = await Review.findAll( searchQuery );
 
     return res.status(200).send({ reviews });
-  // } catch (err) {
-  //   return res.status(400).send("DB정보를 받아오지 못했습니다.");
-  // }
+  } catch (err) {
+    return res.status(400).send("DB정보를 받아오지 못했습니다.");
+  }
 });
 
 
