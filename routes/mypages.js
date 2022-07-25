@@ -39,11 +39,7 @@ router.get("/myprofile", authMiddleware, async (req, res) => {
         res.json({ myprofile });
     }catch(error){
         console.error(error);
-<<<<<<< HEAD
-        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
-=======
         return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
->>>>>>> test
     }
 })
 
