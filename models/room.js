@@ -40,7 +40,9 @@ module.exports = class Room extends Sequelize.Model {
         collate: "utf8mb4_general_ci",
       }
     );
-  }
+}
 
-  static associate(db) {}
+  static associate(db) {
+    Room.hasMany(db.Chat, { foreignKey: 'roomId', sourceKey: 'roomId', onDelete:'CASCADE' });
+  }
 };

@@ -10,10 +10,6 @@ module.exports = class Chat extends Sequelize.Model {
           primaryKey: true,
           type: Sequelize.INTEGER,
         },
-        roomId: {
-          allowNull: false,
-          type: Sequelize.STRING,
-        },
         userId: {
           allowNull: false,
           type: Sequelize.STRING,
@@ -46,6 +42,7 @@ module.exports = class Chat extends Sequelize.Model {
       }
     );
   }
-
-  static associate(db) {}
+  static associate(db) {
+    Chat.belongsTo(db.Room, { foreignKey: 'roomId', sourceKey: 'roomId', onDelete: 'CASCADE' });
+  }
 };

@@ -27,9 +27,6 @@ module.exports = class Pet extends Sequelize.Model {
             petIntro: {
                 type: Sequelize.STRING
             },
-            userId: {
-                type: Sequelize.STRING
-            },
             petName:{
                 type: Sequelize.STRING
             }
@@ -43,5 +40,6 @@ module.exports = class Pet extends Sequelize.Model {
     }
 
     static associate(db) {
+        Pet.belongsTo(db.User, { foreignKey: 'userId', sourceKey: 'userId', onDelete: 'CASCADE' });
     }
 };

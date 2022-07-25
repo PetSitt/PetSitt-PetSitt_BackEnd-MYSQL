@@ -28,7 +28,6 @@ const storage = multerS3({
 });
 const uploadS3 = multer({ storage: storage });
 
-
 //돌봄일지 등록
 router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), async (req, res) => {
   try {
@@ -155,7 +154,6 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
     });    
   };
 });
-
 
 //돌봄일지 요청
 router.get("/:reservationId", authMiddleware, async (req, res) => {
