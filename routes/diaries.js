@@ -97,7 +97,6 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
 
     const fileArray = req.files;    
 
-
     // 배열을 json parsing 한다.
     const decode_checkList    = JSON.parse(checkList);
     const decode_checkStatus   = JSON.parse(checkStatus);

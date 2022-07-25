@@ -7,7 +7,6 @@ const cookieParser = require("cookie-parser");
 const mypageRouter = require("./routes/mypages");
 const usersRouter = require("./routes/users");
 const reservationRouter = require("./routes/reservations.js");
-
 const diariesRouter = require("./routes/diaries");
 const detailsRouter = require("./routes/details.js");
 const informationRouter = require("./routes/information.js");

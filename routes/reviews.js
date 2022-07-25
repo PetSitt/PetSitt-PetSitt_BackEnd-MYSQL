@@ -22,13 +22,18 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
     });
     review.save();
 
-    
-    // 예약상태 변경
-    await Reservation.updateOne({ reservationId }, { $set: { reservationState: "진행완료" } });
-    const reviews = await Review.find({sitterId});
 
-    if ( reviews?.length > 0 ) {
-      const sitter = await Sitter.findById(sitterId);
+    // 예약상태변경
+    await Reservation.update(
+      { reservationState: "진행완료" },
+      { where: { reservationId:reservationId } }
+    );
+
+    const reviews = await Review.findAll({ where: { sitterId: sitterId } });
+
+    if (reviews?.length > 0) {
+      await Sitter.findByPk(sitterId);
+
       const totalReview = reviews.length + 1;
 
       //  평균별점 계산 = 시터 리뷰별점 총합 / 총 리뷰수
@@ -104,6 +109,7 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
     return res.status(400).send({ errorMessage: "요청 실패" });
   }
 });
+
 
 module.exports = router;
 
