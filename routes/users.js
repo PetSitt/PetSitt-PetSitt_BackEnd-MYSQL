@@ -81,7 +81,7 @@ router.post("/login", async (req, res) => {
         expiresIn: "10d",
       }
     );
-    console.log(refreshToken);
+  
     await user.update(
       { refreshToken },
       { where: { userEmail: user.userEmail } }
@@ -145,7 +145,6 @@ router.post("/refresh", (req, res) => {
     return res.status(401).json({ errorMessage: "리프레쉬 토큰이 없습니다." });
   }
 
-  console.log(refreshToken);
   // Verifying refresh token
   if (req.body) {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {

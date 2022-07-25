@@ -9,7 +9,7 @@ router.get("/petcheck", authMiddleware, async (req, res) => {
     const { user } = res.locals;
     let existCheck = false;
 
-    const pet = await Pet.findOne({ where: { userId: user.id } });
+    const pet = await Pet.findOne({ where: { userId: user.userId } });
     if (pet) {
       existCheck = true;
     }
@@ -25,7 +25,7 @@ router.get("/sittercheck", authMiddleware, async (req, res) => {
     const { user } = res.locals;
     let existCheck = false;
 
-    const sitter = await Sitter.findOne({ where: { userId: user.id } });
+    const sitter = await Sitter.findOne({ where: { userId: user.userId } });
     if (sitter) {
       existCheck = true;
     }

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { Sitter } = require("../models");
-
+const { Review } = require("../models");
 const { Pet } = require("../models");
 const { User } = require("../models");
-const AWS = require('aws-sdk');
+const { Op } = require("sequelize");
 require("dotenv").config();
 
 //상세페이지 불러오기 -> MYSQL 적용 프론트 테스트 OK -> <댓글 갯수 안나옴 !!>
@@ -13,10 +13,6 @@ router.get("/:sitterId", async(req, res) => {
     var sitter_info = await Sitter.findOne({where: {sitterId: req.params.sitterId}});
     var user_info = await User.findOne({where: {userId: sitter_info.userId}});
     var pet_info = await Pet.findAll({ where: { userId: user_info.userId } });
-    console.log(sitter_info)
-    console.log(user_info)
-    console.log()
-
 
     if (!sitter_info || !user_info) {
       throw new Error();
@@ -41,7 +37,7 @@ router.get("/:sitterId", async(req, res) => {
 
   return res.status(200).send({
     sitter: {
-      sitterId:     sitter_info._id,
+      sitterId:     sitter_info.sitterId,
       sitterName:   sitter_info.sitterName,
       rehireRate:   sitter_info.rehireRate,
       averageStar:  sitter_info.averageStar,
@@ -66,38 +62,34 @@ router.get("/:sitterId", async(req, res) => {
 
 // 상세보기 페이지 댓글요청 입니다. 무한스크롤 기능 ( 테스트 완료 )
 router.post("/reviews/:sitterId", async (req, res) => {
-  try {
+  // try {
     const { reviewId } = req.body;
     const { sitterId } = req.params;
 
     let searchQuery = null;
 
     if ( reviewId === 0 ) {
-      searchQuery = { "sitterId": sitterId };
+      searchQuery = { 
+        where: { "sitterId": sitterId }, 
+        order: [["reviewDate", "DESC"]],
+      };
     } else {
-      searchQuery = { "_id":{ $lt: reviewId }, "sitterId": sitterId };
+      searchQuery = {
+        where: {
+          reviewId: { [Op.lt]: reviewId },
+          sitterId,
+        },
+        order: [["reviewDate", "DESC"]],
+      }
     }
 
-    // $lt: reviewId 를 사용하여 현재 로딩된 리뷰와 중복되지않도록 보냅니다.
-    const reviews = await Review.find(
-      searchQuery, 
-      {
-        userName:   true,             
-        reviewStar: true,
-        reviewInfo: true,
-        reviewDate: true,
-      }
-    )
-    .sort({_id: -1})
-    .limit(3);
+    // [Op.lt]: reviewId 를 사용하여 현재 로딩된 리뷰와 중복되지않도록 보냅니다.
+    const reviews = await Review.findAll( searchQuery );
 
-    return res.status(200).send({
-      reviews,
-    });
-
-  } catch (err) {
-    return res.status(400).send("DB정보를 받아오지 못했습니다.");
-  }
+    return res.status(200).send({ reviews });
+  // } catch (err) {
+  //   return res.status(400).send("DB정보를 받아오지 못했습니다.");
+  // }
 });
 
 

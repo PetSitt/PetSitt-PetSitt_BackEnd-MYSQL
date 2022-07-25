@@ -12,22 +12,22 @@ module.exports = class Review extends Sequelize.Model {
         userId: {
           type: Sequelize.STRING,
          },
-          sitterId: {
-            type: Sequelize.STRING,
-         },
-          userName: {
-            type: Sequelize.STRING,
-          },
-          reviewStar: {
-            type: Sequelize.FLOAT, //소수점까지 나타냄
-          },
-          reviewInfo: { //1000글자 제한
-            type: Sequelize.STRING,
-          },
-          reviewDate: {
-            type: Sequelize.DATE,
-            defaultValue:  Sequelize.NOW,
-          },
+        sitterId: {
+          type: Sequelize.STRING,
+        },
+        userName: {
+          type: Sequelize.STRING,
+        },
+        reviewStar: {
+          type: Sequelize.FLOAT, //소수점까지 나타냄
+        },
+        reviewInfo: { //1000글자 제한
+          type: Sequelize.STRING,
+        },
+        reviewDate: {
+          type: Sequelize.DATE,
+          defaultValue:  Sequelize.NOW,
+        },
       },
       {
         sequelize,
