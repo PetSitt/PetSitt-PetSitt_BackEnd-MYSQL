@@ -63,41 +63,42 @@ router.get("/:sitterId", async(req, res) => {
   });
 });
 
-//상세보기 페이지 댓글요청 입니다. 무한스크롤 기능 ( 테스트 완료 )
-// router.post("/reviews/:sitterId", async (req, res) => {
-//   try {
-//     const { reviewId } = req.body;
-//     const { sitterId } = req.params;
 
-//     let searchQuery = null;
+// 상세보기 페이지 댓글요청 입니다. 무한스크롤 기능 ( 테스트 완료 )
+router.post("/reviews/:sitterId", async (req, res) => {
+  try {
+    const { reviewId } = req.body;
+    const { sitterId } = req.params;
 
-//     if ( reviewId === 0 ) {
-//       searchQuery = { "sitterId": sitterId };
-//     } else {
-//       searchQuery = { "_id":{ $lt: reviewId }, "sitterId": sitterId };
-//     }
+    let searchQuery = null;
 
-//     // $lt: reviewId 를 사용하여 현재 로딩된 리뷰와 중복되지않도록 보냅니다.
-//     const reviews = await Review.find(
-//       searchQuery, 
-//       {
-//         userName:   true,             
-//         reviewStar: true,
-//         reviewInfo: true,
-//         reviewDate: true,
-//       }
-//     )
-//     .sort({_id: -1})
-//     .limit(3);
+    if ( reviewId === 0 ) {
+      searchQuery = { "sitterId": sitterId };
+    } else {
+      searchQuery = { "_id":{ $lt: reviewId }, "sitterId": sitterId };
+    }
 
-//     return res.status(200).send({
-//       reviews,
-//     });
+    // $lt: reviewId 를 사용하여 현재 로딩된 리뷰와 중복되지않도록 보냅니다.
+    const reviews = await Review.find(
+      searchQuery, 
+      {
+        userName:   true,             
+        reviewStar: true,
+        reviewInfo: true,
+        reviewDate: true,
+      }
+    )
+    .sort({_id: -1})
+    .limit(3);
 
-//   } catch (err) {
-//     return res.status(400).send("DB정보를 받아오지 못했습니다.");
-//   }
-// });
+    return res.status(200).send({
+      reviews,
+    });
+
+  } catch (err) {
+    return res.status(400).send("DB정보를 받아오지 못했습니다.");
+  }
+});
 
 
 module.exports = router;

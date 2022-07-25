@@ -9,11 +9,13 @@ const { Reservation } = require("../models")
 const authMiddleware = require("../middlewares/auth-middleware");
 require("dotenv").config();
 
+
 const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY_ID,
   secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
   region: "ap-northeast-2"
 });
+
 
 const storage = multerS3({
   s3: s3,
@@ -27,7 +29,6 @@ const storage = multerS3({
   }
 });
 const uploadS3 = multer({ storage: storage });
-
 
 //돌봄일지 등록
 router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), async (req, res) => {
@@ -68,6 +69,7 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
     await Reservation.update({ reservationId: reservationId }, 
       { where: { diaryId: diary.id } });
 
+
     return res.status(200).send({
       msg: "돌봄일지 등록 성공" 
     });    
@@ -105,6 +107,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
     if (decode_checkStatus?.length)  diary.checkStatus = decode_checkStatus;
     if (diaryInfo)  diary.diaryInfo = diaryInfo;
 
+
     // 저장할 이미지가 있을 경우
     if (req.files?.length) {
       for (let i = 0; i < fileArray.length; i++) {
@@ -115,11 +118,13 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
     // 삭제할 이미지가 있을 경우
     if (decode_deleteImage?.length) {
 
+
       //삭제할 오브젝트 세팅
       const deleteObject = decode_deleteImage.map((el) => {
         const fileName = 'petSitt/' + el.split('/')[4];
         return { Key: fileName };
       });
+
 
       const options = {
         Bucket: process.env.MY_S3_BUCKET_DELETE || "kimguen-storage",
@@ -136,6 +141,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
         }
       );
       
+
       //DB 에서도 삭제
       diary.diaryImage = diary.diaryImage.filter((el) => {
         if (decode_deleteImage.includes(el)) {
@@ -149,10 +155,9 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
       msg: "돌봄일지 수정 성공" 
     });    
 
+
   } catch {
-    return res.status(400).send({ 
-      errorMessage: "DB정보를 받아오지 못했습니다." 
-    });    
+    return res.status(400).send({msg: "DB정보를 받아오지 못했습니다."});
   };
 });
 
@@ -172,11 +177,10 @@ router.get("/:reservationId", authMiddleware, async (req, res) => {
       checkStatus: diary.checkStatus,
     });
   } catch {
-    return res.status(400).send({ 
-      errorMessage: "DB정보를 받아오지 못했습니다." 
-    });    
+    return res.status(400).send({msg: "DB정보를 받아오지 못했습니다."});
   };
 });
 
 
 module.exports = router;
+

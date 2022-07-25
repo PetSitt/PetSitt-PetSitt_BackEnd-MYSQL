@@ -236,7 +236,6 @@ router.put('/password_change',authMiddleware, async (req, res) => {
       }
   });
 
-
   
 //kakao login  소셜로그인
   router.post('/auth/kakao', async (req, res) => {
@@ -270,6 +269,6 @@ router.put('/password_change',authMiddleware, async (req, res) => {
     }
     // await user.save();
   });
-  
+
 
 module.exports = router;

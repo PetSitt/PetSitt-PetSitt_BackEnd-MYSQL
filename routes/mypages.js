@@ -39,6 +39,7 @@ router.get("/myprofile", authMiddleware, async (req, res) => {
         res.json({ myprofile });
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -52,6 +53,7 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
         res.json({ myprofile });
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -64,6 +66,7 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
         res.json({ petprofile });
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -88,7 +91,8 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
             res.json({ result: "success" });
         }
     }catch(error){
-        console.log(error)
+        console.log(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -104,34 +108,26 @@ router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req
             const petprofile = await Pet.create({ petName: petName, petAge: petAge, petWeight: petWeight, petType: petType, petSpay: petSpay, petIntro: petIntro, petImage: petImage, userId: user.userId });
             res.json({ petprofile });
         }else{
-            const petprofile = await Pet.create({ petName: petName, petAge: petAge, petWeight: petWeight, petType: petType, petSpay: petSpay, petIntro: petIntro, userId: user.userId });
+            const petprofile = await Pet.create({ petName: petName, petAge: petAge, petWeight: petWeight, petType: petType, petSpay: petSpay, petIntro: petIntro, userId: user.userId  });
             res.json({ petprofile });
         }
     }catch(error){
         console.log(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
 // 마이페이지 - 돌보미 등록  -> MYSQL 적용 프론트 테스트 OK
-
 router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{name:'mainImageUrl'}]), async (req, res) => {
     try{
         const { user } = res.locals;
         const { sitterName, address, detailAddress, introTitle, myIntro, careSize, servicePrice, plusService, noDate, region_1depth_name, region_2depth_name, region_3depth_name, category, zoneCode } = req.body;
         
-
-
         const decode_careSize     = JSON.parse(careSize);
         let   decode_noDate       = JSON.parse(noDate);
         const decode_category     = JSON.parse(category);
         const decode_plusService  = JSON.parse(plusService);
 
-        // 밀리초 형식으로 넘어온 Date형식을 "2022/07/11" 형식으로 변환한다.
-        if (decode_noDate?.length) {
-            decode_noDate = decode_noDate.map((el) => {
-            return (new Date(el)).toISOString().split('T')[0].replaceAll('-', '/');
-            });
-        }
         let { x, y } = req.body;
         if (x === 'undefined' || y === 'undefined' || !x || !y ) {
         x = 0;
@@ -169,6 +165,7 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
         res.json({ createSitter })
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -205,6 +202,7 @@ router.delete("/sitterprofile", authMiddleware, async (req, res) => {
         res.json({ result: "success" });
     }catch{
         res.json({ result: "fail" });
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -230,6 +228,7 @@ router.delete("/petprofile/:petId", async (req, res) => {
         res.json({ result: "success" });
     }catch{
         res.json({ result: "fail" });
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -263,6 +262,7 @@ router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), as
     res.json({ result: "success" });
     }catch(error){
         console.log(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -276,13 +276,6 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     let   decode_noDate       = JSON.parse(noDate);
     const decode_category     = JSON.parse(category);
     const decode_plusService  = JSON.parse(plusService);
-
-    // 밀리초 형식으로 넘어온 Date형식을 "2022/07/11" 형식으로 변환한다.
-    if (decode_noDate?.length) {
-        decode_noDate = decode_noDate.map((el) => {
-        return (new Date(el)).toISOString().split('T')[0].replaceAll('-', '/');
-        });
-    }
 
     const sitter = await Sitter.findOne({ where: { userId: user.userId }});
     const sitterprofile = await Sitter.update({
@@ -308,8 +301,6 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     });
 
     if(x !== 'undefined') {
-        console.log(x)
-        console.log('1')
         const location = { type: 'Point', coordinates: [x, y]};
         await Sitter.update({
             location: location
@@ -363,6 +354,7 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     res.json({ sitterprofile });
     }catch(error){
         console.log(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
 
@@ -380,8 +372,37 @@ router.get("/info", authMiddleware, async (req, res) => {
         res.json({sitterimageUrl,sitterMainImageUrl, petImage});
     }catch(error){
         console.error(error);
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
     }
 })
+
+//비밀번호 변경 
+router.put('/password_change',authMiddleware, async (req, res) => {
+  try {
+  
+    let { password, newPassword ,userEmail} = req.body;
+    const salt = await bcrypt.genSalt(Number(process.env.SALT));
+    const newHash = bcrypt.hashSync(newPassword, salt);
+
+    const users = await User.findOne({ where: { userEmail } });
+        if (!users) {
+          return res.status(401).send({ errorMessage: "비밀번호를 확인해 주세요" });
+        } else {
+          const hashed = bcrypt.compareSync(password, users.password);
+          if (!hashed) {
+            return res.status(401).send({ errorMessage: "비밀번호가 일치하지 않습니다." });
+          } else {
+            await User.update({ password: newHash }, { where: { userEmail } });
+            return res.status(200).send({ message: "비밀번호 변경 성공!" });
+          }
+        }
+      } catch (err) {
+        if (err) {
+          console.log(err);
+          res.status(400).send({ errorMessage: "비밀번호 변경 실패" });
+        }
+      }
+  });
 
 
 module.exports = router;

@@ -12,7 +12,6 @@ const { Op } = require("sequelize");
 //예약하기 페이지 - 내 펫정보 요청 -> MYSQL 적용 프론트 테스트 OK
 router.get("/", authMiddleware, async (req, res) => {
   try{
-
     const { user } = res.locals;
     const pets = await Pet.findAll({ where: {userId: user.userId }});
 
@@ -240,7 +239,6 @@ router.get("/details/:reservationId", authMiddleware, async (req, res) => {
         });
   
       case 'sitter': // 돌보미탭 검색
-
         user = await User.findOne({where: {userId: reservation.userId}}); //신청자 정보 - 전화번호 필요
         if (!user) { throw new Error(); }
 
@@ -343,10 +341,11 @@ const setSitterFormReservation = async (array) => {
   if (!array?.length) {
     return setArray;
   } 
-  for (let i = 0; i < array.length; i++) {
 
+  for (let i = 0; i < array.length; i++) {
     const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
-    if (!user ) continue;
+    if (!user) continue;
+
 
     const reservation = {
       category:         array[i].category,
