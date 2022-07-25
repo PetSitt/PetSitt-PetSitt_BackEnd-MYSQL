@@ -4,10 +4,10 @@ module.exports = class Sitter extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
             sitterId: {
-            allowNull: false,
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER,
+              allowNull: false,
+              autoIncrement: true,
+              primaryKey: true,
+              type: Sequelize.INTEGER,
             },
             address: {
               type: Sequelize.STRING,

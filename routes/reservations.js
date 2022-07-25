@@ -241,7 +241,6 @@ router.get("/details/:reservationId", authMiddleware, async (req, res) => {
         });
   
       case 'sitter': // 돌보미탭 검색
-
         user = await User.findOne({where: {userId: reservation.userId}}); //신청자 정보 - 전화번호 필요
         if (!user) { throw new Error(); }
 
@@ -286,7 +285,6 @@ router.put("/cancel/:reservationId", authMiddleware, async (req, res) => {
     if (!reservation) { throw new Error(); }
 
     //예약 상태 변경
-
     await Reservation.update({ reservationState: "취소완료" }, { where: {reservationId: reservationId } })
 
     //취소시 돌보미 예약불가 날짜 빼기
@@ -331,7 +329,6 @@ const setUserFormReservation = async (array) => {
     };
 
     setArray.push(reservation);
-
   }
 
   return setArray;
@@ -344,10 +341,10 @@ const setSitterFormReservation = async (array) => {
   if (!array?.length) {
     return setArray;
   } 
-  for (let i = 0; i < array.length; i++) {
 
+  for (let i = 0; i < array.length; i++) {
     const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
-    if (!user ) continue;
+    if (!user) continue;
 
     const reservation = {
       category:         array[i].category,

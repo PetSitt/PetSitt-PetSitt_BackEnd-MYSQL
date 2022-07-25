@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
       $nin: [
         walk, wash, prac, dayCare, boarding,
       ]}
-    ,
+     ,
   })
 
   return res.send({
@@ -79,5 +79,7 @@ router.post("/search", async (req, res) => {
   }
     res.send({sitters});
 });
+
+
 
 module.exports = router;

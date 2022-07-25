@@ -42,7 +42,6 @@ module.exports = class Chat extends Sequelize.Model {
       }
     );
   }
-
   static associate(db) {
     Chat.belongsTo(db.Room, { foreignKey: 'roomId', sourceKey: 'roomId', onDelete: 'CASCADE' });
   }

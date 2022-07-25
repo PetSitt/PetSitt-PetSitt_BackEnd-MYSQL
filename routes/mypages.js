@@ -123,12 +123,6 @@ router.post("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},{
         const decode_category     = JSON.parse(category);
         const decode_plusService  = JSON.parse(plusService);
 
-        // 밀리초 형식으로 넘어온 Date형식을 "2022/07/11" 형식으로 변환한다.
-        if (decode_noDate?.length) {
-            decode_noDate = decode_noDate.map((el) => {
-            return (new Date(el)).toISOString().split('T')[0].replaceAll('-', '/');
-            });
-        }
         let { x, y } = req.body;
         if (x === 'undefined' || y === 'undefined' || !x || !y ) {
         x = 0;
@@ -273,13 +267,6 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     let   decode_noDate       = JSON.parse(noDate);
     const decode_category     = JSON.parse(category);
     const decode_plusService  = JSON.parse(plusService);
-
-    // 밀리초 형식으로 넘어온 Date형식을 "2022/07/11" 형식으로 변환한다.
-    if (decode_noDate?.length) {
-        decode_noDate = decode_noDate.map((el) => {
-        return (new Date(el)).toISOString().split('T')[0].replaceAll('-', '/');
-        });
-    }
 
     const sitter = await Sitter.findOne({ where: { userId: user.userId }});
     const sitterprofile = await Sitter.update({

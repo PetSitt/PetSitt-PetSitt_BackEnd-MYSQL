@@ -20,7 +20,7 @@ module.exports = class Diary extends Sequelize.Model {
         },
         checkStatus:{
             type:Sequelize.JSON,
-        },
+        }
         }, {
             sequelize,
             modelName: 'Diary',

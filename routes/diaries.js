@@ -4,8 +4,8 @@ const moment = require('moment');
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3    = require('multer-s3');
-const { Diary }   = require("../schemas/diary.js");
-const { Reservation } = require("../schemas/reservation.js");
+const { Diary }   = require("../models");
+const { Reservation } = require("../models")
 const authMiddleware = require("../middlewares/auth-middleware.js");
 require("dotenv").config();
 
@@ -32,9 +32,10 @@ const uploadS3 = multer({ storage: storage });
 router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), async (req, res) => {
   try {
     const { reservationId } = req.params;
+    console.log(reservationId)
     const { 
       checkList, 
-      checkState, 
+      checkStatus, 
       diaryInfo 
     } = req.body;
 
@@ -42,12 +43,12 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
 
     // 배열을 json parsing 한다.
     const decode_checkList  = JSON.parse(checkList);
-    const decode_checkState = JSON.parse(checkState);
+    const decode_checkStatus = JSON.parse(checkStatus);
 
     // 체크리스트, 돌봄일지 글 등록
     const diary = new Diary({ reservationId });
-    if (decode_checkList?.length)   diary.checkList.list = decode_checkList;
-    if (decode_checkState?.length)  diary.checkList.state = decode_checkState;
+    if (decode_checkList?.length)   diary.checkList = decode_checkList;
+    if (decode_checkStatus?.length)  diary.checkStatus= decode_checkStatus;
     if (diaryInfo)  diary.diaryInfo = diaryInfo;
 
 
@@ -58,13 +59,13 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
       for (let i = 0; i < fileArray.length; i++) {
         diaryImage.push(fileArray[i].location);        
       }
-
       diary.diaryImage = diaryImage;
     }
 
-    diary.save();
+    await diary.save();
     // 예약에 돌봄일지 추가
-    await Reservation.updateOne({ reservationId }, { $set: { diaryId: diary.id } });
+    await Reservation.update({ reservationId: reservationId }, 
+      { where: { diaryId: diary.id } });
 
     return res.status(200).send({
       msg: "돌봄일지 등록 성공" 
@@ -83,24 +84,24 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
     const { reservationId } = req.params;
     const {
       checkList, 
-      checkState, 
+      checkStatus, 
       deleteImage,
       diaryInfo,
     } = req.body;
 
-    const diary = await Diary.findOne({ reservationId });
+    const diary = await Diary.findOne({where:{ reservationId }});
     if (!diary) { throw new Error(); }
 
     const fileArray = req.files;    
 
     // 배열을 json parsing 한다.
     const decode_checkList    = JSON.parse(checkList);
-    const decode_checkState   = JSON.parse(checkState);
+    const decode_checkStatus   = JSON.parse(checkStatus);
     const decode_deleteImage  = JSON.parse(deleteImage);
 
     // 변경 내용이 있을 경우
     if (decode_checkList?.length)   diary.checkList = decode_checkList;
-    if (decode_checkState?.length)  diary.checkList = decode_checkState;
+    if (decode_checkStatus?.length)  diary.checkStatus = decode_checkStatus;
     if (diaryInfo)  diary.diaryInfo = diaryInfo;
 
     // 저장할 이미지가 있을 경우
@@ -142,9 +143,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
         return true;
       });
     }
-
-    diary.save();
-
+    await diary.save();
     return res.status(200).send({ 
       msg: "돌봄일지 수정 성공" 
     });    
@@ -160,14 +159,15 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
 router.get("/:reservationId", authMiddleware, async (req, res) => {
   try {
     const { reservationId } = req.params;
+    console.log(reservationId)
     const diary = await Diary.findOne({where:{ reservationId }});
     if (!diary) { throw new Error(); }
 
     return res.status(200).send({ 
       diaryImage: diary.diaryImage,
       diaryInfo:  diary.diaryInfo,
-      checkList:  diary.checkList.list,
-      checkState: diary.checkList.state,
+      checkList:  diary.checkList,
+      checkStatus: diary.checkStatus,
     });
   } catch {
     return res.status(400).send({ 
