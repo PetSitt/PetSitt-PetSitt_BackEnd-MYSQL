@@ -40,7 +40,6 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
       checkStatus, 
       diaryInfo 
     } = req.body;
-
     const fileArray = req.files;    
 
     // 배열을 json parsing 한다.
@@ -52,7 +51,6 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
     if (decode_checkList?.length)   diary.checkList = decode_checkList;
     if (decode_checkStatus?.length)  diary.checkStatus= decode_checkStatus;
     if (diaryInfo)  diary.diaryInfo = diaryInfo;
-
 
     // 저장할 이미지가 있을 경우
     if (req.files) {
@@ -66,8 +64,8 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
 
     await diary.save();
     // 예약에 돌봄일지 추가
-    await Reservation.update({ reservationId: reservationId }, 
-      { where: { diaryId: diary.id } });
+    await Reservation.update({ diaryId: diary.diaryId }, 
+      { where: { reservationId: reservationId } });
 
 
     return res.status(200).send({
@@ -107,6 +105,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
     if (decode_checkStatus?.length)  diary.checkStatus = decode_checkStatus;
     if (diaryInfo)  diary.diaryInfo = diaryInfo;
 
+    let updateImage;
 
     // 저장할 이미지가 있을 경우
     if (req.files?.length) {
@@ -140,8 +139,6 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
           else console.log("삭제성공: ", data);
         }
       );
-      
-
       //DB 에서도 삭제
       diary.diaryImage = diary.diaryImage.filter((el) => {
         if (decode_deleteImage.includes(el)) {
@@ -150,6 +147,8 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
         return true;
       });
     }
+    updateImage = diary.diaryImage;
+    await Diary.update({ diaryImage: updateImage }, { where: {reservationId: reservationId } })
     await diary.save();
     return res.status(200).send({ 
       msg: "돌봄일지 수정 성공" 
