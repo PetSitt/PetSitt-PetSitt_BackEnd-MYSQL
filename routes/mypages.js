@@ -66,7 +66,7 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
         res.json({ petprofile });
     }catch(error){
         console.error(error);
-        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." }); 
     }
 })
 
@@ -201,8 +201,7 @@ router.delete("/sitterprofile", authMiddleware, async (req, res) => {
         await Sitter.destroy({ where: { userId: user.userId }});
         res.json({ result: "success" });
     }catch{
-        res.json({ result: "fail" });
-        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+        return res.status(400).send({ result: "fail" });
     }
 })
 
@@ -227,8 +226,7 @@ router.delete("/petprofile/:petId", async (req, res) => {
         await Pet.destroy({ where: { petId: petId }});
         res.json({ result: "success" });
     }catch{
-        res.json({ result: "fail" });
-        return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+      return res.status(400).send({ result: "fail" }); 
     }
 })
 

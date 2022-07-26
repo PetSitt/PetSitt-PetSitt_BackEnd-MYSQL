@@ -43,5 +43,4 @@ module.exports = class User extends Sequelize.Model {
       User.hasMany(db.Reservation, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
       User.hasOne(db.Sitter, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
     }
-
 };

@@ -11,7 +11,7 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
     const { user } = res.locals;
     const { reservationId } = req.params;
     const { sitterId, reviewStar, reviewInfo } = req.body;
-
+    
     // 리뷰 등록
     const review = new Review({
       userId: user.userEmail,
@@ -22,7 +22,6 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
       reviewInfo,
     });
     review.save();
-
 
     // 예약상태변경
     await Reservation.update(
@@ -45,17 +44,8 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
       const totalReview = reviews.length + 1;
 
       //  평균별점 계산 = 시터 리뷰별점 총합 / 총 리뷰수
-      // const sumStar = reviews.reduce(
-      //   (total, current) => total + current.reviewStar,
-      //   0
-      // );
-      // await Sitter.update(
-      //   { averageStar: ((sumStar + reviewStar) / totalReview).toFixed(1) },
-      //   { where: { sitterId: sitterId } }
-      // );
-
-    const averageStar = (total / totalCount).toFixed(1);
-    await Sitter.update({averageStar: averageStar},{where: {sitterId: sitterId}});
+      const averageStar = (total / totalCount).toFixed(1);
+      await Sitter.update({averageStar: averageStar},{where: {sitterId: sitterId}});
 
       //재고용률 계산 - 중복된 사람의 수를 세어 백분율(% 단위)로 기록합니다.
       // dup_members = 중복이 일어난 멤버(2번이상 고용한 사람만 들어감)
@@ -82,13 +72,7 @@ router.post("/:reservationId", authMiddleware, async (req, res) => {
         { where: { sitterId:sitterId } }
       );
       
-
-      //리뷰 카운트 추가
-      // await Sitter.update(
-      //   { reviewCount: 1 },
-      //   { where: { sitterId:sitterId } }
-      // );
-      
+      //리뷰 카운트 추가      
       await Sitter.update(
         {
           reviewCount: totalCount

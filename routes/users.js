@@ -97,14 +97,13 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
  //refreshToken check 리프레시 토큰 확인 / accessToken 재발급 
   router.post('/refresh', (req, res) => {
     // Destructuring refreshToken from cookie
     const refreshToken  = req.body.refreshToken;
-    if (refreshToken === undefined){
+    if (refreshToken === undefined) {
       return res.status(401).json({ errorMessage: '리프레쉬 토큰이 없습니다.' })
-  };
+    };
     console.log(refreshToken)
     // Verifying refresh token
     if (req.body) {
@@ -126,8 +125,7 @@ router.post("/login", async (req, res) => {
       };
     }); } else {
     return res.status(406).json({ message: '토큰 발급 불가' });
-}});
-
+  }});
 
 //id_check  유저 아이디찾기 
 router.post('/id_check', async (req, res) => {
