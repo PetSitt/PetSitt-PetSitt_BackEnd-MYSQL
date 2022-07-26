@@ -12,6 +12,7 @@ const { Op } = require("sequelize");
 //예약하기 페이지 - 내 펫정보 요청 -> MYSQL 적용 프론트 테스트 OK
 router.get("/", authMiddleware, async (req, res) => {
   try{
+
     const { user } = res.locals;
     const pets = await Pet.findAll({ where: {userId: user.userId }});
 
@@ -37,7 +38,7 @@ router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
       reservationDate,
     } = req.body;
 
-    // petIds = JSON.parse(petIds);
+    // petIds = JSON.parse(petIds);3EWWWWWWW
     // category = JSON.parse(category);
     // reservationDate = JSON.parse(reservationDate);
     if (!petIds?.length   ||
@@ -99,9 +100,11 @@ router.get("/lists", authMiddleware, async (req, res) => {
     let searchQuery = null;
     let dataForm = null;
     let pastReservations = null;
+    let progressReservations = null;
     if(searchCase==="sitter"){
       var sitt = await Sitter.findOne({ where: {userId: user.userId } });
     }
+    console.log('1')
     switch (searchCase) {
       case 'user': // 사용자탭 검색
         searchQuery = { userId: user.userId };
@@ -122,32 +125,42 @@ router.get("/lists", authMiddleware, async (req, res) => {
       default:
         return res.status(403).send({ errorMessage: "잘못된 쿼리입니다." });
     }
-
-    // 진행중인 예약
-    const progressReservations = await Reservation.findAll({
-      where: { 
-        [Op.and]: [searchQuery, {reservationState: "진행중"}]
-      }
-    })
-
+    console.log('2')
     // 진행완료, 취소완료 예약
     if(searchCase==="user"){
       pastReservations = await Reservation.findAll({
+      limit: 3,
+      order: [["reservationId", "desc"]],
       where: {
         userId: user.userId,
-        reservationState: { [Op.not]: "진행중" }
+        reservationState: { [Op.not]: '진행중' }
+      }
+      })
+      progressReservations = await Reservation.findAll({
+        where: {
+          userId: user.userId,
+          reservationState: "진행중"
         }
       })
     }
+    console.log('3')
     if(searchCase==="sitter"){
       pastReservations = await Reservation.findAll({
+      limit: 3,
+      order: [["reservationId", "desc"]],
       where: {
           sitterId: sitt.sitterId,
-          reservationState: { [Op.not]: "진행중" }
-          }
-        })
+          reservationState: { [Op.not]: '진행중' }
+        }
+      })
+      progressReservations = await Reservation.findAll({
+        where: {
+          sitterId: sitt.sitterId,
+          reservationState: "진행중"
+        }
+      })
     }
-
+    console.log('4')
     return res.status(200).send({
       proceedings: await dataForm(progressReservations),
       pasts: await dataForm(pastReservations),
@@ -159,11 +172,12 @@ router.get("/lists", authMiddleware, async (req, res) => {
 });
 
 //예약보기 페이지 - 더보기 리스트 요청 - 무한스크롤 -- MYSQL 변경완료 / 프론트연결 테스트 x (로컬테스트 X) -> 지난내역 아직없어서 테스트 아직불가
-router.get("/lists/:", authMiddleware, async (req, res) => {
+router.get("/lists/:reservationId", authMiddleware, async (req, res) => {
   try{
     const { user } = res.locals;
     const { reservationId } = req.params;
     const { searchCase } = req.query;
+    let sitt2 = await Sitter.findOne({ where: {userId: user.userId} });
     switch (searchCase) {
       case 'user': // 사용자탭 검색
         searchQuery = { userId: user.userId };
@@ -176,6 +190,7 @@ router.get("/lists/:", authMiddleware, async (req, res) => {
         if (!sitter) {
           return res.status(402).send({ errorMessage: "돌보미 정보가 없습니다." });
         }
+
         searchQuery = { sitterId: sitter.sitterId };
         dataForm = setSitterFormReservation;
         break;
@@ -184,14 +199,33 @@ router.get("/lists/:", authMiddleware, async (req, res) => {
         return res.status(403).send({ errorMessage: "잘못된 쿼리입니다." });
     }    
 
-    const reserveDatas = await Reservation.findAll({
-      where: {
-        searchQuery, reservationId: reservationId,
-        reservationState: {
-          [Op.not]: "진행중"
+    if(searchCase==="user"){
+      var reserveDatas = await Reservation.findAll({
+        limit: 3,
+        order: [["reservationId", "desc"]],
+        where: {
+          userId: user.userId, reservationId: reservationId,
+          reservationState: {
+            [Op.not]: "진행중"
+          },
+          reservationId: { [Op.lt]: reservationId }
         }
-      }
-    })
+      }) 
+    }
+
+    if(searchCase==="sitter"){
+      var reserveDatas = await Reservation.findAll({
+        limit: 3,
+        order: [["reservationId", "desc"]],
+        where: {
+          sitterId: sitt2.sitterId, reservationId: reservationId,
+          reservationState: {
+            [Op.not]: "진행중"
+          },
+          reservationId: { [Op.lt]: reservationId }
+        }
+      }) 
+    }
 
     //mySql로 바꿀꺼니 join으로 구현 안함.
     if (!reserveDatas?.length) {
@@ -283,7 +317,6 @@ router.put("/cancel/:reservationId", authMiddleware, async (req, res) => {
     if (!reservation) { throw new Error(); }
 
     //예약 상태 변경
-
     await Reservation.update({ reservationState: "취소완료" }, { where: {reservationId: reservationId } })
 
     //취소시 돌보미 예약불가 날짜 빼기
@@ -328,7 +361,6 @@ const setUserFormReservation = async (array) => {
     };
 
     setArray.push(reservation);
-
   }
 
   return setArray;
@@ -343,9 +375,8 @@ const setSitterFormReservation = async (array) => {
   } 
 
   for (let i = 0; i < array.length; i++) {
-    const user   = await User.findOne({ where: { userId: User.userId }}); //신청자 유저정보
+    const user   = await User.findOne({ where: { userId: array[i].userId }}); //신청자 유저정보
     if (!user) continue;
-
 
     const reservation = {
       category:         array[i].category,

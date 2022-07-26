@@ -78,10 +78,10 @@ module.exports = class Sitter extends Sequelize.Model {
             zoneCode: {
               type: Sequelize.STRING,
             },
-            reviewCount: {
+            reviewCount:{
               type: Sequelize.INTEGER,
               defaultValue:0
-            },
+            }
         }, {
             sequelize,
             modelName: 'Sitter',

@@ -53,7 +53,7 @@ router.get("/:sitterId", async(req, res) => {
       noDate:       sitter_info.noDate,
       x:            sitter_info.location.coordinates[0] || 0, //경도
       y:            sitter_info.location.coordinates[1] || 0, //위도
-      reviewCount:  sitter_info.reviewCount,
+      reviewCount:  sitter_info.reviewCount
     },
     pets: pet_info,
   });
@@ -66,25 +66,23 @@ router.post("/reviews/:sitterId", async (req, res) => {
     const { reviewId } = req.body;
     const { sitterId } = req.params;
 
-    let searchQuery = null;
-
-    if ( reviewId === 0 ) {
-      searchQuery = { 
-        where: { "sitterId": sitterId },
-        order: [["reviewDate", "DESC"]],
-      };
-    } else {
-      searchQuery = {
-        where: {
-          reviewId: { [Op.lt]: reviewId },
-          sitterId,
-        },
-        order: [["reviewDate", "DESC"]],
-      }
+    if(reviewId === 0){
+      var reviews = await Review.findAll({
+        limit: 3,
+        order: [["reviewId", "desc"]],
+        where: { 
+          sitterId: sitterId
+        }
+      })
+    }else{
+      var reviews = await Review.findAll({
+        limit: 3,
+        order: [["reviewId", "desc"]],
+        where: { 
+          sitterId: sitterId, reviewId: { [Op.lt]: reviewId }
+        }
+      })
     }
-
-    // [Op.lt]: reviewId 를 사용하여 현재 로딩된 리뷰와 중복되지않도록 보냅니다.
-    const reviews = await Review.findAll( searchQuery );
 
     return res.status(200).send({ reviews });
   } catch (err) {

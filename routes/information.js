@@ -13,7 +13,7 @@ router.get("/petcheck", authMiddleware, async (req, res) => {
     if (pet) {
       existCheck = true;
     }
-
+    
     return res.status(200).send({ check: existCheck });
   } catch {
     return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
