@@ -23,8 +23,9 @@ const storage = multerS3({
   bucket: process.env.MY_S3_BUCKET || "kimguen-storage",
   key: (req, file, callback) => {
     if (file) {
+      const dir = req.body.dir;
       const datetime = moment().format('YYYYMMDDHHmmss');
-      callback(null, datetime + "_" + file.originalname);  // 저장되는 파일명
+      callback(null, dir + "_" + datetime );  // 저장되는 파일명
     }
   }
 });
@@ -104,8 +105,6 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
     if (decode_checkStatus?.length)  diary.checkStatus = decode_checkStatus;
     if (diaryInfo)  diary.diaryInfo = diaryInfo;
 
-    let updateImage;
-
     // 저장할 이미지가 있을 경우
     if (req.files?.length) {
       for (let i = 0; i < fileArray.length; i++) {
@@ -133,7 +132,7 @@ router.put("/:reservationId", authMiddleware, uploadS3.array('addImage'), async 
       };
 
       //s3에서 삭제
-      await s3.deleteObjects(options, (err, data) => {
+      s3.deleteObjects(options, (err, data) => {
           if (err) console.log( "삭제 실패: ", err);
           else console.log("삭제성공: ", data);
         }

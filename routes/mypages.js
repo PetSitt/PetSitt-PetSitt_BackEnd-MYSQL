@@ -20,11 +20,12 @@ const s3 = new AWS.S3({
 const storage = multerS3({
     s3: s3,
     acl: 'public-read-write',
-    bucket: "avostorage",   // s3 버킷명+경로
+    bucket: process.env.MY_S3_BUCKET || "kimguen-storage/petSitt",   // s3 버킷명+경로
     key: (req, file, callback) => {
-    	let dir = req.body.dir;
-        let datetime = moment().format('YYYYMMDDHHmmss');
-        callback(null, dir + datetime + "_" + file.originalname);  // 저장되는 파일명
+    	const dir = req.body.dir;
+      const datetime = moment().format('YYYYMMDDHHmmss');
+      callback(null, dir + "_" + datetime);  // 저장되는 파일명
+        
     }
 });
 
@@ -174,30 +175,36 @@ router.delete("/sitterprofile", authMiddleware, async (req, res) => {
     const { user } = res.locals;
     try{
         const sitter = await Sitter.findOne({ where: { userId: user.userId }})
-        const delFile = sitter.imageUrl.substr(51);
-        const delFile2 = sitter.mainImageUrl.substr(51);
-        const delParams = {
-            Bucket: process.env.MY_S3_BUCKET || "avostorage",
-            Key: delFile
-        };
-        s3.deleteObject(delParams, function (error, data) {
-            if (error) {
-                console.log('err: ', error, error.stack);
-            } else {
-                console.log(data, " 정상 삭제 되었습니다.");
-            }
-        })
-        const delParams2 = {
-            Bucket: process.env.MY_S3_BUCKET || "avostorage",
-            Key: delFile2
-        };        
-        s3.deleteObject(delParams2, function (error, data) {
-            if (error) {
-                console.log('err: ', error, error.stack);
-            } else {
-                console.log(data, " 정상 삭제 되었습니다.");
-            }
-        })
+        if (sitter.imageUrl) {
+          const delFile = sitter.imageUrl.substr(56);
+          const delParams = {
+              Bucket: process.env.MY_S3_BUCKET_DELETE || "kimguen-storage",
+              Key: delFile
+          };
+          s3.deleteObject(delParams, function (error, data) {
+              if (error) {
+                  console.log('err: ', error, error.stack);
+              } else {
+                  console.log(data, " 정상 삭제 되었습니다.");
+              }
+          })
+        }
+        
+        if (sitter.mainImageUrl) {
+          const delFile2 = sitter.mainImageUrl.substr(56);
+          const delParams2 = {
+              Bucket: process.env.MY_S3_BUCKET_DELETE || "kimguen-storage",
+              Key: delFile2
+          };        
+          s3.deleteObject(delParams2, function (error, data) {
+              if (error) {
+                  console.log('err: ', error, error.stack);
+              } else {
+                  console.log(data, " 정상 삭제 되었습니다.");
+              }
+          })
+        }
+
         await Sitter.destroy({ where: { userId: user.userId }});
         res.json({ result: "success" });
     }catch{
@@ -211,10 +218,10 @@ router.delete("/petprofile/:petId", async (req, res) => {
     try{
         const pet = await Pet.findOne({ where: { petId: petId }});
         if (pet.petImage) {
-          const delFile = pet.petImage.substr(51);
+          const delFile = pet.petImage.substr(56);
 
           const delParams = {
-              Bucket: process.env.MY_S3_BUCKET || "avostorage",
+              Bucket: process.env.MY_S3_BUCKET_DELETE || "kimguen-storage",
               Key: delFile
           };
           s3.deleteObject(delParams, function (error, data) {
@@ -241,9 +248,9 @@ router.patch("/petprofile/:petId", authMiddleware, upload.single('petImage'), as
     const pet = await Pet.findOne({ where: { petId: petId }}); 
     if(req.file != undefined){
         if(pet.petImage) {
-          const delFile = pet.petImage.substr(51);
+          const delFile = pet.petImage.substr(56);
           const delParams = {
-              Bucket: process.env.MY_S3_BUCKET || "avostorage",
+              Bucket: process.env.MY_S3_BUCKET_DELETE || "kimguen-storage",
               Key: delFile
           };
           s3.deleteObject(delParams, function (error, data) {
@@ -312,20 +319,21 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
     }
 
     if(req.files.imageUrl != undefined){
-        const delFile = sitter.imageUrl.substr(51);
-        const delParams = {
-            Bucket: process.env.MY_S3_BUCKET || "avostorage",
-            Key: delFile
-        };
-        
-        s3.deleteObject(delParams, function (error, data) {
-            if (error) {
-                console.log('err: ', error, error.stack);
-            } else {
-                console.log(data, " 정상 삭제 되었습니다.");
-            }
-        })
-
+        if (sitter.imageUrl) {
+          const delFile = sitter.imageUrl.substr(56);
+          const delParams = {
+              Bucket: process.env.MY_S3_BUCKET_DELETE || "kimguen-storage",
+              Key: delFile
+          };
+          
+          s3.deleteObject(delParams, function (error, data) {
+              if (error) {
+                  console.log('err: ', error, error.stack);
+              } else {
+                  console.log(data, " 정상 삭제 되었습니다.");
+              }
+          })
+        }
         const imageUrl = req.files.imageUrl[0].location;
         await Sitter.update({
             imageUrl: imageUrl
@@ -334,19 +342,21 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
 
     }
     if(req.files.mainImageUrl != undefined){
-        const delFile = sitter.mainImageUrl.substr(51);
-        const delParams = {
-            Bucket: process.env.MY_S3_BUCKET || "avostorage",
-            Key: delFile
-        };
-        
-        s3.deleteObject(delParams, function (error, data) {
-            if (error) {
-                console.log('err: ', error, error.stack);
-            } else {
-                console.log(data, " 정상 삭제 되었습니다.");
-            }
-        })
+        if (sitter.mainImageUrl) {
+          const delFile = sitter.mainImageUrl.substr(56);
+          const delParams = {
+              Bucket: process.env.MY_S3_BUCKET_DELETE || "kimguen-storage",
+              Key: delFile
+          };
+          
+          s3.deleteObject(delParams, function (error, data) {
+              if (error) {
+                  console.log('err: ', error, error.stack);
+              } else {
+                  console.log(data, " 정상 삭제 되었습니다.");
+              }
+          })
+        }
         const mainImageUrl = req.files.mainImageUrl[0].location;
         await Sitter.update({
             mainImageUrl: mainImageUrl
