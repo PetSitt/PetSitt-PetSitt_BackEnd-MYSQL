@@ -331,8 +331,10 @@ const setUserFormReservation = async (array) => {
     const sitter = await Sitter.findOne({ where : { sitterId: array[i].sitterId } })
       if (!sitter) continue;
 
-      const user   = await User.findOne({ where: { userId: sitter.userId }}); //돌보미의 유저정보
-      if (!user ) continue;
+    const user   = await User.findOne({ where: { userId: sitter.userId }}); //돌보미의 유저정보
+    if (!user ) continue;
+
+    const diaryExist = array[i].diaryId ? true : false;
 
     const reservation = {
       category:         array[i].category,
@@ -344,6 +346,7 @@ const setUserFormReservation = async (array) => {
       imageUrl:         sitter.imageUrl,
       address:          sitter.address,
       phoneNumber:      user.phoneNumber,
+      diaryExist,
     };
 
     setArray.push(reservation);
@@ -364,6 +367,8 @@ const setSitterFormReservation = async (array) => {
     const user   = await User.findOne({ where: { userId: array[i].userId }}); //신청자 유저정보
     if (!user) continue;
 
+    const diaryExist = array[i].diaryId ? true : false;
+
     const reservation = {
       category:         array[i].category,
       reservationDate:  array[i].reservationDate,
@@ -372,6 +377,7 @@ const setSitterFormReservation = async (array) => {
       sitterId:         array[i].sitterId,
       userName:         user.userName,
       phoneNumber:      user.phoneNumber,
+      diaryExist,
     };
 
     setArray.push(reservation);

@@ -24,7 +24,7 @@ const storage = multerS3({
     key: (req, file, callback) => {
     	const dir = req.body.dir;
       const datetime = moment().format('YYYYMMDDHHmmss');
-      callback(null, dir + "_" + datetime);  // 저장되는 파일명
+      callback(null, dir + datetime + "_" + file.originalname);  // 저장되는 파일명
         
     }
 });
@@ -334,12 +334,15 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
               }
           })
         }
+
         const imageUrl = req.files.imageUrl[0].location;
+
+        console.log("이미지: ",imageUrl);
+
         await Sitter.update({
             imageUrl: imageUrl
         },
             {where: {userId: user.userId}} );
-
     }
     if(req.files.mainImageUrl != undefined){
         if (sitter.mainImageUrl) {
@@ -358,6 +361,9 @@ router.patch("/sitterprofile", authMiddleware, upload.fields([{name:'imageUrl'},
           })
         }
         const mainImageUrl = req.files.mainImageUrl[0].location;
+
+        console.log("메인 이미지: ", mainImageUrl);
+
         await Sitter.update({
             mainImageUrl: mainImageUrl
         },
