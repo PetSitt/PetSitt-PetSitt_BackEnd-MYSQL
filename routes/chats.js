@@ -22,14 +22,11 @@ function chatSocketRouter(io) {
       try {
         console.log("send_message", data);
 
-        if (!socket.data?.userEmail) {
-          socket.data.userEmail = data?.userEmail;
-          socket.join(socket.data.userEmail);
-          console.log("socket데이터 세팅: ", socket.data?.userEmail);
-        }
+        socket.data.userEmail = data.userEmail
+        socket.join(data.userEmail);
 
         const me = await User.findOne({
-          where: { userEmail: socket.data?.userEmail||data?.userEmail },
+          where: { userEmail: data.userEmail },
         });
 
         //메시지 DB저장
