@@ -1,4 +1,4 @@
-const Sequelize = require("sequelize");
+const Sequelize = require('sequelize');
 
 module.exports = class Room extends Sequelize.Model {
   static init(sequelize) {
@@ -20,7 +20,7 @@ module.exports = class Room extends Sequelize.Model {
         },
         lastChat: {
           type: Sequelize.STRING,
-          defaultValue: "",
+          defaultValue: '',
         },
         lastChatAt: {
           allowNull: false,
@@ -34,15 +34,19 @@ module.exports = class Room extends Sequelize.Model {
       },
       {
         sequelize,
-        modelName: "Room",
-        tableName: "rooms",
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
+        modelName: 'Room',
+        tableName: 'rooms',
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_general_ci',
       }
     );
-}
+  }
 
   static associate(db) {
-    Room.hasMany(db.Chat, { foreignKey: 'roomId', sourceKey: 'roomId', onDelete:'CASCADE' });
+    Room.hasMany(db.Chat, {
+      foreignKey: 'roomId',
+      sourceKey: 'roomId',
+      onDelete: 'CASCADE',
+    });
   }
 };

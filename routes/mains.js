@@ -1,14 +1,14 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { Sitter } = require("../models");
-const { Op, Sequelize } = require("sequelize");
+const { Sitter } = require('../models');
+const { Op, Sequelize } = require('sequelize');
 
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
   const { x, y, category } = req.body;
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
   const distance = Sequelize.fn(
-    "ST_Distance",
-    Sequelize.col("location"),
+    'ST_Distance',
+    Sequelize.col('location'),
     location
   );
   const sitter = [];
@@ -27,12 +27,12 @@ router.post("/", async (req, res) => {
   res.send({ sitter });
 });
 
-router.post("/search", async (req, res) => {
+router.post('/search', async (req, res) => {
   const { region_2depth_name, searchDate, category, x, y } = req.body;
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
   const distance = Sequelize.fn(
-    "ST_Distance",
-    Sequelize.col("location"),
+    'ST_Distance',
+    Sequelize.col('location'),
     location
   );
 
@@ -43,7 +43,7 @@ router.post("/search", async (req, res) => {
     },
   });
 
-  if (x === "undefined" || y === "undefined" || !x || !y) {
+  if (x === 'undefined' || y === 'undefined' || !x || !y) {
     x = 126.875078748377;
     y = 37.4856025065543;
   }
