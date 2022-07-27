@@ -210,22 +210,25 @@ router.delete("/petprofile/:petId", async (req, res) => {
     const { petId } = req.params;
     try{
         const pet = await Pet.findOne({ where: { petId: petId }});
-        const delFile = pet.petImage.substr(51);
+        if (pet.petImage) {
+          const delFile = pet.petImage.substr(51);
 
-        const delParams = {
-            Bucket: process.env.MY_S3_BUCKET || "avostorage",
-            Key: delFile
-        };
-        s3.deleteObject(delParams, function (error, data) {
-            if (error) {
-                console.log('err: ', error, error.stack);
-            } else {
-                console.log(data, " 정상 삭제 되었습니다.");
-            }
-        })
+          const delParams = {
+              Bucket: process.env.MY_S3_BUCKET || "avostorage",
+              Key: delFile
+          };
+          s3.deleteObject(delParams, function (error, data) {
+              if (error) {
+                  console.log('err: ', error, error.stack);
+              } else {
+                  console.log(data, " 정상 삭제 되었습니다.");
+              }
+          });
+        }
+
         await Pet.destroy({ where: { petId: petId }});
         res.json({ result: "success" });
-    }catch{
+    } catch {
       return res.status(400).send({ result: "fail" }); 
     }
 })
