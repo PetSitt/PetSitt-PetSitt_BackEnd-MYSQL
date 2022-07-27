@@ -53,7 +53,6 @@ router.post('/signup', async (req, res) => {
 
 
 
-
 // login 로그인 
 router.post("/login", async (req, res) => {
   try {
@@ -79,7 +78,6 @@ router.post("/login", async (req, res) => {
       userEmail: user.userEmail
     }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '100m'
-
     });
     const refreshToken = jwt.sign({
       userEmail: user.userEmail
@@ -99,15 +97,13 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
  //refreshToken check 리프레시 토큰 확인 / accessToken 재발급 
   router.post('/refresh', (req, res) => {
     // Destructuring refreshToken from cookie
     const refreshToken  = req.body.refreshToken;
-    if (refreshToken === undefined){
+    if (refreshToken === undefined) {
       return res.status(401).json({ errorMessage: '리프레쉬 토큰이 없습니다.' })
-  };
-
+    };
     console.log(refreshToken)
     // Verifying refresh token
     if (req.body) {
@@ -115,7 +111,7 @@ router.post("/login", async (req, res) => {
     (err, user) => {
         if (err) {
             // Wrong Refesh Token
-            return res.status(406).json({ message: '리프레시 토큰 오류' });
+         return res.status(406).json({ message: '리프레시 토큰 오류' });
         } else {
             // Correct token we send a new access token
            // const user = {userEmail: refreshToken.userEmail}
@@ -129,10 +125,7 @@ router.post("/login", async (req, res) => {
       };
     }); } else {
     return res.status(406).json({ message: '토큰 발급 불가' });
-}});
-
-
-
+  }});
 
 //id_check  유저 아이디찾기 
 router.post('/id_check', async (req, res) => {
@@ -216,31 +209,25 @@ router.get('/auth', authMiddleware, (req, res) => {
 //비밀번호 변경 
 router.put('/password_change',authMiddleware, async (req, res) => {
   try {
-  
-    let { password, newPassword ,userEmail} = req.body;
+    const { user } = res.locals;
+    let { password, newPassword } = req.body;
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const newHash = bcrypt.hashSync(newPassword, salt);
 
-    const users = await User.findOne({ where: { userEmail } });
-        if (!users) {
-          return res.status(401).send({ errorMessage: "비밀번호를 확인해 주세요" });
-        } else {
-          const hashed = bcrypt.compareSync(password, users.password);
-          if (!hashed) {
-            return res.status(401).send({ errorMessage: "비밀번호가 일치하지 않습니다." });
-          } else {
-            await User.update({ password: newHash }, { where: { userEmail } });
-            return res.status(200).send({ message: "비밀번호 변경 성공!" });
-          }
-        }
-      } catch (err) {
-        if (err) {
-          console.log(err);
-          res.status(400).send({ errorMessage: "비밀번호 변경 실패" });
-        }
-      }
-  });
+    //비밀번호 일치 확인
+    const hashed = bcrypt.compareSync(password, user.password);
+    if (!hashed) {
+      return res.status(401).send({ errorMessage: "비밀번호가 일치하지 않습니다." });
+    }
 
+    //비밀번호 변경
+    await User.update({ password: newHash }, { where: { userEmail: user.userEmail } });
+
+    return res.status(200).send({ message: "비밀번호 변경 성공!" });
+  } catch {
+    return res.status(400).send({ errorMessage: "비밀번호 변경 실패" });
+  }
+});
 
   
 //kakao login  소셜로그인
@@ -268,13 +255,13 @@ router.put('/password_change',authMiddleware, async (req, res) => {
       return res.send({
         result: true,
         token: jwt.sign({ userEmail: user.userEmail }, 
-          process.env.ACCESS_TOKEN_SECRET,
-           {expiresIn: '6h', }
-           ),
+        process.env.ACCESS_TOKEN_SECRET,
+        {expiresIn: '6h', }
+        ),
       });
     }
     // await user.save();
   });
-  
+
 
 module.exports = router;

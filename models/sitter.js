@@ -1,16 +1,12 @@
-const Sequelize = require('sequelize');
-
+const Sequelize = require("sequelize");
 module.exports = class Sitter extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
             sitterId: {
-            allowNull: false,
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER,
-            },
-            userId: {
-                type: Sequelize.STRING
+              allowNull: false,
+              autoIncrement: true,
+              primaryKey: true,
+              type: Sequelize.INTEGER,
             },
             address: {
               type: Sequelize.STRING,
@@ -57,7 +53,7 @@ module.exports = class Sitter extends Sequelize.Model {
               defaultValue:0
             },
             averageStar: {
-              type: Sequelize.INTEGER,
+              type: Sequelize.FLOAT,
               defaultValue:0
             },
             region_1depth_name:{
@@ -81,6 +77,10 @@ module.exports = class Sitter extends Sequelize.Model {
             },
             zoneCode: {
               type: Sequelize.STRING,
+            },
+            reviewCount:{
+              type: Sequelize.INTEGER,
+              defaultValue:0
             }
         }, {
             sequelize,
@@ -92,5 +92,8 @@ module.exports = class Sitter extends Sequelize.Model {
     }
 
     static associate(db) {
+      Sitter.belongsTo(db.User, { foreignKey: 'userId', sourceKey: 'userId', onDelete: 'CASCADE' });
+      Sitter.hasMany(db.Reservation, { foreignKey: 'sitterId', sourceKey: 'sitterId', onDelete:'CASCADE' });
     }
 };
+
