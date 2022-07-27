@@ -38,7 +38,7 @@ router.post("/regist/:sitterId", authMiddleware, async (req, res) => {
       reservationDate,
     } = req.body;
 
-    // petIds = JSON.parse(petIds);3EWWWWWWW
+    // petIds = JSON.parse(petIds)
     // category = JSON.parse(category);
     // reservationDate = JSON.parse(reservationDate);
     if (!petIds?.length   ||
@@ -269,7 +269,7 @@ router.get("/details/:reservationId", authMiddleware, async (req, res) => {
           reservationState:reservation?.reservationState,
           phoneNumber:     user?.phoneNumber,
           servicePrice:    sitter?.servicePrice,
-          sitterName:    sitter?.sitterName
+          sitterName:      sitter?.sitterName
         });
   
       case 'sitter': // 돌보미탭 검색
@@ -284,7 +284,7 @@ router.get("/details/:reservationId", authMiddleware, async (req, res) => {
           address:         sitter?.address,
           phoneNumber:     user?.phoneNumber,
           servicePrice:    sitter?.servicePrice,
-          sitterName:    sitter?.sitterName
+          userName:        user?.userName
         }
 
         // 신청자 서비스받는 반려견 정보세팅
