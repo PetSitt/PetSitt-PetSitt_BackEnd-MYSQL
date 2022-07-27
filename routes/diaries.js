@@ -67,7 +67,6 @@ router.post("/:reservationId", authMiddleware, uploadS3.array('diaryImage'), asy
     await Reservation.update({ diaryId: diary.diaryId }, 
       { where: { reservationId: reservationId } });
 
-
     return res.status(200).send({
       msg: "돌봄일지 등록 성공" 
     });    

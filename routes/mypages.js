@@ -35,7 +35,7 @@ router.get("/myprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
         const myprofile = user;
-
+        
         res.json({ myprofile });
     }catch(error){
         console.error(error);
@@ -48,8 +48,10 @@ router.patch("/myprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
         const { userName, phoneNumber, userEmail } = req.body;
-        const myprofile = await User.update({userName: userName, phoneNumber: phoneNumber, userEmail: userEmail}, 
+        await User.update({userName: userName, phoneNumber: phoneNumber, userEmail: userEmail}, 
             { where: {userId: user.userId}} );
+        const myprofile = await User.findOne({where: {userId: user.userId}})
+
         res.json({ myprofile });
     }catch(error){
         console.error(error);
@@ -72,7 +74,6 @@ router.get("/petprofile", authMiddleware, async (req, res) => {
 
 
 // 마이페이지 - 돌보미 프로필조회 -> MYSQL 적용 프론트 테스트 OK
-
 router.get("/sitterprofile", authMiddleware, async (req, res) => {
     try{
         const { user } = res.locals;
@@ -98,7 +99,6 @@ router.get("/sitterprofile", authMiddleware, async (req, res) => {
 
 
 // 마이페이지 - 반려동물 프로필 등록 -> MYSQL 적용 프론트 테스트 OK
-
 router.post("/petprofile", authMiddleware, upload.single('petImage'), async (req, res) => {
     try{
         const { user } = res.locals;
