@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -13,18 +12,20 @@ router.post('/signup', async (req, res) => {
   try {
     const { userEmail, userName, password, phoneNumber } = req.body;
     const refreshToken = '';
-    //userEmail ot phoneNum 중복확인
-    const existUsers = await User.findAll({
-      where: {
-        [Op.or]: [{ userEmail }, { phoneNumber }],
-      },
-    });
-    if (existUsers.length) {
-      res.status(400).send({
-        errorMessage: '중복된 아이디 혹은 핸드폰 번호 입니다',
-      });
-      return;
+    //userEmail ot phoneNumber 중복확인
+    if (userEmail && userName && password && phoneNumber === "") {
+      res.status(400).send({ errorMessage: "필수 항목을 모두 입력해주세요!"})
     }
+    const existUserEmail = await User.findOne({where: {userEmail: userEmail}});
+      if (existUserEmail) {
+        return res.status(400).send
+        ({ errorMessage: "이미 가입된 이메일 주소 입니다."})
+      } 
+    const existPhoneNumber = await User.findOne({where: {phoneNumber: phoneNumber}});
+    if (existPhoneNumber) {
+      return res.status(400).send 
+      ({errorMessage : "이미 가입된 핸드폰 번호 입니다!"})
+    } 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashPassword = await bcrypt.hash(password, salt);
     await User.create({
@@ -35,13 +36,16 @@ router.post('/signup', async (req, res) => {
       refreshToken,
     });
     res.status(201).json({ message: '회원가입이 완료!' });
-  } catch (err) {
+  }catch (err) {
     console.log(err);
     res.status(400).send({
       errorMessage: '요청한 데이터 형식이 올바르지 않습니다.',
     });
   }
 });
+
+
+
 
 // login 로그인
 router.post('/login', async (req, res) => {
