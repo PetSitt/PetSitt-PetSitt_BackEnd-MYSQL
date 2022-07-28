@@ -1,17 +1,17 @@
-const Sequelize = require("sequelize");
+const Sequelize = require('sequelize');
 module.exports = class Review extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        reviewId:{
-            allowNull: false,
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER,
+        reviewId: {
+          allowNull: false,
+          autoIncrement: true,
+          primaryKey: true,
+          type: Sequelize.INTEGER,
         },
         userId: {
           type: Sequelize.STRING,
-         },
+        },
         sitterId: {
           type: Sequelize.STRING,
         },
@@ -21,25 +21,29 @@ module.exports = class Review extends Sequelize.Model {
         reviewStar: {
           type: Sequelize.FLOAT, //소수점까지 나타냄
         },
-        reviewInfo: { //1000글자 제한
+        reviewInfo: {
+          //1000글자 제한
           type: Sequelize.STRING,
         },
         reviewDate: {
           type: Sequelize.DATE,
-          defaultValue:  Sequelize.NOW,
+          defaultValue: Sequelize.NOW,
         },
       },
       {
         sequelize,
-        modelName: "Review",
-        tableName: "reviews",
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
+        modelName: 'Review',
+        tableName: 'reviews',
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_general_ci',
       }
     );
   }
   static associate(db) {
-    Review.belongsTo(db.Reservation, { foreignKey: 'reservationId', sourceKey: 'reservationId', onDelete: 'CASCADE' });
+    Review.belongsTo(db.Reservation, {
+      foreignKey: 'reservationId',
+      sourceKey: 'reservationId',
+      onDelete: 'CASCADE',
+    });
   }
 };
-

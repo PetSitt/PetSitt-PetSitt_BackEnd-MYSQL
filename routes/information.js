@@ -1,10 +1,10 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { Pet } = require("../models");
-const { Sitter } = require("../models");
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const { Pet } = require('../models');
+const { Sitter } = require('../models');
+const authMiddleware = require('../middlewares/auth-middleware');
 
-router.get("/petcheck", authMiddleware, async (req, res) => {
+router.get('/petcheck', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
     let existCheck = false;
@@ -13,14 +13,15 @@ router.get("/petcheck", authMiddleware, async (req, res) => {
     if (pet) {
       existCheck = true;
     }
-    
     return res.status(200).send({ check: existCheck });
   } catch {
-    return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+    return res
+      .status(400)
+      .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
   }
 });
 
-router.get("/sittercheck", authMiddleware, async (req, res) => {
+router.get('/sittercheck', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
     let existCheck = false;
@@ -32,7 +33,9 @@ router.get("/sittercheck", authMiddleware, async (req, res) => {
 
     return res.status(200).send({ check: existCheck });
   } catch {
-    return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+    return res
+      .status(400)
+      .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
   }
 });
 

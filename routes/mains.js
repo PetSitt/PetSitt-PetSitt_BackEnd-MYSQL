@@ -1,19 +1,19 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { Sitter } = require("../models");
-const { Op, Sequelize } = require("sequelize");
+const { Sitter } = require('../models');
+const { Op, Sequelize } = require('sequelize');
 
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
   const { category } = req.body;
-  let { x, y } = req.body
-  if (x === "undefined" || y === "undefined" || !x || !y) {
+  let { x, y } = req.body;
+  if (x === 'undefined' || y === 'undefined' || !x || !y) {
     x = 126.875078748377;
     y = 37.4856025065543;
   }
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
   const distance = Sequelize.fn(
-    "ST_Distance",
-    Sequelize.col("location"),
+    'ST_Distance',
+    Sequelize.col('location'),
     location
   );
 
@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
   });
 
   for (let i = 0; i < sitters.length; i++) {
-    const intersection2 = category?.filter((x) => 
+    const intersection2 = category?.filter((x) =>
       sitters[i].category.includes(x)
     );
     if (intersection2?.length === category?.length) {
@@ -34,18 +34,17 @@ router.post("/", async (req, res) => {
 
   res.send({ sitter });
 });
-
-router.post("/search", async (req, res) => {
+router.post('/search', async (req, res) => {
   const { region_2depth_name, searchDate, category } = req.body;
-  let { x, y } = req.body
-  if (x === "undefined" || y === "undefined" || !x || !y) {
+  let { x, y } = req.body;
+  if (x === 'undefined' || y === 'undefined' || !x || !y) {
     x = 126.875078748377;
     y = 37.4856025065543;
   }
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
   const distance = Sequelize.fn(
-    "ST_Distance",
-    Sequelize.col("location"),
+    'ST_Distance',
+    Sequelize.col('location'),
     location
   );
 
