@@ -18,14 +18,14 @@ const s3 = new AWS.S3({
 const storage = multerS3({
   s3: s3,
   acl: 'public-read-write',
-  bucket: process.env.MY_S3_BUCKET || 'kimguen-storage',
+  bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', // s3 버킷명+경로
   key: (req, file, callback) => {
-    if (file) {
-      const datetime = moment().format('YYYYMMDDHHmmss');
-      callback(null, datetime + '_' + file.originalname); // 저장되는 파일명
-    }
+    const dir = req.body.dir;
+    const datetime = moment().format('YYYYMMDDHHmmss');
+    callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
   },
 });
+
 const uploadS3 = multer({ storage: storage });
 
 //돌봄일지 등록
@@ -36,9 +36,8 @@ router.post(
   async (req, res) => {
     try {
       const { reservationId } = req.params;
-      console.log(reservationId);
-      const { checkList, checkStatus, diaryInfo } = req.body;
 
+      const { checkList, checkStatus, diaryInfo } = req.body;
       const fileArray = req.files;
 
       // 배열을 json parsing 한다.
@@ -46,7 +45,7 @@ router.post(
       const decode_checkStatus = JSON.parse(checkStatus);
 
       // 체크리스트, 돌봄일지 글 등록
-      const diary = new Diary({ reservationId });
+      const diary = await Diary.create({ reservationId });
       if (decode_checkList?.length) diary.checkList = decode_checkList;
       if (decode_checkStatus?.length) diary.checkStatus = decode_checkStatus;
       if (diaryInfo) diary.diaryInfo = diaryInfo;
@@ -54,6 +53,7 @@ router.post(
       // 저장할 이미지가 있을 경우
       if (req.files) {
         const diaryImage = [];
+
         for (let i = 0; i < fileArray.length; i++) {
           diaryImage.push(fileArray[i].location);
         }
@@ -63,8 +63,8 @@ router.post(
       await diary.save();
       // 예약에 돌봄일지 추가
       await Reservation.update(
-        { reservationId: reservationId },
-        { where: { diaryId: diary.id } }
+        { diaryId: diary.diaryId },
+        { where: { reservationId: reservationId } }
       );
 
       return res.status(200).send({
@@ -129,11 +129,10 @@ router.put(
         };
 
         //s3에서 삭제
-        await s3.deleteObjects(options, (err, data) => {
+        s3.deleteObjects(options, (err, data) => {
           if (err) console.log('삭제 실패: ', err);
           else console.log('삭제성공: ', data);
         });
-
         //DB 에서도 삭제
         diary.diaryImage = diary.diaryImage.filter((el) => {
           if (decode_deleteImage.includes(el)) {
@@ -142,6 +141,11 @@ router.put(
           return true;
         });
       }
+      updateImage = diary.diaryImage;
+      await Diary.update(
+        { diaryImage: updateImage },
+        { where: { reservationId: reservationId } }
+      );
       await diary.save();
       return res.status(200).send({
         msg: '돌봄일지 수정 성공',
@@ -156,10 +160,12 @@ router.put(
 router.get('/:reservationId', authMiddleware, async (req, res) => {
   try {
     const { reservationId } = req.params;
+
     console.log(reservationId);
+
     const diary = await Diary.findOne({ where: { reservationId } });
     if (!diary) {
-      throw new Error();
+      return res.status(400).send({ msg: '등록된 돌봄일지가 없습니다..' });
     }
 
     return res.status(200).send({

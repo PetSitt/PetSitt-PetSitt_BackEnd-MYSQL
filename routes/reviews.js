@@ -31,20 +31,22 @@ router.post('/:reservationId', authMiddleware, async (req, res) => {
 
     const reviews = await Review.findAll({ where: { sitterId: sitterId } });
 
+    let totalCount = 0;
+    let total = 0;
+    for (let i = 0; i < reviews.length; i++) {
+      total = total + reviews[i].reviewStar;
+      totalCount++;
+    }
+
     if (reviews?.length > 0) {
       await Sitter.findByPk(sitterId);
 
       const totalReview = reviews.length + 1;
 
       //  평균별점 계산 = 시터 리뷰별점 총합 / 총 리뷰수
-      const sumStar = reviews.reduce(
-        (total, current) => total + current.reviewStar,
-        0
-      );
+      const averageStar = (total / totalCount).toFixed(1);
       await Sitter.update(
-        {
-          averageStar: ((sumStar + reviewStar) / totalReview).toFixed(1),
-        },
+        { averageStar: averageStar },
         { where: { sitterId: sitterId } }
       );
 
@@ -74,8 +76,10 @@ router.post('/:reservationId', authMiddleware, async (req, res) => {
       );
 
       //리뷰 카운트 추가
-      await Sitter.increment(
-        { reviewCount: 1 },
+      await Sitter.update(
+        {
+          reviewCount: totalCount,
+        },
         { where: { sitterId: sitterId } }
       );
     }

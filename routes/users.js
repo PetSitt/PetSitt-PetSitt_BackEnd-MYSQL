@@ -13,19 +13,25 @@ router.post('/signup', async (req, res) => {
     const { userEmail, userName, password, phoneNumber } = req.body;
     const refreshToken = '';
     //userEmail ot phoneNumber 중복확인
-    if (userEmail && userName && password && phoneNumber === "") {
-      res.status(400).send({ errorMessage: "필수 항목을 모두 입력해주세요!"})
+    if (userEmail && userName && password && phoneNumber === '') {
+      res.status(400).send({ errorMessage: '필수 항목을 모두 입력해주세요!' });
     }
-    const existUserEmail = await User.findOne({where: {userEmail: userEmail}});
-      if (existUserEmail) {
-        return res.status(400).send
-        ({ errorMessage: "이미 가입된 이메일 주소 입니다."})
-      } 
-    const existPhoneNumber = await User.findOne({where: {phoneNumber: phoneNumber}});
+    const existUserEmail = await User.findOne({
+      where: { userEmail: userEmail },
+    });
+    if (existUserEmail) {
+      return res
+        .status(400)
+        .send({ errorMessage: '이미 가입된 이메일 주소 입니다.' });
+    }
+    const existPhoneNumber = await User.findOne({
+      where: { phoneNumber: phoneNumber },
+    });
     if (existPhoneNumber) {
-      return res.status(400).send 
-      ({errorMessage : "이미 가입된 핸드폰 번호 입니다!"})
-    } 
+      return res
+        .status(400)
+        .send({ errorMessage: '이미 가입된 핸드폰 번호 입니다!' });
+    }
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashPassword = await bcrypt.hash(password, salt);
     await User.create({
@@ -36,16 +42,13 @@ router.post('/signup', async (req, res) => {
       refreshToken,
     });
     res.status(201).json({ message: '회원가입이 완료!' });
-  }catch (err) {
+  } catch (err) {
     console.log(err);
     res.status(400).send({
       errorMessage: '요청한 데이터 형식이 올바르지 않습니다.',
     });
   }
 });
-
-
-
 
 // login 로그인
 router.post('/login', async (req, res) => {
@@ -217,35 +220,6 @@ router.get('/auth', authMiddleware, (req, res) => {
     res.status(401).send({
       errormessage: '사용자 정보를 가져오지 못하였습니다.',
     });
-  }
-});
-
-//비밀번호 변경
-router.put('/password_change', authMiddleware, async (req, res) => {
-  try {
-    let { password, newPassword, userEmail } = req.body;
-    const salt = await bcrypt.genSalt(Number(process.env.SALT));
-    const newHash = bcrypt.hashSync(newPassword, salt);
-
-    const users = await User.findOne({ where: { userEmail } });
-    if (!users) {
-      return res.status(401).send({ errorMessage: '비밀번호를 확인해 주세요' });
-    } else {
-      const hashed = bcrypt.compareSync(password, users.password);
-      if (!hashed) {
-        return res
-          .status(401)
-          .send({ errorMessage: '비밀번호가 일치하지 않습니다.' });
-      } else {
-        await User.update({ password: newHash }, { where: { userEmail } });
-        return res.status(200).send({ message: '비밀번호 변경 성공!' });
-      }
-    }
-  } catch (err) {
-    if (err) {
-      console.log(err);
-      res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
-    }
   }
 });
 

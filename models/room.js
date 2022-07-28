@@ -27,7 +27,11 @@ module.exports = class Room extends Sequelize.Model {
           type: Sequelize.DATE,
           defaultValue: Sequelize.NOW,
         },
-        newMessage: {
+        userNew: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false,
+        },
+        sitterNew: {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
         },

@@ -20,10 +20,10 @@ const s3 = new AWS.S3({
 const storage = multerS3({
   s3: s3,
   acl: 'public-read-write',
-  bucket: 'avostorage', // s3 버킷명+경로
+  bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', // s3 버킷명+경로
   key: (req, file, callback) => {
-    let dir = req.body.dir;
-    let datetime = moment().format('YYYYMMDDHHmmss');
+    const dir = req.body.dir;
+    const datetime = moment().format('YYYYMMDDHHmmss');
     callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
   },
 });
@@ -239,37 +239,40 @@ router.delete('/sitterprofile', authMiddleware, async (req, res) => {
   const { user } = res.locals;
   try {
     const sitter = await Sitter.findOne({ where: { userId: user.userId } });
-    const delFile = sitter.imageUrl.substr(51);
-    const delFile2 = sitter.mainImageUrl.substr(51);
-    const delParams = {
-      Bucket: process.env.MY_S3_BUCKET || 'avostorage',
-      Key: delFile,
-    };
-    s3.deleteObject(delParams, function (error, data) {
-      if (error) {
-        console.log('err: ', error, error.stack);
-      } else {
-        console.log(data, ' 정상 삭제 되었습니다.');
-      }
-    });
-    const delParams2 = {
-      Bucket: process.env.MY_S3_BUCKET || 'avostorage',
-      Key: delFile2,
-    };
-    s3.deleteObject(delParams2, function (error, data) {
-      if (error) {
-        console.log('err: ', error, error.stack);
-      } else {
-        console.log(data, ' 정상 삭제 되었습니다.');
-      }
-    });
+    if (sitter.imageUrl) {
+      const delFile = sitter.imageUrl.substr(56);
+      const delParams = {
+        Bucket: process.env.MY_S3_BUCKET_DELETE || 'kimguen-storage',
+        Key: delFile,
+      };
+      s3.deleteObject(delParams, function (error, data) {
+        if (error) {
+          console.log('err: ', error, error.stack);
+        } else {
+          console.log(data, ' 정상 삭제 되었습니다.');
+        }
+      });
+    }
+
+    if (sitter.mainImageUrl) {
+      const delFile2 = sitter.mainImageUrl.substr(56);
+      const delParams2 = {
+        Bucket: process.env.MY_S3_BUCKET_DELETE || 'kimguen-storage',
+        Key: delFile2,
+      };
+      s3.deleteObject(delParams2, function (error, data) {
+        if (error) {
+          console.log('err: ', error, error.stack);
+        } else {
+          console.log(data, ' 정상 삭제 되었습니다.');
+        }
+      });
+    }
+
     await Sitter.destroy({ where: { userId: user.userId } });
     res.json({ result: 'success' });
   } catch {
-    res.json({ result: 'fail' });
-    return res
-      .status(400)
-      .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
+    return res.status(400).send({ result: 'fail' });
   }
 });
 
@@ -278,26 +281,26 @@ router.delete('/petprofile/:petId', async (req, res) => {
   const { petId } = req.params;
   try {
     const pet = await Pet.findOne({ where: { petId: petId } });
-    const delFile = pet.petImage.substr(51);
+    if (pet.petImage) {
+      const delFile = pet.petImage.substr(56);
 
-    const delParams = {
-      Bucket: process.env.MY_S3_BUCKET || 'avostorage',
-      Key: delFile,
-    };
-    s3.deleteObject(delParams, function (error, data) {
-      if (error) {
-        console.log('err: ', error, error.stack);
-      } else {
-        console.log(data, ' 정상 삭제 되었습니다.');
-      }
-    });
+      const delParams = {
+        Bucket: process.env.MY_S3_BUCKET_DELETE || 'kimguen-storage',
+        Key: delFile,
+      };
+      s3.deleteObject(delParams, function (error, data) {
+        if (error) {
+          console.log('err: ', error, error.stack);
+        } else {
+          console.log(data, ' 정상 삭제 되었습니다.');
+        }
+      });
+    }
+
     await Pet.destroy({ where: { petId: petId } });
     res.json({ result: 'success' });
   } catch {
-    res.json({ result: 'fail' });
-    return res
-      .status(400)
-      .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
+    return res.status(400).send({ result: 'fail' });
   }
 });
 
@@ -313,18 +316,20 @@ router.patch(
         req.body;
       const pet = await Pet.findOne({ where: { petId: petId } });
       if (req.file != undefined) {
-        const delFile = pet.petImage.substr(51);
-        const delParams = {
-          Bucket: process.env.MY_S3_BUCKET || 'avostorage',
-          Key: delFile,
-        };
-        s3.deleteObject(delParams, function (error, data) {
-          if (error) {
-            console.log('err: ', error, error.stack);
-          } else {
-            console.log(data, ' 정상 삭제 되었습니다.');
-          }
-        });
+        if (pet.petImage) {
+          const delFile = pet.petImage.substr(56);
+          const delParams = {
+            Bucket: process.env.MY_S3_BUCKET_DELETE || 'kimguen-storage',
+            Key: delFile,
+          };
+          s3.deleteObject(delParams, function (error, data) {
+            if (error) {
+              console.log('err: ', error, error.stack);
+            } else {
+              console.log(data, ' 정상 삭제 되었습니다.');
+            }
+          });
+        }
         const petImage = req.file.location;
         await Pet.update(
           {
@@ -352,7 +357,7 @@ router.patch(
         );
       }
 
-      res.json({ result: 'success' });
+      return res.json({ result: 'success' });
     } catch (error) {
       console.log(error);
       return res
@@ -433,21 +438,26 @@ router.patch(
       }
 
       if (req.files.imageUrl != undefined) {
-        const delFile = sitter.imageUrl.substr(51);
-        const delParams = {
-          Bucket: process.env.MY_S3_BUCKET || 'avostorage',
-          Key: delFile,
-        };
+        if (sitter.imageUrl) {
+          const delFile = sitter.imageUrl.substr(56);
+          const delParams = {
+            Bucket: process.env.MY_S3_BUCKET_DELETE || 'kimguen-storage',
+            Key: delFile,
+          };
 
-        s3.deleteObject(delParams, function (error, data) {
-          if (error) {
-            console.log('err: ', error, error.stack);
-          } else {
-            console.log(data, ' 정상 삭제 되었습니다.');
-          }
-        });
+          s3.deleteObject(delParams, function (error, data) {
+            if (error) {
+              console.log('err: ', error, error.stack);
+            } else {
+              console.log(data, ' 정상 삭제 되었습니다.');
+            }
+          });
+        }
 
         const imageUrl = req.files.imageUrl[0].location;
+
+        console.log('이미지: ', imageUrl);
+
         await Sitter.update(
           {
             imageUrl: imageUrl,
@@ -456,20 +466,25 @@ router.patch(
         );
       }
       if (req.files.mainImageUrl != undefined) {
-        const delFile = sitter.mainImageUrl.substr(51);
-        const delParams = {
-          Bucket: process.env.MY_S3_BUCKET || 'avostorage',
-          Key: delFile,
-        };
+        if (sitter.mainImageUrl) {
+          const delFile = sitter.mainImageUrl.substr(56);
+          const delParams = {
+            Bucket: process.env.MY_S3_BUCKET_DELETE || 'kimguen-storage',
+            Key: delFile,
+          };
 
-        s3.deleteObject(delParams, function (error, data) {
-          if (error) {
-            console.log('err: ', error, error.stack);
-          } else {
-            console.log(data, ' 정상 삭제 되었습니다.');
-          }
-        });
+          s3.deleteObject(delParams, function (error, data) {
+            if (error) {
+              console.log('err: ', error, error.stack);
+            } else {
+              console.log(data, ' 정상 삭제 되었습니다.');
+            }
+          });
+        }
         const mainImageUrl = req.files.mainImageUrl[0].location;
+
+        console.log('메인 이미지: ', mainImageUrl);
+
         await Sitter.update(
           {
             mainImageUrl: mainImageUrl,
@@ -512,29 +527,28 @@ router.get('/info', authMiddleware, async (req, res) => {
 //비밀번호 변경
 router.put('/password_change', authMiddleware, async (req, res) => {
   try {
-    let { password, newPassword, userEmail } = req.body;
+    const { user } = res.locals;
+    let { password, newPassword } = req.body;
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const newHash = bcrypt.hashSync(newPassword, salt);
 
-    const users = await User.findOne({ where: { userEmail } });
-    if (!users) {
-      return res.status(401).send({ errorMessage: '비밀번호를 확인해 주세요' });
-    } else {
-      const hashed = bcrypt.compareSync(password, users.password);
-      if (!hashed) {
-        return res
-          .status(401)
-          .send({ errorMessage: '비밀번호가 일치하지 않습니다.' });
-      } else {
-        await User.update({ password: newHash }, { where: { userEmail } });
-        return res.status(200).send({ message: '비밀번호 변경 성공!' });
-      }
+    //비밀번호 일치 확인
+    const hashed = bcrypt.compareSync(password, user.password);
+    if (!hashed) {
+      return res
+        .status(401)
+        .send({ errorMessage: '비밀번호가 일치하지 않습니다.' });
     }
-  } catch (err) {
-    if (err) {
-      console.log(err);
-      res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
-    }
+
+    //비밀번호 변경
+    await User.update(
+      { password: newHash },
+      { where: { userEmail: user.userEmail } }
+    );
+
+    return res.status(200).send({ message: '비밀번호 변경 성공!' });
+  } catch {
+    return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
   }
 });
 

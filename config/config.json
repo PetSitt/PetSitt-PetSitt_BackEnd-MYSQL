@@ -4,7 +4,8 @@
     "password": "hanghae99",
     "database": "petsitt",
     "host": "petsitt.cs0sx8emochx.ap-northeast-2.rds.amazonaws.com",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "test": {
     "username": "root",
