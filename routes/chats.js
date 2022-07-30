@@ -18,6 +18,11 @@ function chatSocketRouter(io) {
   io.on('connection', (socket) => {
     console.log(`연결된 소켓 정보: ${socket.id}`);
 
+    socket.on('join_room', (roomId) => {
+      console.log(`${socket.id} 방접속: ${roomId}`)
+      socket.join(`${roomId}`);
+    });
+
     //메시지 전송 & DB 저장
     socket.on('send_message', async (data) => {
       try {
@@ -32,6 +37,9 @@ function chatSocketRouter(io) {
         let userNew = false;
         let sitterNew = false;
         let otherPos = null;
+
+        // 예외 처리 - 연결이 끊겼을 경우 대비
+        socket.join(`${room.roomId}`);
 
         // 상대방의 정보 세팅
         if (room.userId !== String(me.userId)) {
@@ -75,14 +83,14 @@ function chatSocketRouter(io) {
             lastChatAt: new Date(chat.createdAt).getTime(),
           };
 
-          //위의 other로 보냄 server-sent-Event
+          //other가 접속해 있다면 보냅니다 - server-sent-Event
           clients.forEach(client => {
             if (client.userEmail === other.userEmail) {
-              client.res.write(`data: ${JSON.stringify(newChat)}\n\n`);
+              client.res.write(`data: ${JSON.stringify(room_data)}\n\n`);
             }
           });
 
-          // 상대방 chatList 업데이트용 세팅
+          //chatList 업데이트용 세팅
           otherPos === 'user' ? userNew = true : sitterNew = true;
         }
 
@@ -102,12 +110,6 @@ function chatSocketRouter(io) {
       }
     });
 
-    //채팅방 나가기
-    socket.on('leave_room', (roomId) => {
-      console.log(`leave_room 연결해제: ${socket.id}`);
-      socket.disconnect(true);
-    });
-
     //소켓연결 해제
     socket.on('disconnect', () => {
       console.log('User Disconnected', socket.id);
@@ -117,7 +119,7 @@ function chatSocketRouter(io) {
   const router = express.Router();
   
   //Server-Sent-Event 연결
-  router.get('/sse/:userEmail', (req, res) => {
+  router.get('/sse/:userEmail', async (req, res) => {
     res.writeHead(200, headers);
 
     // 접속하는 순서대로 이메일 등록
@@ -179,9 +181,6 @@ function chatSocketRouter(io) {
       const { user } = res.locals;
       const { roomId, socketId } = req.params;
 
-      //보낸 socketId로 자신의 이메일로 된 방으로 들어감
-      io.in(socketId).socketsJoin(user.userEmail);
-
       const room = await Room.findOne({ where: { roomId } });
       if (!room) {
         return res
@@ -189,8 +188,15 @@ function chatSocketRouter(io) {
           .send({ errorMessage: '존재하지 않는 방입니다.' });
       }
 
-      const otherId = 
-        room.userId !== String(user.userId) ? room.userId : room.sitter_userId;
+      //개발용
+      if (!socketId || socketId === 'undefined' || socketId === 'null') {
+        return res
+        .status(402)
+        .send({ errorMessage: '소켓Id가 안왔어요!' });
+      }
+
+      //보낸 socketId로 자신의 이메일로 된 방으로 들어감
+      io.in(socketId).socketsJoin(`${room.roomId}`);
 
       // 해당 room의 모든 chat 가져오기
       const set_chats = [];
@@ -230,11 +236,11 @@ function chatSocketRouter(io) {
   });
 
   router.post('/test', async (req, res) => {
+    const { roomId } = req.body;
     console.log('--------------------------');
     if (io.sockets) {
       console.log(io.sockets.adapter.rooms);
-      const sockets = await io.in('50').fetchSockets();
-      console.log(sockets?.length);
+      const sockets = await io.in(`${roomId}`).fetchSockets();
     } else {
       console.log('소켓이 없습니다.');
     }
@@ -343,7 +349,6 @@ const setRoomForm = async (user) => {
       imageUrl,
       newMessage: newThing,
     };
-
     room_set.push(room);
   }
 

@@ -10,6 +10,7 @@ const { Op } = require('sequelize');
 const { Pet } = require('../models');
 const { Sitter } = require('../models');
 const { User } = require('../models');
+const bcrypt = require('bcrypt');
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -88,21 +89,12 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
 
-    let sitterprofile = null;
     const sitter = await Sitter.findOne({ where: { userId: user.userId } });
     if (!sitter) {
       return res.status(200).send({ sitterprofile, isError: true });
     }
-    sitterprofile = sitter;
-    if (sitterprofile) {
-      // sitterprofile.careSize = JSON.parse(sitter.careSize);
-      // sitterprofile.category = JSON.parse(sitter.category);
-      // sitterprofile.plusService = JSON.parse(sitter.plusService);
-      // sitterprofile.noDate = JSON.parse(sitter.noDate);
-      res.json({ sitterprofile });
-    } else {
-      res.json({ result: 'success' });
-    }
+
+    return res.json({ sitterprofile: sitter });
   } catch (error) {
     console.log(error);
     return res
@@ -112,7 +104,6 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
 });
 
 // 마이페이지 - 반려동물 프로필 등록 -> MYSQL 적용 프론트 테스트 OK
-
 router.post(
   '/petprofile',
   authMiddleware,
