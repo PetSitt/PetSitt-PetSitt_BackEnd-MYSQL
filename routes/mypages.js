@@ -526,9 +526,12 @@ router.get('/info', authMiddleware, async (req, res) => {
 
 //비밀번호 변경
 router.put('/password_change', authMiddleware, async (req, res) => {
-  try {
+  // try {
     const { user } = res.locals;
     let { password, newPassword } = req.body;
+    console.log("비밀번호:", password);
+    console.log("새 비밀번호:", newPassword);
+
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const newHash = bcrypt.hashSync(newPassword, salt);
 
@@ -547,9 +550,9 @@ router.put('/password_change', authMiddleware, async (req, res) => {
     );
 
     return res.status(200).send({ message: '비밀번호 변경 성공!' });
-  } catch {
-    return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
-  }
+  // } catch {
+  //   return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
+  // }
 });
 
 module.exports = router;
