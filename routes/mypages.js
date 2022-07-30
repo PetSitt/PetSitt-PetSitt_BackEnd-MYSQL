@@ -504,6 +504,7 @@ router.get('/info', authMiddleware, async (req, res) => {
   }
 });
 
+
 //비밀번호 변경
 router.put('/password_change', authMiddleware, async (req, res) => {
   // try {
@@ -519,13 +520,10 @@ router.put('/password_change', authMiddleware, async (req, res) => {
         .status(401)
         .send({ errorMessage: '비밀번호가 일치하지 않습니다.' });
     }
-
-    //비밀번호 변경
     await User.update(
       { password: newHash },
       { where: { userEmail: user.userEmail } }
     );
-
     return res.status(200).send({ message: '비밀번호 변경 성공!' });
   // } catch {
   //   return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
