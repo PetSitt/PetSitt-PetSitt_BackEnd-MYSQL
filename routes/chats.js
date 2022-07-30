@@ -120,43 +120,47 @@ function chatSocketRouter(io) {
   
   //Server-Sent-Event 연결
   router.get('/sse/:userEmail', async (req, res) => {
-    res.writeHead(200, headers);
+    try {
+      // 접속하는 순서대로 이메일 등록
+      const { userEmail } = req.params;
+      const me = await User.findOne({ where: { userEmail } });
 
-    // 접속하는 순서대로 이메일 등록
-    const { userEmail } = req.params;
-    const me = await User.findOne({ where: { userEmail } });
+      res.writeHead(200, headers);
+      console.log("SSE 연결: ", userEmail);
 
-    console.log("연결된 유저:", userEmail);
+      //접속시 메뉴바 new표기 확인
+      const newMessage = await Room.findOne({ 
+          where: {
+            [Op.or]: [
+              { userId: String(me.userId), userNew: true },
+              { sitter_userId: String(me.userId), sitterNew: true },
+            ]
+          },
+      });
 
-    //접속시 메뉴바 new표기 확인
-    const newMessage = await Room.findOne({ 
-        where: {
-          [Op.or]: [
-            { userId: String(me.userId), userNew: true },
-            { sitter_userId: String(me.userId), sitterNew: true },
-          ]
-        },
-    });
+      let room_data = {
+        newMessage: false,
+        roomId: null,
+        lastText: null,
+        lastChatAt: null,
+      };
 
-    let room_data = {
-      newMessage: false,
-      roomId: null,
-      lastText: null,
-      lastChatAt: null,
-    };
+      // 룸 중에 new가 있으면 true 보냄
+      if (newMessage) room_data.newMessage = true;
 
-    // 룸 중에 new가 있으면 true 보냄
-    if (newMessage) room_data.newMessage = true;
+      res.write(`data: ${JSON.stringify(room_data)}\n\n`);
 
-    res.write(`data: ${JSON.stringify(room_data)}\n\n`);
+      // 새로운 연결 저장
+      clients.push({ userEmail, res });
 
-    // 새로운 연결 저장
-    clients.push({ userEmail, res });
+      res.on('close', () => {
+        console.log(`SSE 연결!!종료!! ${userEmail}`);
+        clients = clients.filter(client => client.userEmail !== userEmail);
+      });
 
-    res.on('close', () => {
-      console.log(`${userEmail} - 연결 종료`);
-      clients = clients.filter(client => client.userEmail !== userEmail);
-    });
+    } catch {
+      console.log("SSE 연결 오류");
+    }
   });
 
   //채팅 리스트 요청
@@ -244,6 +248,10 @@ function chatSocketRouter(io) {
     } else {
       console.log('소켓이 없습니다.');
     }
+
+    if (clients.length);
+
+
     console.log('--------------------------');
 
     res.send({ msg: 'test complete' });
