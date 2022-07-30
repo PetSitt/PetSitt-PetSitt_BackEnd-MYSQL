@@ -10,6 +10,7 @@ const { Op } = require('sequelize');
 const { Pet } = require('../models');
 const { Sitter } = require('../models');
 const { User } = require('../models');
+const bcrypt = require('bcrypt');
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -88,23 +89,13 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
 
-    let sitterprofile = null;
     const sitter = await Sitter.findOne({ where: { userId: user.userId } });
     if (!sitter) {
       return res.status(200).send({ sitterprofile, isError: true });
     }
-    sitterprofile = sitter;
-    if (sitterprofile) {
-      // sitterprofile.careSize = JSON.parse(sitter.careSize);
-      // sitterprofile.category = JSON.parse(sitter.category);
-      // sitterprofile.plusService = JSON.parse(sitter.plusService);
-      // sitterprofile.noDate = JSON.parse(sitter.noDate);
-      res.json({ sitterprofile });
-    } else {
-      res.json({ result: 'success' });
-    }
-  } catch (error) {
-    console.log(error);
+
+    return res.json({ sitterprofile: sitter });
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -113,11 +104,7 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
 
 // 마이페이지 - 반려동물 프로필 등록 -> MYSQL 적용 프론트 테스트 OK
 
-router.post(
-  '/petprofile',
-  authMiddleware,
-  upload.single('petImage'),
-  async (req, res) => {
+router.post('/petprofile', authMiddleware, upload.single('petImage'), async (req, res) => {
     try {
       const { user } = res.locals;
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
@@ -157,10 +144,7 @@ router.post(
 );
 
 // 마이페이지 - 돌보미 등록  -> MYSQL 적용 프론트 테스트 OK
-router.post(
-  '/sitterprofile',
-  authMiddleware,
-  upload.fields([{ name: 'imageUrl' }, { name: 'mainImageUrl' }]),
+router.post('/sitterprofile', authMiddleware, upload.fields([{ name: 'imageUrl' }, { name: 'mainImageUrl' }]),
   async (req, res) => {
     try {
       const { user } = res.locals;
@@ -305,11 +289,7 @@ router.delete('/petprofile/:petId', async (req, res) => {
 });
 
 // 반려동물 프로필 수정 -> MYSQL 적용 프론트 테스트 OK
-router.patch(
-  '/petprofile/:petId',
-  authMiddleware,
-  upload.single('petImage'),
-  async (req, res) => {
+router.patch('/petprofile/:petId', authMiddleware, upload.single('petImage'), async (req, res) => {
     try {
       const { petId } = req.params;
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
@@ -526,7 +506,7 @@ router.get('/info', authMiddleware, async (req, res) => {
 
 //비밀번호 변경
 router.put('/password_change', authMiddleware, async (req, res) => {
-  try {
+  // try {
     const { user } = res.locals;
     let { password, newPassword } = req.body;
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
@@ -547,9 +527,9 @@ router.put('/password_change', authMiddleware, async (req, res) => {
     );
 
     return res.status(200).send({ message: '비밀번호 변경 성공!' });
-  } catch {
-    return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
-  }
+  // } catch {
+  //   return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
+  // }
 });
 
 module.exports = router;
