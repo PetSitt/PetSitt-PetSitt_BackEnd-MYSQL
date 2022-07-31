@@ -42,12 +42,13 @@ function chatSocketRouter(io) {
         socket.join(`${room.roomId}`);
 
         // 상대방의 정보 세팅
-        if (room.userId !== String(me.userId)) {
+        if (room.userId === String(me.userId)) {
+          other = await User.findOne({ where: { userId: room.sitter_userId } });    
+          otherPos = 'sitter';
+
+        } else {
           other = await User.findOne({ where: { userId: room.userId } });
           otherPos = 'user';
-        } else {
-          other = await User.findOne({ where: { userId: room.sitter_userId } });    
-          otherPos = 'sitter';     
         }
 
         //메시지 DB저장
@@ -93,6 +94,10 @@ function chatSocketRouter(io) {
           //chatList 업데이트용 세팅
           otherPos === 'user' ? userNew = true : sitterNew = true;
         }
+
+        console.log("상대방 Pos: ", otherPos);
+        console.log("userNew: ", userNew);
+        console.log("sitterNew: ", sitterNew);
 
         //room 마지막채팅 업데이트
         await Room.update (
@@ -196,14 +201,20 @@ function chatSocketRouter(io) {
       io.in(socketId).socketsJoin(`${room.roomId}`);
 
       //room의 new로 된 부분 false로 바꿔주기
-      const myPos = room.userId !== String(user.userId) ? 'user' : 'sitter';
+      const myPos = room.userId === String(user.userId) ? 'user' : 'sitter';
+
+      console.log("나의 Pos: ", myPos);
+      console.log("userNew: ", room.userNew);
+      console.log("sitterNew: ", room.sitterNew);
 
       if (myPos === 'user' && room.userNew === true) {
+        console.log("userNew false 업데이트 들어옴");
         await Room.update(
           { userNew: false }, 
           { where: { roomId: room.roomId } }
         );
       } else if (myPos === 'sitter' && room.sitterNew === true) {
+        console.log("sitterNew false 업데이트 들어옴");
         await Room.update(
           { sitterNew: false }, 
           { where: { roomId: room.roomId } }
@@ -256,8 +267,7 @@ function chatSocketRouter(io) {
       console.log('소켓이 없습니다.');
     }
 
-    if (clients.length);
-
+    if (clients.length){}
 
     console.log('--------------------------');
 
@@ -333,16 +343,15 @@ const setRoomForm = async (user) => {
       'https://kimguen-storage.s3.ap-northeast-2.amazonaws.com/sitterImage/default_user.jpg';
 
     //내가 시터인지 사용자인지 판단
-    if (rooms[i].userId !== String(user.userId)) {
-      otherId = rooms[i].userId;
-      other_state = 'user';
-    } else {
+    if (rooms[i].userId === String(user.userId)) {
       otherId = rooms[i].sitter_userId;
       other_state = 'sitter';
+    } else {
+      otherId = rooms[i].userId;
+      other_state = 'user';
     }
 
     //상대방의 정보 가져오기
-
     other = await User.findOne({ where: { userId: otherId } });
     if (!other) continue;
 
@@ -352,8 +361,7 @@ const setRoomForm = async (user) => {
     if (other_sitter) imageUrl = other_sitter.imageUrl;
 
     // 채팅방 리스트에 new 만들기
-    const newThing =
-      other_state === 'user' ? rooms[i].userNew : rooms[i].sitterNew;
+    const newThing = other_state === 'user' ? rooms[i].sitterNew : rooms[i].userNew;
 
     // room 정보 세팅
     room = {
