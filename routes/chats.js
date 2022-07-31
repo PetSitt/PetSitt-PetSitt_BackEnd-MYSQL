@@ -125,6 +125,7 @@ function chatSocketRouter(io) {
       const { userEmail } = req.params;
       const me = await User.findOne({ where: { userEmail } });
 
+      // 헤더 세팅
       res.writeHead(200, headers);
       console.log("SSE 연결: ", userEmail);
 
@@ -147,7 +148,6 @@ function chatSocketRouter(io) {
 
       // 룸 중에 new가 있으면 true 보냄
       if (newMessage) room_data.newMessage = true;
-
       res.write(`data: ${JSON.stringify(room_data)}\n\n`);
 
       // 새로운 연결 저장
@@ -169,9 +169,9 @@ function chatSocketRouter(io) {
       const { user } = res.locals;
 
       //클라이언트로 보낼 rooms 데이터 세팅
-      const room_set = await setRoomForm(user);
+      const rooms = await setRoomForm(user);
 
-      return res.status(200).send({ rooms: room_set });
+      return res.status(200).send({ rooms });
     } catch {
       return res
         .status(400)
@@ -192,21 +192,28 @@ function chatSocketRouter(io) {
           .send({ errorMessage: '존재하지 않는 방입니다.' });
       }
 
-      //개발용
-      if (!socketId || socketId === 'undefined' || socketId === 'null') {
-        return res
-        .status(402)
-        .send({ errorMessage: '소켓Id가 안왔어요!' });
-      }
-
-      //보낸 socketId로 자신의 이메일로 된 방으로 들어감
+      //보낸 socketId로 채팅방으로 들어감
       io.in(socketId).socketsJoin(`${room.roomId}`);
+
+      //room의 new로 된 부분 false로 바꿔주기
+      const myPos = room.userId !== String(user.userId) ? 'user' : 'sitter';
+
+      if (myPos === 'user' && room.userNew === true) {
+        await Room.update(
+          { userNew: false }, 
+          { where: { roomId: room.roomId } }
+        );
+      } else if (myPos === 'sitter' && room.sitterNew === true) {
+        await Room.update(
+          { sitterNew: false }, 
+          { where: { roomId: room.roomId } }
+        );        
+      }
 
       // 해당 room의 모든 chat 가져오기
       const set_chats = [];
       let chats = await Chat.findAll({
         where: { roomId },
-
         order: [['createdAt', 'ASC']],
       });
 
@@ -348,7 +355,7 @@ const setRoomForm = async (user) => {
     const newThing =
       other_state === 'user' ? rooms[i].userNew : rooms[i].sitterNew;
 
-    //room 정보 세팅
+    // room 정보 세팅
     room = {
       roomId: rooms[i].roomId,
       userName: other.userName,
