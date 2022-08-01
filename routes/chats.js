@@ -1,30 +1,30 @@
-const express = require("express");
-const { User } = require("../models");
-const { Sitter } = require("../models");
-const { Room } = require("../models");
-const { Chat } = require("../models");
-const { Op } = require("sequelize");
-const authMiddleware = require("../middlewares/auth-middleware.js");
+const express = require('express');
+const { User } = require('../models');
+const { Sitter } = require('../models');
+const { Room } = require('../models');
+const { Chat } = require('../models');
+const { Op } = require('sequelize');
+const authMiddleware = require('../middlewares/auth-middleware.js');
 
 function chatSocketRouter(io) {
-  io.on("connection", (socket) => {
+  io.on('connection', (socket) => {
     console.log(`연결된 소켓 정보: ${socket.id}`);
 
     //검색을 위해 내 이메일로된 개인방으로 들어갑니다.
-    socket.on("join_my_room", (userEmail) => {
+    socket.on('join_my_room', (userEmail) => {
       socket.data.userEmail = userEmail;
       socket.join(userEmail);
-      console.log("joined my room: ", socket.rooms);
+
+      console.log('joined my room: ', socket.rooms);
     });
 
     //메시지 전송 & DB 저장
-    socket.on("send_message", async (data) => {
+    socket.on('send_message', async (data) => {
       try {
-        console.log("send_message", data);
+        console.log('send_message', data);
 
-        socket.data.userEmail = data.userEmail
+        socket.data.userEmail = data.userEmail;
         socket.join(data.userEmail);
-
         const me = await User.findOne({
           where: { userEmail: data.userEmail },
         });
@@ -43,7 +43,7 @@ function chatSocketRouter(io) {
             lastChat: data.message,
             lastChatAt: chat.createdAt,
           },
-          { where: { roomId: data.roomId } },
+          { where: { roomId: data.roomId } }
         );
 
         //상대방의 대화목록 업데이트
@@ -58,10 +58,9 @@ function chatSocketRouter(io) {
             createdAt: new Date(chat.createdAt).getTime(),
             me: false,
           };
-  
-          socket.to(`${data.roomId}`).emit("receive_message", chat_data);
-        } 
-        else if (sockets?.length === 1) {
+
+          socket.to(`${data.roomId}`).emit('receive_message', chat_data);
+        } else if (sockets?.length === 1) {
           console.log(`(${data.roomId}) 채팅방에 혼자에요...`);
           // const room = await Room.findOne({ where: { roomId: data.roomId } });
           // const otherId = room.userId !== String(me.userId) ? room.userId : room.sitter_userId;
@@ -75,31 +74,31 @@ function chatSocketRouter(io) {
           };
 
           //상대방의 채팅리스트를 최신화
-          socket.to(other.userEmail).emit("receive_chatList", room_data);
+          socket.to(other.userEmail).emit('receive_chatList', room_data);
         }
-        
       } catch {
-        console.log("채팅오류 나서 안됬습니다.");
-        socket.to(data.roomId).emit("chat_error", "채팅오류");
+        console.log('채팅오류 나서 안됬습니다.');
+        socket.to(data.roomId).emit('chat_error', '채팅오류');
       }
     });
 
     //채팅방 나가기
-    socket.on("leave_room", (roomId) => {
+    socket.on('leave_room', (roomId) => {
       console.log(`ID: ${socket.id} leave room: ${roomId}`);
       socket.leave(roomId);
     });
 
     //소켓연결 해제
-    socket.on("disconnect", () => {
-      console.log("User Disconnected", socket.id);
+    socket.on('disconnect', () => {
+      console.log('User Disconnected', socket.id);
     });
   });
 
   const router = express.Router();
 
   //채팅 리스트 요청
-  router.get("/chatList/:socketId", authMiddleware, async (req, res) => {
+
+  router.get('/chatList/:socketId', authMiddleware, async (req, res) => {
     try {
       const { user } = res.locals;
       const { socketId } = req.params;
@@ -114,12 +113,13 @@ function chatSocketRouter(io) {
     } catch {
       return res
         .status(400)
-        .send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+        .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
     }
   });
 
   // 채팅방 접속
-  router.get("/:roomId/:socketId", authMiddleware, async (req, res) => {
+
+  router.get('/:roomId/:socketId', authMiddleware, async (req, res) => {
     try {
       const { user } = res.locals;
       const { roomId, socketId } = req.params;
@@ -129,19 +129,23 @@ function chatSocketRouter(io) {
 
       const room = await Room.findOne({ where: { roomId } });
       if (!room) {
-        return res.status(401).send({ errorMessage: "존재하지 않는 방입니다." });
+        return res
+          .status(401)
+          .send({ errorMessage: '존재하지 않는 방입니다.' });
       }
 
-      const otherId = room.userId !== String(user.userId) ? room.userId : room.sitter_userId;
+      const otherId =
+        room.userId !== String(user.userId) ? room.userId : room.sitter_userId;
 
       // 해당 room의 모든 chat 가져오기
       const set_chats = [];
       let chats = await Chat.findAll({
         where: { roomId },
-        order: [["createdAt", "ASC"]],
+
+        order: [['createdAt', 'ASC']],
       });
 
-      console.log("채팅 갯수:", chats?.length);
+      console.log('채팅 갯수:', chats?.length);
 
       if (chats?.length) {
         //채팅방 접속순간 내가 확인하게 되기 때문에 상대방의 newMessage는 모두 false 처리
@@ -156,7 +160,7 @@ function chatSocketRouter(io) {
         );
 
         //상대방 new_delete 시키기
-        io.in(`${roomId}`).emit("new_delete");
+        io.in(`${roomId}`).emit('new_delete');
 
         for (let i = 0; i < chats.length; i++) {
           const me = chats[i].userId === String(user.userId) ? true : false;
@@ -173,7 +177,7 @@ function chatSocketRouter(io) {
         }
       }
 
-      console.log("세팅된 개수:", set_chats.length);
+      console.log('세팅된 개수:', set_chats.length);
 
       //해당 사람의 소켓을 roomId방에 join 시킨다.
       io.in(user.userEmail).socketsJoin(`${roomId}`);
@@ -186,37 +190,39 @@ function chatSocketRouter(io) {
     } catch {
       return res
         .status(400)
-        .send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+        .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
     }
   });
 
-  router.post("/test", async (req, res) => {
-    console.log("--------------------------")
-    if ( io.sockets ){
-      console.log( io.sockets.adapter.rooms );
+  router.post('/test', async (req, res) => {
+    console.log('--------------------------');
+    if (io.sockets) {
+      console.log(io.sockets.adapter.rooms);
       const sockets = await io.in('50').fetchSockets();
       console.log(sockets?.length);
-    }else{
-      console.log("소켓이 없습니다.");
+    } else {
+      console.log('소켓이 없습니다.');
     }
-    console.log("--------------------------")
+    console.log('--------------------------');
 
-    res.send({ msg: "test complete" });
+    res.send({ msg: 'test complete' });
   });
 
   // 채팅방 존재유무 판단 후 만들기
-  router.post("/:sitterId", authMiddleware, async (req, res) => {
+  router.post('/:sitterId', authMiddleware, async (req, res) => {
     try {
       const { user } = res.locals;
       const { sitterId } = req.params;
 
       const sitter = await Sitter.findOne({ where: { sitterId } });
       if (!sitter) {
-        return res.status(401).send({ errorMessage: "상대방이 존재하지 않습니다." });
+        return res
+          .status(401)
+          .send({ errorMessage: '상대방이 존재하지 않습니다.' });
       }
 
       // 나와 시터간의 방이 있는지 검사
-      const [room, created]= await Room.findOrCreate({
+      const [room, created] = await Room.findOrCreate({
         where: {
           userId: String(user.userId),
           sitter_userId: sitter.userId,
@@ -224,17 +230,19 @@ function chatSocketRouter(io) {
         defaults: {
           userId: user.userId,
           sitter_userId: sitter.userId,
-        }
+        },
       });
 
       if (created) {
-        console.log("방이 없어서 만들었습니다.", room.roomId);
+        console.log('방이 없어서 만들었습니다.', room.roomId);
         //new_room
       }
 
       return res.send({ roomId: room.roomId });
     } catch {
-      return res.status(400).send({ errorMessage: "DB정보를 받아오지 못했습니다." });
+      return res
+        .status(400)
+        .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
     }
   });
 
@@ -243,7 +251,6 @@ function chatSocketRouter(io) {
 
 // 룸 리스트 정보 세팅
 const setRoomForm = async (user) => {
-
   //유저 속해있는 모든 room 검색
   const rooms = await Room.findAll({
     where: {
@@ -267,7 +274,8 @@ const setRoomForm = async (user) => {
     otherId = null;
     other_sitter = null;
     room = null;
-    imageUrl = "https://kimguen-storage.s3.ap-northeast-2.amazonaws.com/sitterImage/default_user.jpg";
+    imageUrl =
+      'https://kimguen-storage.s3.ap-northeast-2.amazonaws.com/sitterImage/default_user.jpg';
 
     //내가 시터인지 사용자인지 판단
     if (rooms[i].userId !== String(user.userId)) {
@@ -279,15 +287,19 @@ const setRoomForm = async (user) => {
     }
 
     //상대방의 정보 가져오기
+
     other = await User.findOne({ where: { userId: otherId } });
     if (!other) continue;
 
-    other_sitter = await Sitter.findOne({ where: { userId: String(other.userId) } });
+    other_sitter = await Sitter.findOne({
+      where: { userId: String(other.userId) },
+    });
     if (other_sitter) imageUrl = other_sitter.imageUrl;
 
     // 채팅방 리스트에 new 만들기
-    const newThing = other_state === 'user' ? rooms[i].userNew : rooms[i].sitterNew;
-    
+    const newThing =
+      other_state === 'user' ? rooms[i].userNew : rooms[i].sitterNew;
+
     //room 정보 세팅
     room = {
       roomId: rooms[i].roomId,
@@ -295,7 +307,7 @@ const setRoomForm = async (user) => {
       lastChat: rooms[i].lastChat,
       lastChatAt: new Date(rooms[i].lastChatAt).getTime(),
       imageUrl,
-      newMessage: newThing
+      newMessage: newThing,
     };
 
     room_set.push(room);

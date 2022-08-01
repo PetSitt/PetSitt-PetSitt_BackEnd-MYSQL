@@ -2,9 +2,6 @@
   "name": "petsitt",
   "version": "1.0.0",
   "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PetSitt/PetSitt_BackEnd.git"
@@ -16,6 +13,9 @@
     "url": "https://github.com/PetSitt/PetSitt_BackEnd/issues"
   },
   "homepage": "https://github.com/PetSitt/PetSitt_BackEnd#readme",
+  "scripts": {
+    "prettify": "prettier --write *.js **/*.js"
+  },
   "dependencies": {
     "aws-sdk": "^2.1162.0",
     "bcrypt": "^5.0.1",
@@ -24,6 +24,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "helmet": "^5.1.1",
     "joi": "^17.6.0",
     "joi-password-complexity": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
@@ -41,6 +42,7 @@
   },
   "description": "",
   "devDependencies": {
+    "prettier": "^2.7.1",
     "sequelize-cli": "^6.4.1"
   }
 }
