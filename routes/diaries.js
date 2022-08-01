@@ -39,8 +39,6 @@ router.post(
 
       const { checkList, checkStatus, diaryInfo } = req.body;
       const fileArray = req.files;
-
-      // 배열을 json parsing 한다.
       const decode_checkList = JSON.parse(checkList);
       const decode_checkStatus = JSON.parse(checkStatus);
 
@@ -94,8 +92,6 @@ router.put(
       }
 
       const fileArray = req.files;
-
-      // 배열을 json parsing 한다.
       const decode_checkList = JSON.parse(checkList);
       const decode_checkStatus = JSON.parse(checkStatus);
       const decode_deleteImage = JSON.parse(deleteImage);
