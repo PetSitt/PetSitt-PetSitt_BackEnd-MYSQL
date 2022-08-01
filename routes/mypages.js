@@ -10,6 +10,7 @@ const { Op } = require('sequelize');
 const { Pet } = require('../models');
 const { Sitter } = require('../models');
 const { User } = require('../models');
+const bcrypt = require('bcrypt');
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -88,30 +89,19 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
 
-    let sitterprofile = null;
     const sitter = await Sitter.findOne({ where: { userId: user.userId } });
     if (!sitter) {
       return res.status(200).send({ sitterprofile, isError: true });
     }
-    sitterprofile = sitter;
-    if (sitterprofile) {
-      // sitterprofile.careSize = JSON.parse(sitter.careSize);
-      // sitterprofile.category = JSON.parse(sitter.category);
-      // sitterprofile.plusService = JSON.parse(sitter.plusService);
-      // sitterprofile.noDate = JSON.parse(sitter.noDate);
-      res.json({ sitterprofile });
-    } else {
-      res.json({ result: 'success' });
-    }
-  } catch (error) {
-    console.log(error);
+
+    return res.json({ sitterprofile: sitter });
+
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
   }
 });
-
-// 마이페이지 - 반려동물 프로필 등록 
 
 router.post(
   '/petprofile',
@@ -527,9 +517,12 @@ router.get('/info', authMiddleware, async (req, res) => {
 
 //비밀번호 변경
 router.put('/password_change', authMiddleware, async (req, res) => {
-  try {
+  // try {
     const { user } = res.locals;
     let { password, newPassword } = req.body;
+    console.log("비밀번호:", password);
+    console.log("새 비밀번호:", newPassword);
+
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const newHash = bcrypt.hashSync(newPassword, salt);
     //비밀번호 일치 확인
@@ -544,9 +537,9 @@ router.put('/password_change', authMiddleware, async (req, res) => {
       { where: { userEmail: user.userEmail } }
     );
     return res.status(200).send({ message: '비밀번호 변경 성공!' });
-  } catch {
-    return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
-  }
+  // } catch {
+  //   return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
+  // }
 });
 
 module.exports = router;
