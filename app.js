@@ -10,8 +10,10 @@ const reservationRouter = require('./routes/reservations.js');
 const diariesRouter = require('./routes/diaries');
 const detailsRouter = require('./routes/details.js');
 const informationRouter = require('./routes/information.js');
+const chatRouter = require('./routes/chats.js')(io);
 const http = require('http');
 const cors = require('cors');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
@@ -23,8 +25,6 @@ const io = require('socket.io')(server, {
   },
 });
 
-// 채팅 관련
-const chatRouter = require('./routes/chats.js')(io);
 
 sequelize
   .sync()
@@ -38,14 +38,15 @@ sequelize
 app.use(
   cors({
     exposedHeaders: ['authorization'],
-    origin: '*', //출처 허용 옵션: 테스트용 - 전부허용!
-    credentials: 'true', // 사용자 인증이 필요한 리소스(쿠키..등) 접근
+    origin: '*', 
+    credentials: 'true', 
   })
 );
 
-app.use(express.json()); // json형태의 데이터를 parsing하여 사용할 수 있게 만듦.
+app.use(express.json()); 
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(helmet());
 
 app.use((req, res, next) => {
   console.log(`Req: [${req.method}] -`, req.originalUrl, ' - ', new Date());
