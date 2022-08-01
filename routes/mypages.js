@@ -4,7 +4,8 @@ const AWS = require('aws-sdk');
 const authMiddleware = require('../middlewares/auth-middleware');
 require('dotenv').config();
 const multer = require('multer');
-const multerS3 = require('multer-s3');
+const multerS3 = require('multer-s3-transform');
+const sharp = require("sharp");
 const moment = require('moment');
 const { Op } = require('sequelize');
 const { Pet } = require('../models');
@@ -22,11 +23,35 @@ const storage = multerS3({
   s3: s3,
   acl: 'public-read-write',
   bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', // s3 버킷명+경로
-  key: (req, file, callback) => {
-    const dir = req.body.dir;
-    const datetime = moment().format('YYYYMMDDHHmmss');
-    callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
-  },
+  contentType: multerS3.AUTO_CONTENT_TYPE,
+  shouldTransform: true,
+  transforms: [
+    {
+      key: (req, file, callback) => {
+        const dir = req.body.dir;
+        const datetime = moment().format('YYYYMMDDHHmmss');
+        callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
+      },
+      transform: function (req, file, cb) {
+        if (file) {
+          switch(file.fieldname) {
+            case 'petImage':
+                cb(null, sharp().resize({ width: 120 }).withMetadata());
+              break;
+            case 'imageUrl':
+                cb(null, sharp().resize({ width: 160 }).withMetadata());
+              break;
+            case 'mainImageUrl':
+                cb(null, sharp().resize({ width: 500 }).withMetadata());
+              break;
+            default: 
+                cb(null, sharp().resize({ width: 200 }).withMetadata());
+              break;
+          }
+        }
+      },
+    },
+  ]
 });
 
 const upload = multer({ storage: storage });
@@ -38,8 +63,7 @@ router.get('/myprofile', authMiddleware, async (req, res) => {
     const myprofile = user;
 
     res.json({ myprofile });
-  } catch (error) {
-    console.error(error);
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -60,8 +84,7 @@ router.patch('/myprofile', authMiddleware, async (req, res) => {
       { where: { userId: user.userId } }
     );
     res.json({ myprofile });
-  } catch (error) {
-    console.error(error);
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -75,8 +98,7 @@ router.get('/petprofile', authMiddleware, async (req, res) => {
     const petprofile = await Pet.findAll({ where: { userId: user.userId } });
 
     res.json({ petprofile });
-  } catch (error) {
-    console.error(error);
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -84,14 +106,13 @@ router.get('/petprofile', authMiddleware, async (req, res) => {
 });
 
 // 마이페이지 - 돌보미 프로필조회 -> MYSQL 적용 프론트 테스트 OK
-
 router.get('/sitterprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
 
     const sitter = await Sitter.findOne({ where: { userId: user.userId } });
     if (!sitter) {
-      return res.status(200).send({ sitterprofile, isError: true });
+      return res.status(200).send({ sitterprofile: null, isError: true });
     }
 
     return res.json({ sitterprofile: sitter });
@@ -110,7 +131,7 @@ router.post('/petprofile', authMiddleware, upload.single('petImage'), async (req
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
         req.body;
       if (req.file != undefined) {
-        const petImage = req.file.location;
+        const petImage = req.file.transforms[0].location;
         const petprofile = await Pet.create({
           petName: petName,
           petAge: petAge,
@@ -195,14 +216,16 @@ router.post('/sitterprofile', authMiddleware, upload.fields([{ name: 'imageUrl' 
         location: location,
       });
       if (req.files.imageUrl != undefined) {
-        const imageUrl = req.files.imageUrl[0].location;
+        const imageUrl 
+          = req.files.imageUrl[0].transforms[0].location;
         await Sitter.update(
           { imageUrl: imageUrl },
           { where: { userId: user.userId } }
         );
       }
       if (req.files.mainImageUrl != undefined) {
-        const mainImageUrl = req.files.mainImageUrl[0].location;
+        const mainImageUrl 
+          = req.files.mainImageUrl[0].transforms[0].location;
         await Sitter.update(
           { mainImageUrl: mainImageUrl },
           { where: { userId: user.userId } }
@@ -434,7 +457,7 @@ router.patch(
           });
         }
 
-        const imageUrl = req.files.imageUrl[0].location;
+        const imageUrl = req.files.imageUrl[0].transforms[0].location;
 
         console.log('이미지: ', imageUrl);
 
@@ -507,11 +530,9 @@ router.get('/info', authMiddleware, async (req, res) => {
 
 //비밀번호 변경
 router.put('/password_change', authMiddleware, async (req, res) => {
-  // try {
+  try {
     const { user } = res.locals;
     let { password, newPassword } = req.body;
-    console.log("비밀번호:", password);
-    console.log("새 비밀번호:", newPassword);
 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const newHash = bcrypt.hashSync(newPassword, salt);
@@ -528,9 +549,9 @@ router.put('/password_change', authMiddleware, async (req, res) => {
       { where: { userEmail: user.userEmail } }
     );
     return res.status(200).send({ message: '비밀번호 변경 성공!' });
-  // } catch {
-  //   return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
-  // }
+  } catch {
+    return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
+  }
 });
 
 module.exports = router;
