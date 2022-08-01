@@ -16,8 +16,7 @@ const headers = {
 
 function chatSocketRouter(io) {
   io.on('connection', (socket) => {
-    console.log(`연결된 소켓 정보: ${socket.id}`);
-
+    
     socket.on('join_room', (roomId) => {
       socket.join(`${roomId}`);
     });
@@ -25,8 +24,6 @@ function chatSocketRouter(io) {
     //메시지 전송 & DB 저장
     socket.on('send_message', async (data) => {
       try {
-        console.log('send_message', data);
-
         const me = await User.findOne({
           where: { userEmail: data.userEmail },
         });
@@ -103,7 +100,6 @@ function chatSocketRouter(io) {
         );
 
       } catch {
-        console.log('채팅오류 나서 안됬습니다.');
       }
     });
 
@@ -124,7 +120,6 @@ function chatSocketRouter(io) {
 
       // 헤더 세팅
       res.writeHead(200, headers);
-      console.log("SSE 연결: ", userEmail);
 
       //접속시 메뉴바 new표기 확인
       const newMessage = await Room.findOne({ 
@@ -151,12 +146,13 @@ function chatSocketRouter(io) {
       clients.push({ userEmail, res });
 
       res.on('close', () => {
-        console.log(`SSE 연결!!종료!! ${userEmail}`);
         clients = clients.filter(client => client.userEmail !== userEmail);
       });
 
     } catch {
-      console.log("SSE 연결 오류");
+      return res
+        .status(400)
+        .send({ errorMessage: "SSE등록 오류" });
     }
   });
 
@@ -195,18 +191,12 @@ function chatSocketRouter(io) {
       //room의 new로 된 부분 false로 바꿔주기
       const myPos = room.userId === String(user.userId) ? 'user' : 'sitter';
 
-      console.log("나의 Pos: ", myPos);
-      console.log("userNew: ", room.userNew);
-      console.log("sitterNew: ", room.sitterNew);
-
       if (myPos === 'user' && room.userNew === true) {
-        console.log("userNew false 업데이트 들어옴");
         await Room.update(
           { userNew: false }, 
           { where: { roomId: room.roomId } }
         );
       } else if (myPos === 'sitter' && room.sitterNew === true) {
-        console.log("sitterNew false 업데이트 들어옴");
         await Room.update(
           { sitterNew: false }, 
           { where: { roomId: room.roomId } }
@@ -219,8 +209,6 @@ function chatSocketRouter(io) {
         where: { roomId },
         order: [['createdAt', 'ASC']],
       });
-
-      console.log('채팅 갯수:', chats?.length);
 
       if (chats?.length) {
         for (let i = 0; i < chats.length; i++) {
@@ -273,10 +261,6 @@ function chatSocketRouter(io) {
           sitter_userId: sitter.userId,
         },
       });
-
-      if (created) {
-        console.log('방이 없어서 만들었습니다.', room.roomId);
-      }
 
       return res.send({ roomId: room.roomId });
     } catch {
