@@ -9,7 +9,6 @@ const mailer = require("../mail/passwordEmail");
 require("dotenv").config();
 
 
-
 //signup 회원가입
 router.post('/signup', async (req, res) => {
   try {

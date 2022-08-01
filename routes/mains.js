@@ -5,12 +5,17 @@ const { Op, Sequelize } = require("sequelize");
 
 router.post("/", async (req, res) => {
   const { x, y, category } = req.body;
+  if (x === "undefined" || y === "undefined" || !x || !y) {
+    x = 126.875078748377;
+    y = 37.4856025065543;
+  }
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
   const distance = Sequelize.fn(
     "ST_Distance",
     Sequelize.col("location"),
     location
   );
+  
   const sitter = [];
   const sitters = await Sitter.findAll({
     order: distance,
