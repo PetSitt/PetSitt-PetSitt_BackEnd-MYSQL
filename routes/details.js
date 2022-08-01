@@ -7,7 +7,7 @@ const { User } = require('../models');
 const { Op } = require('sequelize');
 require('dotenv').config();
 
-//상세페이지 불러오기 -> MYSQL 적용 프론트 테스트 OK -> <댓글 갯수 안나옴 !!>
+//상세페이지 불러오기
 router.get('/:sitterId', async (req, res) => {
   try {
     var sitter_info = await Sitter.findOne({
@@ -64,7 +64,7 @@ router.get('/:sitterId', async (req, res) => {
   });
 });
 
-// 상세보기 페이지 댓글요청 입니다. 무한스크롤 기능 ( 테스트 완료 )
+// 상세보기 페이지 
 router.post('/reviews/:sitterId', async (req, res) => {
   try {
     const { reviewId } = req.body;

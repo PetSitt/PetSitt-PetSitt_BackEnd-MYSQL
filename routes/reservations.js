@@ -9,7 +9,7 @@ const { User } = require('../models');
 require('dotenv').config();
 const { Op } = require('sequelize');
 
-//예약하기 페이지 - 내 펫정보 요청 -> MYSQL 적용 프론트 테스트 OK
+//예약하기 페이지 - 내 펫정보 요청 
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
@@ -21,7 +21,7 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-//예약하기 페이지 - 예약등록 -> MYSQL 적용 프론트 테스트 OK
+//예약하기 페이지 - 예약등록
 
 router.post('/regist/:sitterId', authMiddleware, async (req, res) => {
   try {
@@ -62,7 +62,7 @@ router.post('/regist/:sitterId', authMiddleware, async (req, res) => {
       reservationDate: reservationDate,
     });
 
-    //돌보미 - 예약불가 기간에 추가해줍니다.
+    //돌보미 - 예약불가 기간에 추가
     reservationDate.forEach((el) => noDate.push(el));
     await Sitter.update({ noDate: noDate }, { where: { sitterId: sitterId } });
     return res.status(200).send({ msg: '예약 완료' });
@@ -71,7 +71,7 @@ router.post('/regist/:sitterId', authMiddleware, async (req, res) => {
   }
 });
 
-//예약보기 페이지 - 리스트 요청 - 첫로딩 -> MYSQL 적용 프론트 테스트 OK
+//예약보기 페이지 
 router.get('/lists', authMiddleware, async (req, res) => {
   try {
     const { searchCase } = req.query;
@@ -155,8 +155,7 @@ router.get('/lists', authMiddleware, async (req, res) => {
   }
 });
 
-//예약보기 페이지 - 더보기 리스트 요청 - 무한스크롤 -- MYSQL 변경완료 / 프론트연결 테스트 x (로컬테스트 X) -> 지난내역 아직없어서 테스트 아직불가
-
+//예약보기 페이지 
 router.get('/lists/:reservationId', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
@@ -218,7 +217,6 @@ router.get('/lists/:reservationId', authMiddleware, async (req, res) => {
       });
     }
 
-    //mySql로 바꿀꺼니 join으로 구현 안함.
     if (!reserveDatas?.length) {
       return res
         .status(401)
@@ -235,7 +233,7 @@ router.get('/lists/:reservationId', authMiddleware, async (req, res) => {
   }
 });
 
-// 예약 진행중 예약 상세보기 -> MYSQL 적용 프론트 테스트 OK // 돌보미탭은 확인 아직 안됨
+// 예약 진행중 예약 상세보기 
 router.get('/details/:reservationId', authMiddleware, async (req, res) => {
   try {
     const { reservationId } = req.params;
@@ -318,7 +316,7 @@ router.get('/details/:reservationId', authMiddleware, async (req, res) => {
   }
 });
 
-// 예약 취소 -- MYSQL 변경완료 -> MYSQL 적용 프론트 테스트 OK
+// 예약 취소
 router.put('/cancel/:reservationId', authMiddleware, async (req, res) => {
   try {
     const { reservationId } = req.params;

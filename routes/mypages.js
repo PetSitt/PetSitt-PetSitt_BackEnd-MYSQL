@@ -21,17 +21,17 @@ const s3 = new AWS.S3({
 const storage = multerS3({
   s3: s3,
   acl: 'public-read-write',
-  bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', // s3 버킷명+경로
+  bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', 
   key: (req, file, callback) => {
     const dir = req.body.dir;
     const datetime = moment().format('YYYYMMDDHHmmss');
-    callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
+    callback(null, dir + datetime + '_' + file.originalname);
   },
 });
 
 const upload = multer({ storage: storage });
 
-// 마이페이지 - 내프로필 조회 -> MYSQL 적용 프론트 테스트 OK
+// 마이페이지 - 내프로필 조회 
 router.get('/myprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
@@ -46,7 +46,7 @@ router.get('/myprofile', authMiddleware, async (req, res) => {
   }
 });
 
-// 마이페이지 - 내프로필 수정 -> MYSQL 적용 프론트 테스트 OK
+// 마이페이지 - 내프로필 수정
 router.patch('/myprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
@@ -68,7 +68,7 @@ router.patch('/myprofile', authMiddleware, async (req, res) => {
   }
 });
 
-// 마이페이지 - 반려동물 프로필조회 -> MYSQL 적용 프론트 테스트 OK
+// 마이페이지 - 반려동물 프로필조회 
 router.get('/petprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
@@ -83,7 +83,7 @@ router.get('/petprofile', authMiddleware, async (req, res) => {
   }
 });
 
-// 마이페이지 - 돌보미 프로필조회 -> MYSQL 적용 프론트 테스트 OK
+// 마이페이지 - 돌보미 프로필조회
 
 router.get('/sitterprofile', authMiddleware, async (req, res) => {
   try {
@@ -103,8 +103,11 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
   }
 });
 
-// 마이페이지 - 반려동물 프로필 등록 -> MYSQL 적용 프론트 테스트 OK
-router.post('/petprofile', authMiddleware, upload.single('petImage'), async (req, res) => {
+router.post(
+  '/petprofile',
+  authMiddleware,
+  upload.single('petImage'),
+  async (req, res) => {
     try {
       const { user } = res.locals;
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
@@ -143,8 +146,11 @@ router.post('/petprofile', authMiddleware, upload.single('petImage'), async (req
   }
 );
 
-// 마이페이지 - 돌보미 등록  -> MYSQL 적용 프론트 테스트 OK
-router.post('/sitterprofile', authMiddleware, upload.fields([{ name: 'imageUrl' }, { name: 'mainImageUrl' }]),
+// 마이페이지 - 돌보미 등록 
+router.post(
+  '/sitterprofile',
+  authMiddleware,
+  upload.fields([{ name: 'imageUrl' }, { name: 'mainImageUrl' }]),
   async (req, res) => {
     try {
       const { user } = res.locals;
@@ -218,7 +224,7 @@ router.post('/sitterprofile', authMiddleware, upload.fields([{ name: 'imageUrl' 
   }
 );
 
-// 마이페이지 - 돌보미 프로필 삭제 -> MYSQL 적용 프론트 테스트 OK
+// 마이페이지 - 돌보미 프로필 삭제 
 router.delete('/sitterprofile', authMiddleware, async (req, res) => {
   const { user } = res.locals;
   try {
@@ -260,7 +266,7 @@ router.delete('/sitterprofile', authMiddleware, async (req, res) => {
   }
 });
 
-// 마이페이지 - 반려동물 프로필 삭제 -> MYSQL 적용 프론트 테스트 OK
+// 마이페이지 - 반려동물 프로필 삭제 
 router.delete('/petprofile/:petId', async (req, res) => {
   const { petId } = req.params;
   try {
@@ -288,8 +294,12 @@ router.delete('/petprofile/:petId', async (req, res) => {
   }
 });
 
-// 반려동물 프로필 수정 -> MYSQL 적용 프론트 테스트 OK
-router.patch('/petprofile/:petId', authMiddleware, upload.single('petImage'), async (req, res) => {
+// 반려동물 프로필 수정 
+router.patch(
+  '/petprofile/:petId',
+  authMiddleware,
+  upload.single('petImage'),
+  async (req, res) => {
     try {
       const { petId } = req.params;
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
@@ -347,7 +357,7 @@ router.patch('/petprofile/:petId', authMiddleware, upload.single('petImage'), as
   }
 );
 
-// 마이페이지 - 돌보미 프로필 수정 -> MYSQL 적용 프론트 테스트 OK
+// 마이페이지 - 돌보미 프로필 수정 
 router.patch(
   '/sitterprofile',
   authMiddleware,
@@ -394,9 +404,9 @@ router.patch(
           introTitle: introTitle,
           myIntro: myIntro,
           careSize: decode_careSize,
-          category: decode_category, // 제공 가능한 서비스
-          servicePrice: servicePrice, // 일당 서비스 금액
-          plusService: decode_plusService, // 추가 가능한 서비스 (배열)
+          category: decode_category, 
+          servicePrice: servicePrice, 
+          plusService: decode_plusService,
           noDate: decode_noDate,
           zoneCode: zoneCode,
         },
@@ -515,7 +525,6 @@ router.put('/password_change', authMiddleware, async (req, res) => {
 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const newHash = bcrypt.hashSync(newPassword, salt);
-
     //비밀번호 일치 확인
     const hashed = bcrypt.compareSync(password, user.password);
     if (!hashed) {

@@ -41,7 +41,7 @@ router.post('/signup', async (req, res) => {
       phoneNumber,
       refreshToken,
     });
-    res.status(201).json({ message: '회원가입이 완료!' });
+    res.status(201).json({ message: '회원가입이 완료되었습니다!' });
   } catch (err) {
     console.log(err);
     res.status(400).send({
@@ -57,7 +57,7 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ where: { userEmail: userEmail } });
     if (!user) {
       res.status(400).send({
-        errorMessage: '이메일 또는 비밀번호를 확인해주세요.',
+        errorMessage: '가입된 이메일 주소가 아닙니다 다시 확인해주세요.',
       });
       return;
     }
@@ -66,7 +66,7 @@ router.post('/login', async (req, res) => {
       if (!passwordIsValid) {
         return res.status(401).send({
           accessToken: null,
-          message: '이메일 또는 비밀번호를 확인해주세요',
+          message: '비밀번호를 다시 확인해주세요!',
         });
       }
     }
@@ -126,7 +126,6 @@ router.post('/refresh', (req, res) => {
         return res.status(406).json({ message: '리프레시 토큰 오류' });
       } else {
         // Correct token we send a new access token
-        // const user = {userEmail: refreshToken.userEmail}
         const accessToken = jwt.sign(
           { userEmail: user.userEmail },
           process.env.ACCESS_TOKEN_SECRET,
@@ -152,7 +151,7 @@ router.post('/id_check', async (req, res) => {
     const { phoneNumber } = req.body;
     if (phoneNumber === undefined) {
       res.status(400).send({
-        errorMessage: '핸드폰 번호를 확인해주세요.',
+        errorMessage: '핸드폰 번호를 다시 확인해주세요.',
       });
       return;
     }
@@ -160,12 +159,12 @@ router.post('/id_check', async (req, res) => {
     console.log(phoneNumber);
     console.log(user);
     if (!user) {
-      res.status(406).send({ errorMessage: '존재하지 않는 번호입니다' });
+      res.status(406).send({ errorMessage: '가입시 사용된 핸드폰 번호가 아닙니다.' });
       return;
     } else {
       return res
         .status(200)
-        .send({ message: ' 이메일 확인', userEmail: user.userEmail });
+        .send({ message: '가입시 사용된 이메일 주소 입니다!', userEmail: user.userEmail });
     }
   } catch (err) {
     res.status(400).json({ errorMessage: 'fail' });
@@ -178,7 +177,7 @@ router.post('/password_check', async (req, res) => {
   try {
     if (userEmail === undefined) {
       res.status(400).send({
-        errorMessage: '이메일을 확인해 주세요.',
+        errorMessage: '이메일을 다시 확인해 주세요.',
       });
       return;
     }
