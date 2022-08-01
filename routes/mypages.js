@@ -95,8 +95,8 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
     }
 
     return res.json({ sitterprofile: sitter });
-  } catch (error) {
-    console.log(error);
+
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -104,11 +104,7 @@ router.get('/sitterprofile', authMiddleware, async (req, res) => {
 });
 
 // 마이페이지 - 반려동물 프로필 등록 -> MYSQL 적용 프론트 테스트 OK
-router.post(
-  '/petprofile',
-  authMiddleware,
-  upload.single('petImage'),
-  async (req, res) => {
+router.post('/petprofile', authMiddleware, upload.single('petImage'), async (req, res) => {
     try {
       const { user } = res.locals;
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
@@ -148,10 +144,7 @@ router.post(
 );
 
 // 마이페이지 - 돌보미 등록  -> MYSQL 적용 프론트 테스트 OK
-router.post(
-  '/sitterprofile',
-  authMiddleware,
-  upload.fields([{ name: 'imageUrl' }, { name: 'mainImageUrl' }]),
+router.post('/sitterprofile', authMiddleware, upload.fields([{ name: 'imageUrl' }, { name: 'mainImageUrl' }]),
   async (req, res) => {
     try {
       const { user } = res.locals;
@@ -296,11 +289,7 @@ router.delete('/petprofile/:petId', async (req, res) => {
 });
 
 // 반려동물 프로필 수정 -> MYSQL 적용 프론트 테스트 OK
-router.patch(
-  '/petprofile/:petId',
-  authMiddleware,
-  upload.single('petImage'),
-  async (req, res) => {
+router.patch('/petprofile/:petId', authMiddleware, upload.single('petImage'), async (req, res) => {
     try {
       const { petId } = req.params;
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
