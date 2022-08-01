@@ -19,7 +19,6 @@ function chatSocketRouter(io) {
     console.log(`연결된 소켓 정보: ${socket.id}`);
 
     socket.on('join_room', (roomId) => {
-      console.log(`${socket.id} 방접속: ${roomId}`)
       socket.join(`${roomId}`);
     });
 
@@ -63,7 +62,6 @@ function chatSocketRouter(io) {
         const sockets = await io.in(`${data.roomId}`).fetchSockets();
 
         if (sockets?.length === 2) {
-          console.log(`(${data.roomId}) 채팅방에 두 명 있어요!`);
           const chat_data = {
             newMessage: false,
             userName: me.userName,
@@ -75,8 +73,6 @@ function chatSocketRouter(io) {
           socket.to(`${data.roomId}`).emit('receive_message', chat_data);
 
         } else if (sockets?.length === 1) {
-          console.log(`(${data.roomId}) 채팅방에 혼자에요...`);
-
           const room_data = {
             newMessage: true,
             roomId: data.roomId,
@@ -94,10 +90,6 @@ function chatSocketRouter(io) {
           //chatList 업데이트용 세팅
           otherPos === 'user' ? userNew = true : sitterNew = true;
         }
-
-        console.log("상대방 Pos: ", otherPos);
-        console.log("userNew: ", userNew);
-        console.log("sitterNew: ", sitterNew);
 
         //room 마지막채팅 업데이트
         await Room.update (
@@ -255,23 +247,6 @@ function chatSocketRouter(io) {
         .status(400)
         .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
     }
-  });
-
-  router.post('/test', async (req, res) => {
-    const { roomId } = req.body;
-    console.log('--------------------------');
-    if (io.sockets) {
-      console.log(io.sockets.adapter.rooms);
-      const sockets = await io.in(`${roomId}`).fetchSockets();
-    } else {
-      console.log('소켓이 없습니다.');
-    }
-
-    if (clients.length){}
-
-    console.log('--------------------------');
-
-    res.send({ msg: 'test complete' });
   });
 
   // 채팅방 존재유무 판단 후 만들기
