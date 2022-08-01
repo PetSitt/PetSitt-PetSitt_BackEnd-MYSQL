@@ -38,8 +38,7 @@ router.get('/myprofile', authMiddleware, async (req, res) => {
     const myprofile = user;
 
     res.json({ myprofile });
-  } catch (error) {
-    console.error(error);
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -60,8 +59,7 @@ router.patch('/myprofile', authMiddleware, async (req, res) => {
       { where: { userId: user.userId } }
     );
     res.json({ myprofile });
-  } catch (error) {
-    console.error(error);
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -75,8 +73,7 @@ router.get('/petprofile', authMiddleware, async (req, res) => {
     const petprofile = await Pet.findAll({ where: { userId: user.userId } });
 
     res.json({ petprofile });
-  } catch (error) {
-    console.error(error);
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -137,8 +134,7 @@ router.post(
         });
         res.json({ petprofile });
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
       return res
         .status(400)
         .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -215,8 +211,7 @@ router.post(
         );
       }
       res.json({ createSitter });
-    } catch (error) {
-      console.error(error);
+    } catch {
       return res
         .status(400)
         .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -348,8 +343,7 @@ router.patch(
       }
 
       return res.json({ result: 'success' });
-    } catch (error) {
-      console.log(error);
+    } catch {
       return res
         .status(400)
         .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -446,8 +440,6 @@ router.patch(
 
         const imageUrl = req.files.imageUrl[0].location;
 
-        console.log('이미지: ', imageUrl);
-
         await Sitter.update(
           {
             imageUrl: imageUrl,
@@ -473,8 +465,6 @@ router.patch(
         }
         const mainImageUrl = req.files.mainImageUrl[0].location;
 
-        console.log('메인 이미지: ', mainImageUrl);
-
         await Sitter.update(
           {
             mainImageUrl: mainImageUrl,
@@ -483,8 +473,7 @@ router.patch(
         );
       }
       res.json({ sitterprofile });
-    } catch (error) {
-      console.log(error);
+    } catch {
       return res
         .status(400)
         .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -506,8 +495,7 @@ router.get('/info', authMiddleware, async (req, res) => {
     const sitterMainImageUrl = sitterprofile.mainImageUrl;
 
     res.json({ sitterimageUrl, sitterMainImageUrl, petImage });
-  } catch (error) {
-    console.error(error);
+  } catch {
     return res
       .status(400)
       .send({ errorMessage: 'DB정보를 받아오지 못했습니다.' });
@@ -517,11 +505,9 @@ router.get('/info', authMiddleware, async (req, res) => {
 
 //비밀번호 변경
 router.put('/password_change', authMiddleware, async (req, res) => {
-  // try {
+  try {
     const { user } = res.locals;
     let { password, newPassword } = req.body;
-    console.log("비밀번호:", password);
-    console.log("새 비밀번호:", newPassword);
 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const newHash = bcrypt.hashSync(newPassword, salt);
@@ -537,9 +523,9 @@ router.put('/password_change', authMiddleware, async (req, res) => {
       { where: { userEmail: user.userEmail } }
     );
     return res.status(200).send({ message: '비밀번호 변경 성공!' });
-  // } catch {
-  //   return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
-  // }
+  } catch {
+    return res.status(400).send({ errorMessage: '비밀번호 변경 실패' });
+  }
 });
 
 module.exports = router;

@@ -86,8 +86,7 @@ router.post('/:reservationId', authMiddleware, async (req, res) => {
     return res.status(200).send({
       msg: '리뷰작성 완료',
     });
-  } catch (err) {
-    console.log(err);
+  } catch {
     return res.status(400).send({
       errorMessage: 'DB정보를 받아오지 못했습니다.',
     });

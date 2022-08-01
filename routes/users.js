@@ -42,8 +42,7 @@ router.post('/signup', async (req, res) => {
       refreshToken,
     });
     res.status(201).json({ message: '회원가입이 완료되었습니다!' });
-  } catch (err) {
-    console.log(err);
+  } catch {
     res.status(400).send({
       errorMessage: '요청한 데이터 형식이 올바르지 않습니다.',
     });
@@ -88,7 +87,7 @@ router.post('/login', async (req, res) => {
         expiresIn: '10d',
       }
     );
-    console.log(refreshToken);
+
     await user.update(
       { refreshToken },
       { where: { userEmail: user.userEmail } }
@@ -117,7 +116,7 @@ router.post('/refresh', (req, res) => {
   if (refreshToken === undefined) {
     return res.status(401).json({ errorMessage: '리프레쉬 토큰이 없습니다.' });
   }
-  console.log(refreshToken);
+
   // Verifying refresh token
   if (req.body) {
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
@@ -156,8 +155,7 @@ router.post('/id_check', async (req, res) => {
       return;
     }
     const user = await User.findOne({ where: { phoneNumber: phoneNumber } });
-    console.log(phoneNumber);
-    console.log(user);
+
     if (!user) {
       res.status(406).send({ errorMessage: '가입시 사용된 핸드폰 번호가 아닙니다.' });
       return;
@@ -182,7 +180,7 @@ router.post('/password_check', async (req, res) => {
       return;
     }
     const user = await User.findOne({ where: { userEmail } });
-    console.log(user);
+
     if (!user) {
       res.status(406).send({ errorMessage: '존재하지 않는 이메일입니다' });
       return;
@@ -199,7 +197,7 @@ router.post('/password_check', async (req, res) => {
       subject: 'petsitter 임시 비밀번호 메일발송', // 메일 제목
       text: `${user.userName} 회원님! 임시 비밀번호는 ${randomPassword} 입니다`, // 메일 내용
     };
-    console.log(user.userName);
+
     mailer.sendGmail(emailParam);
     res.send({ result: true });
   } catch (err) {
@@ -214,8 +212,7 @@ router.get('/auth', authMiddleware, (req, res) => {
     res.status(200).send({
       user,
     });
-  } catch (error) {
-    console.log(error);
+  } catch {
     res.status(401).send({
       errormessage: '사용자 정보를 가져오지 못하였습니다.',
     });
@@ -224,11 +221,10 @@ router.get('/auth', authMiddleware, (req, res) => {
 
 //kakao login  소셜로그인
 router.post('/auth/kakao', async (req, res) => {
-  console.log(req.body);
   const { userEmail, userName } = req.body;
 
   const existsUsers = await User.findOne({ where: { userEmail: userEmail } });
-  console.log(existsUsers);
+
   if (existsUsers) {
     // 이미 해당 이메일이 DB에 있는 경우 DB에 new User로 새로 테이블을 만들어주지 않고 토큰만 보내준다.
     return res.send({
