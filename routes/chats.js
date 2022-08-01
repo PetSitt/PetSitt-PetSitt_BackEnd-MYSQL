@@ -131,6 +131,8 @@ function chatSocketRouter(io) {
           },
       });
 
+      console.log("SSE연결:", userEmail);
+
       let room_data = {
         newMessage: false,
         roomId: null,
@@ -289,6 +291,7 @@ const setRoomForm = async (user) => {
   let other_sitter = null;
   let other_state = null;
   let room = null;
+  let userName = "";
   let imageUrl = null;
   const room_set = [];
 
@@ -298,6 +301,7 @@ const setRoomForm = async (user) => {
     otherId = null;
     other_sitter = null;
     room = null;
+    userName = "";
     imageUrl =
       'https://kimguen-storage.s3.ap-northeast-2.amazonaws.com/sitterImage/default_user.jpg';
 
@@ -314,10 +318,16 @@ const setRoomForm = async (user) => {
     other = await User.findOne({ where: { userId: otherId } });
     if (!other) continue;
 
-    other_sitter = await Sitter.findOne({
-      where: { userId: String(other.userId) },
-    });
-    if (other_sitter) imageUrl = other_sitter.imageUrl;
+    if ( other_state === 'sitter') {
+      other_sitter = await Sitter.findOne({
+        where: { userId: String(other.userId) },
+      });
+
+      userName = other_sitter.sitterName;
+      imageUrl = other_sitter.imageUrl;
+    } else {
+      userName = other.userName;
+    }
 
     // 채팅방 리스트에 new 만들기
     const newThing = other_state === 'user' ? rooms[i].sitterNew : rooms[i].userNew;
@@ -325,7 +335,7 @@ const setRoomForm = async (user) => {
     // room 정보 세팅
     room = {
       roomId: rooms[i].roomId,
-      userName: other.userName,
+      userName,
       lastChat: rooms[i].lastChat,
       lastChatAt: new Date(rooms[i].lastChatAt).getTime(),
       imageUrl,

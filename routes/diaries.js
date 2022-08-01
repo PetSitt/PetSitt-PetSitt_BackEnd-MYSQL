@@ -3,7 +3,8 @@ const router = express.Router();
 const moment = require('moment');
 const AWS = require('aws-sdk');
 const multer = require('multer');
-const multerS3 = require('multer-s3');
+const multerS3 = require('multer-s3-transform');
+const sharp = require("sharp");
 const { Diary } = require('../models');
 const { Reservation } = require('../models');
 const authMiddleware = require('../middlewares/auth-middleware');
@@ -19,11 +20,30 @@ const storage = multerS3({
   s3: s3,
   acl: 'public-read-write',
   bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', // s3 버킷명+경로
-  key: (req, file, callback) => {
-    const dir = req.body.dir;
-    const datetime = moment().format('YYYYMMDDHHmmss');
-    callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
-  },
+  contentType: multerS3.AUTO_CONTENT_TYPE,
+  shouldTransform: true,
+  transforms: [
+    {
+      key: (req, file, callback) => {
+        const dir = req.body.dir;
+        const datetime = moment().format('YYYYMMDDHHmmss');
+        callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
+      },
+      transform: function (req, file, cb) {
+        if (file) {
+          switch(file.fieldname) {
+            case 'diaryImage':
+            case 'addImage':
+                cb(null, sharp().resize({ width: 105 }).withMetadata());
+              break;
+            default: 
+                cb(null, sharp().resize({ width: 105 }).withMetadata());
+              break;
+          }
+        }
+      },
+    },
+  ]
 });
 
 const uploadS3 = multer({ storage: storage });
@@ -53,7 +73,7 @@ router.post(
         const diaryImage = [];
 
         for (let i = 0; i < fileArray.length; i++) {
-          diaryImage.push(fileArray[i].location);
+          diaryImage.push(fileArray[i].transforms[0].location);
         }
         diary.diaryImage = diaryImage;
       }
@@ -104,7 +124,7 @@ router.put(
       // 저장할 이미지가 있을 경우
       if (req.files?.length) {
         for (let i = 0; i < fileArray.length; i++) {
-          diary.diaryImage.push(fileArray[i].location);
+          diary.diaryImage.push(fileArray[i].transforms[0].location);
         }
       }
 
@@ -156,8 +176,6 @@ router.put(
 router.get('/:reservationId', authMiddleware, async (req, res) => {
   try {
     const { reservationId } = req.params;
-
-    console.log(reservationId);
 
     const diary = await Diary.findOne({ where: { reservationId } });
     if (!diary) {
