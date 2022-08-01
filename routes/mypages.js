@@ -4,7 +4,8 @@ const AWS = require('aws-sdk');
 const authMiddleware = require('../middlewares/auth-middleware');
 require('dotenv').config();
 const multer = require('multer');
-const multerS3 = require('multer-s3');
+const multerS3 = require('multer-s3-transform');
+const sharp = require("sharp");
 const moment = require('moment');
 const { Op } = require('sequelize');
 const { Pet } = require('../models');
@@ -21,12 +22,36 @@ const s3 = new AWS.S3({
 const storage = multerS3({
   s3: s3,
   acl: 'public-read-write',
-  bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', 
-  key: (req, file, callback) => {
-    const dir = req.body.dir;
-    const datetime = moment().format('YYYYMMDDHHmmss');
-    callback(null, dir + datetime + '_' + file.originalname);
-  },
+  bucket: process.env.MY_S3_BUCKET || 'kimguen-storage/petSitt', // s3 버킷명+경로
+  contentType: multerS3.AUTO_CONTENT_TYPE,
+  shouldTransform: true,
+  transforms: [
+    {
+      key: (req, file, callback) => {
+        const dir = req.body.dir;
+        const datetime = moment().format('YYYYMMDDHHmmss');
+        callback(null, dir + datetime + '_' + file.originalname); // 저장되는 파일명
+      },
+      transform: function (req, file, cb) {
+        if (file) {
+          switch(file.fieldname) {
+            case 'petImage':
+                cb(null, sharp().resize({ width: 120 }).withMetadata());
+              break;
+            case 'imageUrl':
+                cb(null, sharp().resize({ width: 160 }).withMetadata());
+              break;
+            case 'mainImageUrl':
+                cb(null, sharp().resize({ width: 500 }).withMetadata());
+              break;
+            default: 
+                cb(null, sharp().resize({ width: 200 }).withMetadata());
+              break;
+          }
+        }
+      },
+    },
+  ]
 });
 
 const upload = multer({ storage: storage });
@@ -81,14 +106,13 @@ router.get('/petprofile', authMiddleware, async (req, res) => {
 });
 
 // 마이페이지 - 돌보미 프로필조회
-
 router.get('/sitterprofile', authMiddleware, async (req, res) => {
   try {
     const { user } = res.locals;
 
     const sitter = await Sitter.findOne({ where: { userId: user.userId } });
     if (!sitter) {
-      return res.status(200).send({ sitterprofile, isError: true });
+      return res.status(200).send({ sitterprofile: null, isError: true });
     }
 
     return res.json({ sitterprofile: sitter });
@@ -110,7 +134,7 @@ router.post(
       const { petName, petAge, petWeight, petType, petSpay, petIntro } =
         req.body;
       if (req.file != undefined) {
-        const petImage = req.file.location;
+        const petImage = req.file.transforms[0].location;
         const petprofile = await Pet.create({
           petName: petName,
           petAge: petAge,
@@ -197,14 +221,16 @@ router.post(
         location: location,
       });
       if (req.files.imageUrl != undefined) {
-        const imageUrl = req.files.imageUrl[0].location;
+        const imageUrl 
+          = req.files.imageUrl[0].transforms[0].location;
         await Sitter.update(
           { imageUrl: imageUrl },
           { where: { userId: user.userId } }
         );
       }
       if (req.files.mainImageUrl != undefined) {
-        const mainImageUrl = req.files.mainImageUrl[0].location;
+        const mainImageUrl 
+          = req.files.mainImageUrl[0].transforms[0].location;
         await Sitter.update(
           { mainImageUrl: mainImageUrl },
           { where: { userId: user.userId } }
@@ -438,7 +464,7 @@ router.patch(
           });
         }
 
-        const imageUrl = req.files.imageUrl[0].location;
+        const imageUrl = req.files.imageUrl[0].transforms[0].location;
 
         await Sitter.update(
           {
