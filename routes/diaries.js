@@ -64,6 +64,10 @@ router.post(
 
       // 체크리스트, 돌봄일지 글 등록
       const diary = await Diary.create({ reservationId });
+      diary.checkList = [];
+      diary.checkStatus = [];
+      diary.diaryInfo = " ";
+
       if (decode_checkList?.length) diary.checkList = decode_checkList;
       if (decode_checkStatus?.length) diary.checkStatus = decode_checkStatus;
       if (diaryInfo) diary.diaryInfo = diaryInfo;
