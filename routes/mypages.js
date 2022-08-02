@@ -343,7 +343,7 @@ router.patch(
             }
           });
         }
-        const petImage = req.file.location;
+        const petImage = req.file.transforms[0].location;
         await Pet.update(
           {
             petName: petName,
