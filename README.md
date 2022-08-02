@@ -6,31 +6,13 @@
 내가 검색한 지역, 조건에 맞는 돌보미의 정보를 제공하고, 예약시스템을 통해 돌보미와 연결해주는\
 기능을 제공합니다.
 
+
 ## ⏰개발기간
 2022년 6월 24일 ~ 2022년 8월 5일(6주)
 
-## 👨‍👧‍👧팀원
-## 📌 팀원소개
-### 백엔드
-<table width = "200" style="text-align:center;" >
-  <tr>
-    <th height = "40"> Name</th>
-    <th height = "40"> Github</th>
-  </tr>
-  <tr>
-    <td> Node.js </td>
-    <td> 김형근,  유승완,  서아름,  김정현 </td>
-  </tr>
-  <tr>
-    <td> ReactJS </td>
-    <td> 소윤호,  김하연,  이정민 </td>
-  </tr>  
-  <tr>
-    <td> UI/UX </td>
-    <td> 고가은 </td>
-  </tr> 
-</table>
-
+## 🐶 Petsitt 둘러보기
+- 사이트 바로가기 : https://petsitt.link/
+- 발표 영상 : 
 
 ## 🖊 서비스의 주요기능
 
@@ -48,7 +30,7 @@
     - 로그인 중 새로운 메시지를 전송받았을 경우
     - 펫싯 사이트에 접속해있지 않다가 다시 로그인 했을 때 새로운 메세지가 있는 경우
 
-## ⚒️ FE개발 스팩
+## ⚒️ FE개발 스택
 ![](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white)
 ![](https://img.shields.io/badge/styledComponents-db7093?style=for-the-badge&logo=styled-components&logoColor=white)
 ![](https://img.shields.io/badge/REACT-0A395B?style=for-the-badge&logo=REACT&logoColor=white)
@@ -57,7 +39,7 @@
 ![](https://img.shields.io/badge/reactquery-ff4154?style=for-the-badge&logo=reactquery&logoColor=black)
 ![](https://img.shields.io/badge/Socket.io-000000?style=for-the-badge&logo=Socket.io&logoColor=white)
 
-## ⚒️ BE개발 스팩
+## ⚒️ BE개발 스택
 ![](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white)
 ![](https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white)
 ![](https://img.shields.io/badge/socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white)
@@ -71,6 +53,64 @@
 
 ## ⚒️ ERD
 <img width="875" alt="Screen Shot 2022-08-02 at 6 15 07 AM" src="https://user-images.githubusercontent.com/104882862/182362019-c9b7b365-c66e-4932-b6e6-cebeda864d97.png">
+
+
+## 📌 팀원소개
+### 백엔드
+<table width = "200" style="text-align:center;" >
+  <tr>
+    <th height = "40"> Name</th>
+    <th height = "40"> Github</th>
+  </tr>
+  <tr>
+    <td> 김형근 </td>
+    <td> https://github.com/fnvkd5316 </td>
+  </tr>
+  <tr>
+    <td> 유승완 </td>
+    <td> https://github.com/avo1032 </td>
+  </tr>
+  <tr>
+    <td> 서아름 </td>
+    <td> https://github.com/seoa909 </td>
+  </tr>
+  <tr>
+    <td> 김정현 </td>
+    <td> https://github.com/jeong-hyeonkim </td>
+  </tr>
+</table>
+  
+### 프론트엔드
+<table width = "200" style="text-align:center;" >
+  <tr>
+    <th height = "40"> Name</th>
+    <th height = "40">Github</th>
+  </tr>
+  <tr>
+    <td> 소윤호 </td>
+    <td> https://github.com/younhoso </td>
+  </tr>
+  <tr>
+    <td> 김하연 </td>
+    <td> https://github.com/hayeooooon </td>
+  </tr>
+  <tr>
+    <td> 이정민 </td>
+    <td> https://github.com/jeongmin-dev </td>
+  </tr>
+</table>
+
+### 디자이너
+<table width = "200" style="text-align:center;" >
+  <tr>
+    <th height = "40"> Name</th>
+    <th height = "40">Blog</th>
+  </tr>
+  <tr>
+    <td> 고가은 </td>
+    <td>  </td>
+  </tr>
+</table>
 
 
 
