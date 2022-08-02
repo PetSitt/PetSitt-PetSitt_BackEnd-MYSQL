@@ -10,9 +10,27 @@
 2022년 6월 24일 ~ 2022년 8월 5일(6주)
 
 ## 👨‍👧‍👧팀원
-ReactJS : 소윤호, 김하연, 이정민\
-Node.js : 김형근, 유승완, 서아름, 김정현\
-UI/UX : 고가은
+## 📌 팀원소개
+### 백엔드
+<table width = "200" style="text-align:center;" >
+  <tr>
+    <th height = "40"> Name</th>
+    <th height = "40"> Github</th>
+  </tr>
+  <tr>
+    <td> Node.js </td>
+    <td> 김형근,  유승완,  서아름,  김정현 </td>
+  </tr>
+  <tr>
+    <td> ReactJS </td>
+    <td> 소윤호,  김하연,  이정민 </td>
+  </tr>  
+  <tr>
+    <td> UI/UX </td>
+    <td> 고가은 </td>
+  </tr> 
+</table>
+
 
 ## 🖊 서비스의 주요기능
 
