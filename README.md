@@ -40,6 +40,7 @@ UI/UX : 고가은
 ![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white)
 
 ## ⚒️ ERD
+![ERD](https://user-images.githubusercontent.com/75964402/182356683-7b4e51c7-44d0-420f-ab96-c47aa47ab470.PNG)
 
 
 ## 🏗Service Architecture
