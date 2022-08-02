@@ -54,5 +54,5 @@ UI/UX : 고가은
 ## ⚒️ ERD
 <img width="875" alt="Screen Shot 2022-08-02 at 6 15 07 AM" src="https://user-images.githubusercontent.com/104882862/182362019-c9b7b365-c66e-4932-b6e6-cebeda864d97.png">
 
-## 📌 트러블슈팅 & 피드백 개선
+
 
