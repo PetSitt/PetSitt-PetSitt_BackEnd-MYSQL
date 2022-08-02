@@ -42,6 +42,5 @@ UI/UX : 고가은
 ## ⚒️ ERD
 ![ERD](https://user-images.githubusercontent.com/75964402/182356683-7b4e51c7-44d0-420f-ab96-c47aa47ab470.PNG)
 
-
 ## 🏗Service Architecture
-![Untitled](https://user-images.githubusercontent.com/72438873/179398245-e3fb79ed-9be5-4e80-b1b8-156463f5f025.png)
+![KakaoTalk_20220802_180108489](https://user-images.githubusercontent.com/75964402/182356945-32fd49ef-c3ce-4e74-8161-dcfdd0b17890.png)
