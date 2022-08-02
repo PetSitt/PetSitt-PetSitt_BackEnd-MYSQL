@@ -39,8 +39,9 @@ UI/UX : 고가은
 ![](https://img.shields.io/badge/amazonaws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white)
 
-## ⚒️ ERD
-![ERD](https://user-images.githubusercontent.com/75964402/182356683-7b4e51c7-44d0-420f-ab96-c47aa47ab470.PNG)
-
 ## 🏗Service Architecture
 ![KakaoTalk_20220802_180108489](https://user-images.githubusercontent.com/75964402/182356945-32fd49ef-c3ce-4e74-8161-dcfdd0b17890.png)
+
+## ⚒️ ERD
+<img width="875" alt="Screen Shot 2022-08-02 at 6 15 07 AM" src="https://user-images.githubusercontent.com/104882862/182362019-c9b7b365-c66e-4932-b6e6-cebeda864d97.png">
+
