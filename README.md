@@ -32,7 +32,7 @@ RDS | 관계형 데이터베이스 서비스
 <img src='https://img.shields.io/badge/artillery-1.7.9-lightgrey'> | 서버 부하 테스트
 <img src='https://img.shields.io/badge/bcrypt-5.0.1-lightgrey'> | 비밀번호 암호화
 <img src='https://img.shields.io/badge/cors-2.8.5-lightgrey'> | 교차 리소스 공유
-<img src='https://img.shields.io/badge/dotenv-10.0.0-lightgrey'>  | 환경변수 관리
+<img src='https://img.shields.io/badge/dotenv-16.0.1-lightgrey'>  | 환경변수 관리
 <img src='https://img.shields.io/badge/express-4.18.1-lightgrey'> | 웹 프레임워크
 <img src='https://img.shields.io/badge/helmet-4.6.0-lightgrey'>  | HTTP 헤더 보안
 <img src='https://img.shields.io/badge/joi-17.6.0-lightgrey'>  | 입력데이터 검출
