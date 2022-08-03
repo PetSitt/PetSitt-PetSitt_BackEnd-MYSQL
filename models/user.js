@@ -1,4 +1,4 @@
-const Sequelize = require("sequelize");
+const Sequelize = require('sequelize');
 module.exports = class User extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
@@ -14,34 +14,46 @@ module.exports = class User extends Sequelize.Model {
         },
         password: {
           type: Sequelize.STRING,
-          defaultValue: "",
+          defaultValue: '',
         },
         userName: {
           type: Sequelize.STRING,
-          defaultValue: "",
+          defaultValue: '',
         },
         phoneNumber: {
           type: Sequelize.STRING,
-          defaultValue: "",
+          defaultValue: '',
         },
         refreshToken: {
           type: Sequelize.STRING,
-          defaultValue: "",
+          defaultValue: '',
         },
       },
       {
         sequelize,
-        modelName: "User",
-        tableName: "Users",
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
+        modelName: 'User',
+        tableName: 'Users',
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_general_ci',
       }
     );
   }
-    static associate(db) {
-      User.hasMany(db.Pet, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
-      User.hasMany(db.Reservation, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
-      User.hasOne(db.Sitter, { foreignKey: 'userId', sourceKey: 'userId', onDelete:'CASCADE' });
-    }
 
+  static associate(db) {
+    User.hasMany(db.Pet, {
+      foreignKey: 'userId',
+      sourceKey: 'userId',
+      onDelete: 'CASCADE',
+    });
+    User.hasMany(db.Reservation, {
+      foreignKey: 'userId',
+      sourceKey: 'userId',
+      onDelete: 'CASCADE',
+    });
+    User.hasOne(db.Sitter, {
+      foreignKey: 'userId',
+      sourceKey: 'userId',
+      onDelete: 'CASCADE',
+    });
+  }
 };

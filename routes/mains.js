@@ -1,7 +1,8 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { Sitter } = require("../models");
-const { Op, Sequelize } = require("sequelize");
+const { Sitter } = require('../models');
+const { Op, Sequelize } = require('sequelize');
+
 
 router.post("/", async (req, res) => {
   try {
@@ -16,7 +17,7 @@ router.post("/", async (req, res) => {
     if (x === "undefined" || y === "undefined" || !x || !y) {
       x = 126.875078748377;
       y = 37.4856025065543;
-    }
+      }
 
     const next = [];
     const sitter = [];
@@ -46,14 +47,15 @@ router.post("/", async (req, res) => {
   } catch {
     res.status(400).send({ errorMessage: "시터 정보가 없습니다." });
   }
+
 });
 
 router.post("/search", async (req, res) => {
   const { region_2depth_name, searchDate, category, x, y, limit, offset } = req.body;
   const location = Sequelize.literal(`ST_GeomFromText('POINT(${x} ${y})')`);
   const distance = Sequelize.fn(
-    "ST_Distance",
-    Sequelize.col("location"),
+    'ST_Distance',
+    Sequelize.col('location'),
     location
   );
 
@@ -67,11 +69,10 @@ router.post("/search", async (req, res) => {
     },
   });
 
-  if (x === "undefined" || y === "undefined" || !x || !y) {
+if (x === "undefined" || y === "undefined" || !x || !y) {
     x = 126.875078748377;
     y = 37.4856025065543;
   }
-
   for (i = 0; i < sitters2.length; i++) {
     const intersection = searchDate.filter((x) =>
       sitters2[i].noDate.includes(x)
