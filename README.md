@@ -46,6 +46,10 @@ RDS | 관계형 데이터베이스 서비스
 <img src='https://img.shields.io/badge/socket.io-4.5.1-lightgrey'> | 실시간 상호작용
 <br>
 
+## 📂 [Project Notion](https://www.notion.so/62309f0a306b44c494fe560ded17ecff)
+
+<br>
+
 ## 🖊 서비스의 주요기능
 
 #### ✅  **실시간 위치 정보 및 지도 (kakao Map API)를 활용한 돌보미 리스트 표기**
