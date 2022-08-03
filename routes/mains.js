@@ -18,6 +18,7 @@ router.post("/", async (req, res) => {
       y = 37.4856025065543;
     }
 
+    const next = [];
     const sitter = [];
     const sitters = await Sitter.findAll({
       offset: offset,
@@ -34,12 +35,14 @@ router.post("/", async (req, res) => {
         sitter.push(sitters[i]);
       }
     }
-
-    if (!sitter.length) {
-      return res.status(200).send({ sitter: false });
+    if(sitter.length){
+      next.push(true)
     }
-
-    return res.status(200).send({ sitter });
+    if(!sitter.length){
+      next.push(false)
+    }
+    
+    return res.status(200).send({ sitter,next });
   } catch {
     res.status(400).send({ errorMessage: "시터 정보가 없습니다." });
   }
@@ -54,6 +57,7 @@ router.post("/search", async (req, res) => {
     location
   );
 
+  const next = [];
   const sitters = [];
   const sitters2 = await Sitter.findAll({
     offset: offset,
@@ -75,13 +79,16 @@ router.post("/search", async (req, res) => {
     const intersection2 = category.filter((x) =>
       sitters2[i].category.includes(x)
     );
-
     if (!intersection.length && intersection2.length === category.length) {
       sitters.push(sitters2[i]);
     }
   }
+  
+  if(!sitters.length){
+    next.push(false)
+  }
 
-  if (!sitters?.length) {
+  if (!sitters?.length ) {
     const sitters2 = await Sitter.findAll({
       offset: offset,
       limit: limit,
@@ -95,11 +102,14 @@ router.post("/search", async (req, res) => {
       const intersection2 = category.filter((x) =>
         sitters2[i].category.includes(x)
       );
+      if(!intersection2.length ){
+        return res.send({sitters:[]})
+      }
       if (!intersection.length && intersection2.length === category.length) {
         sitters.push(sitters2[i]);
       }
     }
-    return res.send({ sitters });
+    return res.send({ sitters, next });
   }
   res.send({ sitters });
 });
