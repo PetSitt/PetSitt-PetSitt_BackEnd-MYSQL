@@ -41,7 +41,7 @@ RDS | 관계형 데이터베이스 서비스
 <img src='https://img.shields.io/badge/mysql-2.18.1-lightgrey'> | MySQL
 <img src='https://img.shields.io/badge/sequelize-6.21.3-lightgrey'>  | MySQL ORM
 <img src='https://img.shields.io/badge/sequelize--cli-6.4.1-lightgrey'> | MySQL ORM Console
-<img src='https://img.shields.io/badge/multer--1.4.5-lts.1-lightgrey'> | 이미지 업로드
+<img src='https://img.shields.io/badge/multer-1.4.5--lts.1-lightgrey'> | 이미지 업로드
 <img src='https://img.shields.io/badge/multer--s3-2.10.0-lightgrey'> | s3에 이미지 업로드
 <img src='https://img.shields.io/badge/nodemailer-6.7.6-lightgrey'> | 메일 전송
 <img src='https://img.shields.io/badge/socket.io-4.5.1-lightgrey'> | 실시간 상호작용
