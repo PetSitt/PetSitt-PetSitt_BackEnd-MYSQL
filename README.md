@@ -11,6 +11,63 @@
 ## ⏰개발기간
 2022년 6월 24일 ~ 2022년 8월 5일(6주)
 
+## 📌 팀원소개
+### 백엔드
+<table width = "200" style="text-align:center;" >
+  <tr>
+    <th height = "40"> Name</th>
+    <th height = "40"> Github</th>
+  </tr>
+  <tr>
+    <td> 김형근 </td>
+    <td> https://github.com/fnvkd5316 </td>
+  </tr>
+  <tr>
+    <td> 유승완 </td>
+    <td> https://github.com/avo1032 </td>
+  </tr>
+  <tr>
+    <td> 서아름 </td>
+    <td> https://github.com/seoa909 </td>
+  </tr>
+  <tr>
+    <td> 김정현 </td>
+    <td> https://github.com/jeong-hyeonkim </td>
+  </tr>
+</table>
+  
+### 프론트엔드
+<table width = "200" style="text-align:center;" >
+  <tr>
+    <th height = "40"> Name</th>
+    <th height = "40">Github</th>
+  </tr>
+  <tr>
+    <td> 소윤호 </td>
+    <td> https://github.com/younhoso </td>
+  </tr>
+  <tr>
+    <td> 김하연 </td>
+    <td> https://github.com/hayeooooon </td>
+  </tr>
+  <tr>
+    <td> 이정민 </td>
+    <td> https://github.com/jeongmin-dev </td>
+  </tr>
+</table>
+
+### 디자이너
+<table width = "200" style="text-align:center;" >
+  <tr>
+    <th height = "40"> Name</th>
+    <th height = "40">Blog</th>
+  </tr>
+  <tr>
+    <td> 고가은 </td>
+    <td>  </td>
+  </tr>
+</table>
+
 ## 🐶 Petsitt 둘러보기
 - 사이트 바로가기 : https://petsitt.link/
 - 발표 영상 : 
@@ -91,62 +148,7 @@ RDS | 관계형 데이터베이스 서비스
 <img width="875" alt="Screen Shot 2022-08-02 at 6 15 07 AM" src="https://user-images.githubusercontent.com/104882862/182362019-c9b7b365-c66e-4932-b6e6-cebeda864d97.png">
 
 
-## 📌 팀원소개
-### 백엔드
-<table width = "200" style="text-align:center;" >
-  <tr>
-    <th height = "40"> Name</th>
-    <th height = "40"> Github</th>
-  </tr>
-  <tr>
-    <td> 김형근 </td>
-    <td> https://github.com/fnvkd5316 </td>
-  </tr>
-  <tr>
-    <td> 유승완 </td>
-    <td> https://github.com/avo1032 </td>
-  </tr>
-  <tr>
-    <td> 서아름 </td>
-    <td> https://github.com/seoa909 </td>
-  </tr>
-  <tr>
-    <td> 김정현 </td>
-    <td> https://github.com/jeong-hyeonkim </td>
-  </tr>
-</table>
-  
-### 프론트엔드
-<table width = "200" style="text-align:center;" >
-  <tr>
-    <th height = "40"> Name</th>
-    <th height = "40">Github</th>
-  </tr>
-  <tr>
-    <td> 소윤호 </td>
-    <td> https://github.com/younhoso </td>
-  </tr>
-  <tr>
-    <td> 김하연 </td>
-    <td> https://github.com/hayeooooon </td>
-  </tr>
-  <tr>
-    <td> 이정민 </td>
-    <td> https://github.com/jeongmin-dev </td>
-  </tr>
-</table>
 
-### 디자이너
-<table width = "200" style="text-align:center;" >
-  <tr>
-    <th height = "40"> Name</th>
-    <th height = "40">Blog</th>
-  </tr>
-  <tr>
-    <td> 고가은 </td>
-    <td>  </td>
-  </tr>
-</table>
 
 
 
