@@ -1,15 +1,23 @@
 ![image](https://user-images.githubusercontent.com/105031842/182522359-499bd4b5-7b95-48e5-b7f5-78099f885189.png)
 
 
+## 🐶 Petsitt 둘러보기
+- 사이트 바로가기 : https://petsitt.link/
+- 발표 영상 : 
 
-## 😃PetSitt 소개
+<br>
+
+## 😃 PetSitt 소개
 반려견을 특정 기간 동안 맡길수 있는 돌보미와 사용자를 연결해 주는 중계 서비스입니다.\
 내가 검색한 지역, 조건에 맞는 돌보미의 정보를 제공하고, 예약시스템을 통해 돌보미와 연결해주는\
 기능을 제공합니다.
 
+<br>
 
 ## ⏰개발기간
 2022년 6월 24일 ~ 2022년 8월 5일(6주)
+
+<br>
 
 ## 📌 팀원소개
 ### 백엔드
@@ -35,6 +43,8 @@
     <td> https://github.com/jeong-hyeonkim </td>
   </tr>
 </table>
+
+<br>
   
 ### 프론트엔드
 <table width = "200" style="text-align:center;" >
@@ -56,6 +66,8 @@
   </tr>
 </table>
 
+<br>
+
 ### 디자이너
 <table width = "200" style="text-align:center;" >
   <tr>
@@ -68,9 +80,8 @@
   </tr>
 </table>
 
-## 🐶 Petsitt 둘러보기
-- 사이트 바로가기 : https://petsitt.link/
-- 발표 영상 : 
+<br>
+
 
 ## 🛠 기술스택 ([설명]())
 
@@ -80,6 +91,7 @@ Node.js | 자바스크립트 런타임
 Express | 웹 프레임워크
 MySQL | MySQL
 RDS | 관계형 데이터베이스 서비스
+
 <br>
 
 ## 📖 라이브러리 ([설명]())
@@ -101,6 +113,7 @@ RDS | 관계형 데이터베이스 서비스
 <img src='https://img.shields.io/badge/multer--s3-2.10.0-lightgrey'> | s3에 이미지 업로드
 <img src='https://img.shields.io/badge/nodemailer-6.7.6-lightgrey'> | 메일 전송
 <img src='https://img.shields.io/badge/socket.io-4.5.1-lightgrey'> | 실시간 상호작용
+
 <br>
 
 ## 📂 [Project Notion](https://www.notion.so/62309f0a306b44c494fe560ded17ecff)
@@ -132,6 +145,8 @@ RDS | 관계형 데이터베이스 서비스
 ![](https://img.shields.io/badge/reactquery-ff4154?style=for-the-badge&logo=reactquery&logoColor=black)
 ![](https://img.shields.io/badge/Socket.io-000000?style=for-the-badge&logo=Socket.io&logoColor=white)
 
+<br>
+
 ## ⚒️ BE개발 스택
 ![](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white)
 ![](https://img.shields.io/badge/express-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -141,8 +156,12 @@ RDS | 관계형 데이터베이스 서비스
 ![](https://img.shields.io/badge/amazonaws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white)
 
+<br>
+
 ## 🏗Service Architecture
 ![KakaoTalk_20220802_180108489](https://user-images.githubusercontent.com/75964402/182356945-32fd49ef-c3ce-4e74-8161-dcfdd0b17890.png)
+
+<br>
 
 ## ⚒️ ERD
 <img width="875" alt="Screen Shot 2022-08-02 at 6 15 07 AM" src="https://user-images.githubusercontent.com/104882862/182362019-c9b7b365-c66e-4932-b6e6-cebeda864d97.png">
