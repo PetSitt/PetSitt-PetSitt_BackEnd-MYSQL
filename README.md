@@ -15,6 +15,38 @@
 - 사이트 바로가기 : https://petsitt.link/
 - 발표 영상 : 
 
+## 🛠 기술스택 ([사용이유]())
+
+기술스택 | 설명
+---|:---:
+Node.js | 자바스크립트 런타임
+Express | 웹 프레임워크
+MySQL | MySQL
+RDS | 관계형 데이터베이스 서비스
+<br>
+
+## 📖 라이브러리 ([사용이유]())
+
+라이브러리 | 설명
+---|:---:
+<img src='https://img.shields.io/badge/artillery-1.7.9-lightgrey'> | 서버 부하 테스트
+<img src='https://img.shields.io/badge/bcrypt-5.0.1-lightgrey'> | 비밀번호 암호화
+<img src='https://img.shields.io/badge/cors-2.8.5-lightgrey'> | 교차 리소스 공유
+<img src='https://img.shields.io/badge/dotenv-10.0.0-lightgrey'>  | 환경변수 관리
+<img src='https://img.shields.io/badge/express-4.18.1-lightgrey'> | 웹 프레임워크
+<img src='https://img.shields.io/badge/helmet-4.6.0-lightgrey'>  | HTTP 헤더 보안
+<img src='https://img.shields.io/badge/joi-17.6.0-lightgrey'>  | 입력데이터 검출
+<img src='https://img.shields.io/badge/jsonwebtoken-8.5.1-lightgrey'>  | 토큰 기반 인증
+<img src='https://img.shields.io/badge/moment-2.29.3-lightgrey'> | 날짜 라이브러리
+<img src='https://img.shields.io/badge/mysql-2.18.1-lightgrey'> | MySQL
+<img src='https://img.shields.io/badge/sequelize-6.21.3-lightgrey'>  | MySQL ORM
+<img src='https://img.shields.io/badge/sequelize--cli-6.4.1-lightgrey'> | MySQL ORM Console
+<img src='https://img.shields.io/badge/multer-1.4.5-lts.1-lightgrey'> | 이미지 업로드
+<img src='https://img.shields.io/badge/multer-s3-2.10.0-lightgrey'> | s3에 이미지 업로드
+<img src='https://img.shields.io/badge/nodemailer-6.7.6-lightgrey'> | 메일 전송
+<img src='https://img.shields.io/badge/socket.io-4.5.1-lightgrey'> | 실시간 상호작용
+<br>
+
 ## 🖊 서비스의 주요기능
 
 #### ✅  **실시간 위치 정보 및 지도 (kakao Map API)를 활용한 돌보미 리스트 표기**
