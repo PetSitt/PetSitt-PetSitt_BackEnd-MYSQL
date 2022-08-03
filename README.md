@@ -29,7 +29,6 @@ RDS | 관계형 데이터베이스 서비스
 
 라이브러리 | 설명
 ---|:---:
-<img src='https://img.shields.io/badge/artillery-1.7.9-lightgrey'> | 서버 부하 테스트
 <img src='https://img.shields.io/badge/bcrypt-5.0.1-lightgrey'> | 비밀번호 암호화
 <img src='https://img.shields.io/badge/cors-2.8.5-lightgrey'> | 교차 리소스 공유
 <img src='https://img.shields.io/badge/dotenv-16.0.1-lightgrey'>  | 환경변수 관리
