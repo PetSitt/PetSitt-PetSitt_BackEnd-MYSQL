@@ -1,4 +1,4 @@
-![PetSitt](https://user-images.githubusercontent.com/30254570/181733324-25c5ba55-b010-49d3-9627-65df39ac523f.png)
+https://www.figma.com/file/27G1hnx7F93PF0JWn0hMl2/Diagram---%ED%8E%AB%EC%8B%AF-%EA%B8%B0%ED%9A%8D-%EB%AC%B8%EC%84%9C?node-id=1549%3A2123
 
 
 ## 😃PetSitt 소개
