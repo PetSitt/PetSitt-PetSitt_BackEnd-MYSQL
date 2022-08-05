@@ -140,6 +140,8 @@ function chatSocketRouter(io) {
         lastChatAt: null,
       };
 
+      console.log("new잇음:", newMessage);
+
       // 룸 중에 new가 있으면 true 보냄
       if (newMessage) room_data.newMessage = true;
       res.write(`data: ${JSON.stringify(room_data)}\n\n`);
