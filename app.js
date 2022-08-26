@@ -10,7 +10,6 @@ const reservationRouter = require('./routes/reservations.js');
 const diariesRouter = require('./routes/diaries');
 const detailsRouter = require('./routes/details.js');
 const informationRouter = require('./routes/information.js');
-const chatRouter = require('./routes/chats.js')(io);
 const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -25,6 +24,7 @@ const io = require('socket.io')(server, {
   },
 });
 
+const chatRouter = require('./routes/chats.js')(io);
 
 sequelize
   .sync()
